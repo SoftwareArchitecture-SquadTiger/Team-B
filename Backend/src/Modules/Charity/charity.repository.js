@@ -5,7 +5,7 @@ const getAll = async () => {
 };
 
 const getById = async (id) => {
-    return await Charity.findById(id);
+    return await Charity.findOne({ charity_id: id });
 };
 
 const create = async (charityData) => {
