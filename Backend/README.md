@@ -18,9 +18,9 @@ Make sure you have the following installed on your system:
    - Create a `.env` file and place it in the same directory level as the `src` folder.
    - Populate the `.env` file with the required environment variables.
 
-2. **Navigate to the Backend Folder**
+2. **Navigate to the backend Folder**
    ```bash
-   cd Backend
+   cd backend
 
 3. **Install Dependencies**
    ```bash
