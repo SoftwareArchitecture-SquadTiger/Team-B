@@ -1,0 +1,27 @@
+src/
+├── assets/                # Static assets like images, fonts, or any files used globally.
+├── components/            # Shared components used across multiple modules.
+├── hooks/                 # Shared custom React hooks for reusable logic.
+│   
+├── modules/               # Feature-specific modules for better separation of concerns.
+│   ├── Auth/              # Handles authentication-related functionality.
+│   │   ├── components/    # Components specific to authentication (e.g., LoginForm).
+│   │   ├── hooks/         # Custom hooks specific to authentication logic.
+│   │   ├── pages/         # Pages related to authentication (e.g., LoginPage, RegisterPage).
+│   │   └── services/      # API calls or business logic specific to authentication.
+│   │
+│   ├── Dashboard/         # Handles dashboard functionality.
+│   │   ├── components/    # Components specific to the dashboard (e.g., Sidebar, Header).
+│   │   ├── hooks/         # Custom hooks specific to dashboard-related logic.
+│   │   ├── pages/         # Pages related to the dashboard (e.g., DashboardOverview).
+│   │   └── services/      # API calls or business logic for dashboard features.
+│   │
+│   ├── Projects/          # Manages project-related features (similar subfolders as above).
+│   ├── Settings/          # Handles user or app settings.
+│   ├── Statistics/        # Manages statistics or analytics-related features.
+│   └── Users/             # Handles user management features.
+│   
+├── services/              # Shared services (e.g., global API utilities or helper functions).
+├── state/                 # Global state management (e.g., Redux, Context API).
+├── App.jsx                # Main App component.
+├── main.jsx               # Entry point for the React app.
