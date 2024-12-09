@@ -1,4 +1,4 @@
-import charityService from "./charity.service";
+import charityService from "./charity.service.js";
 
 export const getAllCharities = async (req, res) => {
     try {
