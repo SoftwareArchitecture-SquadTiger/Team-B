@@ -14,11 +14,15 @@ const create = async (charityData) => {
 };
 
 const update = async (id, updateData) => {
-    return await Charity.findByIdAndUpdate(id, updateData, { new: true, runValidators: true });
+    return await Charity.findOneAndUpdate(
+        { charity_id: id }, 
+        updateData,
+        { new: true, runValidators: true }
+    );
 };
 
 const remove = async (id) => {
-    return await Charity.findByIdAndDelete(id);
+    return await Charity.findOneAndDelete({ charity_id: id }); 
 };
 
 export default { getAll, getById, create, update, remove };
