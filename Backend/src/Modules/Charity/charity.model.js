@@ -32,7 +32,7 @@ const charitySchema = new mongoose.Schema(
     },
     tax_code: {
       type: String,
-      required: false, 
+      required: true, 
       trim: true,
     },
     address: {
@@ -60,6 +60,6 @@ const charitySchema = new mongoose.Schema(
   }
 );
 
-const Charity = donorDb.model("Charity", charitySchema);
+const Charity = charityDb.model("Charity", charitySchema);
 
 export default Charity;
