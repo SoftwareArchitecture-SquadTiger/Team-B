@@ -1,4 +1,4 @@
-import { getDbConnection } from '../../Config/dbConnections.js';
+import { getDbConnection } from '../../Config/dbConnection.js';
 import mongoose from 'mongoose';
 import { v4 as uuidv4 } from "uuid";
 import "dotenv/config";
@@ -12,47 +12,60 @@ const charitySchema = new mongoose.Schema(
   {
     charity_id: {
       type: String,
-      default: uuidv4, // Generate UUID
+      default: uuidv4, // Automatically generate a UUID
       unique: true,
       immutable: true,
     },
-    user_id: {
-      type: String,
-      required: true, // Ownership
-    },
-    organization_name: {
+    name: {
       type: String,
       required: true,
       trim: true,
     },
-    organization_type: {
+    email: {
       type: String,
-      required: true,
-      enum: ['Individual', 'Company', 'Non-Profit'], 
+      required: true, 
+      trim: true,
+      unique: true, 
+    },
+    phone: {
+      type: String,
+      required: true, 
+      trim: true,
+    },
+    type: {
+      type: String,
+      required: true, 
+      enum: ["Individual", "Company", "Non-Profit"],
+    },
+    address: {
+      type: {
+        street: { type: String, required: true, trim: true },
+        city: { type: String, required: true, trim: true },
+        state: { type: String, required: true, trim: true },
+        zip: { type: String, required: true, trim: true },
+      },
+      required: true, 
+    },
+    country: {
+      type: String,
+      required: true, 
+      trim: true,
+    },
+    password: {
+      type: String,
+      required: true, 
+      minlength: 8, 
+      select: false, 
     },
     tax_code: {
       type: String,
       required: true, 
       trim: true,
     },
-    address: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    country: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    logo: {
+    img_url: {
       type: String,
       default: null, 
-    },
-    credit_card_info: {
-      type: String,
-      required: false, 
-      select: false, 
+      trim: true,
     },
   },
   {
