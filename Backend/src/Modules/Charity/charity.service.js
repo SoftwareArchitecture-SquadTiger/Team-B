@@ -4,7 +4,7 @@ const getAllCharities = async () => {
     return await charityRepository.getAll();
 };
 
-const getById = async (id) => {
+const getCharityById = async (id) => {
     return await charityRepository.getById(id);
 };
 
@@ -22,7 +22,7 @@ const deleteCharity = async (id) => {
 
 export default { 
     getAllCharities, 
-    getById, 
+    getCharityById, 
     addCharity, 
     updateCharity, 
     deleteCharity 
