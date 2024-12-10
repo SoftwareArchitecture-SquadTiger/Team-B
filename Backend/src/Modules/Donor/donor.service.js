@@ -1,11 +1,29 @@
-import donorRepository from './donor.repository.js'
+import donorRepository from "./donor.repository.js";
 
 const getAllDonors = async () => {
-    return await donorRepository.getAll();
+  return await donorRepository.getAll();
+};
+
+const getDonorById = async (id) => {
+  return await donorRepository.getById(id);
 };
 
 const addDonor = async (donorData) => {
-    return await donorRepository.create(donorData);
-}
+  return await donorRepository.create(donorData);
+};
 
-export default { getAllDonors, addDonor };
+const updateDonor = async (id, donorData) => {
+  return await donorRepository.update(id, donorData);
+};
+
+const deleteDonor = async (id) => {
+  return await donorRepository.remove(id);
+};
+
+export default {
+  getAllDonors,
+  getDonorById,
+  addDonor,
+  updateDonor,
+  deleteDonor,
+};
