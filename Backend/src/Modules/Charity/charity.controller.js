@@ -3,7 +3,7 @@ import charityService from "./charity.service.js";
 export const getAllCharities = async (req, res) => {
   try {
     const charities = await charityService.getAllCharities();
-    res.status(200).json(charities);
+    res.status(200).json({ success: true, data: charities });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Failed to fetch charities" });
@@ -16,7 +16,7 @@ export const getCharityById = async (req, res) => {
     if (!charity) {
       return res.status(404).json({ error: "Charity not found" });
     }
-    res.status(200).json(charity);
+    res.status(200).json({ success: true, data: charity });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Failed to fetch charity" });
@@ -26,7 +26,7 @@ export const getCharityById = async (req, res) => {
 export const addCharity = async (req, res) => {
   try {
     const newCharity = await charityService.addCharity(req.body);
-    res.status(201).json(newCharity);
+    res.status(201).json({ success: true, data: newCharity });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Failed to create charity" });
@@ -42,7 +42,7 @@ export const updateCharity = async (req, res) => {
     if (!updatedCharity) {
       return res.status(404).json({ error: "Charity not found" });
     }
-    res.status(200).json(updatedCharity);
+    res.status(200).json({ success: true, data: updatedCharity });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Failed to update charity" });
