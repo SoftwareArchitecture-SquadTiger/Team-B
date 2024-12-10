@@ -61,11 +61,3 @@ export const deleteCharity = async (req, res) => {
     res.status(500).json({ error: "Failed to delete charity" });
   }
 };
-
-export default {
-  getAllCharities,
-  getCharityById,
-  addCharity,
-  updateCharity,
-  deleteCharity,
-};
