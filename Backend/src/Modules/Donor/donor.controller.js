@@ -43,7 +43,7 @@ export const updateDonor = async (req, res, next) => {
 export const deleteDonor = async (req, res, next) => {
   try {
     await donorService.deleteDonor(req.params.id);
-    res.status(204).json({ success: true, data: {} });
+    res.status(200).json({ success: true, message: "Donor deleted!" });
   } catch (error) {
     next(error);
     res.status(500).json({ success: false, message: "Server Error" });

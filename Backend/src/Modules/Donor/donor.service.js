@@ -5,7 +5,7 @@ const getAllDonors = async () => {
 };
 
 const getDonorById = async (id) => {
-    return await donorRepository.getById(id);
+  return await donorRepository.getById(id);
 };
 
 const addDonor = async (donorData) => {
@@ -17,7 +17,13 @@ const updateDonor = async (id, donorData) => {
 };
 
 const deleteDonor = async (id) => {
-  return await donorRepository.delete(id);
+  return await donorRepository.remove(id);
 };
 
-export default { getAllDonors, getDonorById, addDonor, updateDonor, deleteDonor };
+export default {
+  getAllDonors,
+  getDonorById,
+  addDonor,
+  updateDonor,
+  deleteDonor,
+};

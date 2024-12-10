@@ -20,8 +20,8 @@ const update = async (id, updateData) => {
   });
 };
 
-const deleteDonor = async (id) => {
+const remove = async (id) => {
   return await Donor.findOneAndDelete({ donor_id: id });
 };
 
-export default { getAll, getById, create, update, deleteDonor };
+export default { getAll, getById, create, update, remove };
