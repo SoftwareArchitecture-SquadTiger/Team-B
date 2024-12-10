@@ -10,6 +10,16 @@ export const getAllDonors = async (req, res, next) => {
   }
 };
 
+export const getDonorById = async (req, res, next) => {
+  try {
+    const donor = await donorService.getDonorById(req.params.id);
+    res.status(200).json({ success: true, data: donor });
+  } catch (error) {
+    next(error);
+    res.status(500).json({ success: false, message: "Server Error" });
+  }
+};
+
 export const addDonor = async (req, res, next) => {
   try {
     const donor = await donorService.addDonor(req.body);

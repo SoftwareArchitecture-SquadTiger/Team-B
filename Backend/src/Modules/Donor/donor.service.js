@@ -4,6 +4,10 @@ const getAllDonors = async () => {
   return await donorRepository.getAll();
 };
 
+const getDonorById = async (id) => {
+    return await donorRepository.getById(id);
+};
+
 const addDonor = async (donorData) => {
   return await donorRepository.create(donorData);
 };
@@ -16,4 +20,4 @@ const deleteDonor = async (id) => {
   return await donorRepository.delete(id);
 };
 
-export default { getAllDonors, addDonor, updateDonor, deleteDonor };
+export default { getAllDonors, getDonorById, addDonor, updateDonor, deleteDonor };
