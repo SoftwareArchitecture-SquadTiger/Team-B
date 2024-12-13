@@ -1,0 +1,38 @@
+BackendV2/
+├── kafka/
+│   ├── config/
+│   │   ├── kafkaConfig.js
+│   │   └── topics.js
+│   ├── setupTopics.js
+│   └── index.js
+│
+├── services/
+│   │
+│   ├── donor-service/
+│   │   ├── src/
+│   │   │   ├── events/
+│   │   │   │   ├── producer.js
+│   │   │   │   └── consumer.js
+│   │   │   ├── controllers/
+│   │   │   ├── services/
+│   │   │   ├── models/
+│   │   │   ├── routes/
+│   │   │   ├── index.js
+│   │   ├── Dockerfile          
+│   │   └── package.json
+│   │
+│   └── charity-service/
+│       ├── src/
+│       │   ├── events/
+│       │   │   ├── producer.js
+│       │   │   └── consumer.js
+│       │   ├── controllers/
+│       │   ├── services/
+│       │   ├── models/
+│       │   ├── routes/
+│       │   ├── index.js
+│       ├── Dockerfile          
+│       └── package.json
+│
+├── docker-compose.yml          # Orchestrates all services and Kafka
+└── README.md
