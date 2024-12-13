@@ -1,7 +1,11 @@
 module.exports = {
   content: ['./src/**/*.{js,jsx,ts,tsx}'],
   theme: {
-    extend: {},
+    extend: {
+      colors:{
+        customPink: "FB1465"
+      },
+    },
   },
   plugins: [],
 };

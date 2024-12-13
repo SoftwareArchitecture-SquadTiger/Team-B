@@ -21,6 +21,22 @@ const Users = () => {
     { id: "CHA003", name: "Charity 4", role: "CHARITY", email: "charity4@gmail.com", country: "India", type: "Individual" },
     { id: "CHA004", name: "Charity 5", role: "CHARITY", email: "charity5@gmail.com", country: "Canada", type: "Non-profit" },
     { id: "CHA005", name: "Charity 6", role: "CHARITY", email: "charity6@gmail.com", country: "Italy", type: "Non-profit" },
+    { id: "DOR001", name: "Dornor 2", role: "DORNOR", email: "dornor2@gmail.com", country: "China", type: "-" },
+    { id: "CHA001", name: "Charity 1", role: "CHARITY", email: "charity1@gmail.com", country: "South Africa", type: "Individual" },
+    { id: "CHA001", name: "Charity 2", role: "CHARITY", email: "charity2@gmail.com", country: "Australia", type: "Non-profit" },
+    { id: "DOR002", name: "Dornor 3", role: "DORNOR", email: "dornor3@gmail.com", country: "USA", type: "-" },
+    { id: "CHA002", name: "Charity 3", role: "CHARITY", email: "charity3@gmail.com", country: "UK", type: "Non-profit" },
+    { id: "CHA003", name: "Charity 4", role: "CHARITY", email: "charity4@gmail.com", country: "India", type: "Individual" },
+    { id: "CHA004", name: "Charity 5", role: "CHARITY", email: "charity5@gmail.com", country: "Canada", type: "Non-profit" },
+    { id: "CHA005", name: "Charity 6", role: "CHARITY", email: "charity6@gmail.com", country: "Italy", type: "Non-profit" },
+    { id: "DOR001", name: "Dornor 2", role: "DORNOR", email: "dornor2@gmail.com", country: "China", type: "-" },
+    { id: "CHA001", name: "Charity 1", role: "CHARITY", email: "charity1@gmail.com", country: "South Africa", type: "Individual" },
+    { id: "CHA001", name: "Charity 2", role: "CHARITY", email: "charity2@gmail.com", country: "Australia", type: "Non-profit" },
+    { id: "DOR002", name: "Dornor 3", role: "DORNOR", email: "dornor3@gmail.com", country: "USA", type: "-" },
+    { id: "CHA002", name: "Charity 3", role: "CHARITY", email: "charity3@gmail.com", country: "UK", type: "Non-profit" },
+    { id: "CHA003", name: "Charity 4", role: "CHARITY", email: "charity4@gmail.com", country: "India", type: "Individual" },
+    { id: "CHA004", name: "Charity 5", role: "CHARITY", email: "charity5@gmail.com", country: "Canada", type: "Non-profit" },
+    { id: "CHA005", name: "Charity 6", role: "CHARITY", email: "charity6@gmail.com", country: "Italy", type: "Non-profit" },
   ];
 
   const handleSearch = (e) => {
@@ -73,7 +89,7 @@ const Users = () => {
         <div className="relative">
           <button
             onClick={handleFilterClick}
-            className="px-4 py-2 bg-pink-500 text-white rounded flex items-center gap-2"
+            className="px-4 py-2 bg-white text-pink-500 rounded flex items-center gap-2 border border-pink-500"
           >
             <FilterListIcon /> Filters
           </button>
