@@ -1,10 +1,5 @@
 import React from 'react';
 import { useLocation, Link } from 'react-router-dom';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import BarChartIcon from '@mui/icons-material/BarChart';
-import PeopleIcon from '@mui/icons-material/People';
-import ProjectIcon from '@mui/icons-material/Work';
-import SettingsIcon from '@mui/icons-material/Settings';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 
 function Sidebar() {
@@ -20,31 +15,31 @@ function Sidebar() {
       <ul className="space-y-12">
         <li className={`flex items-center text-xl font-bold cursor-pointer ${isActive('/dashboard') ? 'text-pink-500' : 'text-gray-700 hover:text-pink-500'}`}>
           <Link to="/dashboard" className="flex items-center">
-            <DashboardIcon className="mr-2" />
+
             Dashboard
           </Link>
         </li>
         <li className={`flex items-center text-xl font-bold cursor-pointer ${isActive('/statistics') ? 'text-pink-500' : 'text-gray-700 hover:text-pink-500'}`}>
           <Link to="/statistics" className="flex items-center">
-            <BarChartIcon className="mr-2" />
+
             Statistics
           </Link>
         </li>
         <li className={`flex items-center text-xl font-bold cursor-pointer ${isActive('/users') ? 'text-pink-500' : 'text-gray-700 hover:text-pink-500'}`}>
           <Link to="/users" className="flex items-center">
-            <PeopleIcon className="mr-2" />
+
             Users
           </Link>
         </li>
         <li className={`flex items-center text-xl font-bold cursor-pointer ${isActive('/projects') ? 'text-pink-500' : 'text-gray-700 hover:text-pink-500'}`}>
           <Link to="/projects" className="flex items-center">
-            <ProjectIcon className="mr-2" />
+
             Projects
           </Link>
         </li>
         <li className={`flex items-center text-xl font-bold cursor-pointer ${isActive('/settings') ? 'text-pink-500' : 'text-gray-700 hover:text-pink-500'}`}>
           <Link to="/settings" className="flex items-center">
-            <SettingsIcon className="mr-2" />
+
             Settings
           </Link>
         </li>

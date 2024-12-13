@@ -2,6 +2,7 @@ import React from 'react';
 import Statistics from './components/statistics/Statistics';
 import Settings from './components/settings/Settings.jsx'
 import Dashboard from './components/dashboard/Dashboard.jsx';
+import Users from './components/users/Users.jsx'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './Layout';
 
@@ -44,14 +45,14 @@ function App() {
             </Layout>
           }
         />
-        {/* <Route
-          path="/add-charity"
+        <Route
+          path="/users"
           element={
             <Layout>
-              <AddCharityForm />
+              <Users />
             </Layout>
           }
-        /> */}
+        />
         <Route
           path="/settings"
           element={
