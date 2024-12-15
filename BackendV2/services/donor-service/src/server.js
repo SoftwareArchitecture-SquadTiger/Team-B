@@ -1,9 +1,17 @@
-import app from './app.js';
-import "dotenv/config"
+import { consumeMessages } from './events/consumer.js';
 
-const PORT = process.env.PORT;
+const startService = async () => {
+  try {
+    console.log('Starting donor-service...');
 
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on port ${PORT}`);
-});
+    // Start Kafka consumer
+    await consumeMessages();
 
+    console.log('donor-service is running and consuming Kafka messages');
+  } catch (error) {
+    console.error('Error starting donor-service:', error);
+    process.exit(1); // Exit the process if something goes wrong
+  }
+};
+
+startService();

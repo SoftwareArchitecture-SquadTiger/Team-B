@@ -1,18 +1,18 @@
-const { Kafka } = require('kafkajs');
+import { Kafka } from 'kafkajs';
 
 // Initialize Kafka client
 const kafka = new Kafka({
   clientId: 'donor-service',
-  brokers: ['localhost:9092'], // Update with your broker addresses
+  brokers: ['kafka:9092'], 
 });
 
 const producer = kafka.producer();
 
-const produceMessage = async (message) => {
+export const produceMessage = async (message) => {
   await producer.connect();
   try {
     await producer.send({
-      topic: 'donations',
+      topic: 'donor-response',
       messages: [{ value: JSON.stringify(message) }],
     });
     console.log('Message sent:', message);
@@ -23,5 +23,3 @@ const produceMessage = async (message) => {
   }
 };
 
-// test usage
-// produceMessage({ donorId: '123', charityId: '456', amount: 100 });
