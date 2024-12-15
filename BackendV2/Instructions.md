@@ -2,6 +2,7 @@
 
 ## Requirements
 - Docker and Docker Compose installed.
+- Please make sure that team A ports doesn't have any conflicts with the ports written in PORTS.md
 
 ## How to Run
 1. Navigate to the BackendV2 directory
