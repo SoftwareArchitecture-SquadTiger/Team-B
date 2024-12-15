@@ -1,0 +1,22 @@
+{
+  "name": "donor-microservice",
+    "version": "1.0.0",
+    "description": "Donor Microservice for the charitan project",
+    "main": "src/server.js",
+    "type": "module",
+    "scripts": {
+      "test": "echo \"Error: no test specified\" && exit 1",
+      "dev": "nodemon src/server.js"
+    },
+    "author": "team B",
+    "license": "ISC",
+    "dependencies": {
+      "dotenv": "^16.4.7",
+      "express": "^4.21.2",
+      "mongoose": "^8.8.4",
+      "nodemon": "^3.1.7",
+      "team-b": "file:",
+      "uuid": "^11.0.3"
+    }
+  }
+  
