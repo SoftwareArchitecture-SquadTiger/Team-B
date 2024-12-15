@@ -5,6 +5,7 @@ import StatisticsPage from './components/pages/StatisticsPage';
 import AddCharityForm from './components/pages/AddCharityForm';
 import SystemSettingsPage from './components/pages/SystemSettingsPage';
 import SignInPage from './components/pages/SignInPage';
+import ProjectManagementPage from './components/pages/ProjectManagementPage'; // Import Project Management Page
 
 function App() {
   return (
@@ -43,6 +44,14 @@ function App() {
           element={
             <Layout>
               <StatisticsPage />
+            </Layout>
+          }
+        />
+        <Route
+          path="/projects" // New route for Project Management Page
+          element={
+            <Layout>
+              <ProjectManagementPage />
             </Layout>
           }
         />

@@ -18,8 +18,8 @@ function Sidebar() {
         <FavoriteBorderIcon className="mr-2 text-pink-500" /> Charitan
       </h1>
       <ul className="space-y-12">
-        <li className={`flex items-center text-xl font-bold cursor-pointer ${isActive('/dashboard') ? 'text-pink-500' : 'text-gray-700 hover:text-pink-500'}`}>
-          <Link to="/dashboard" className="flex items-center">
+        <li className={`flex items-center text-xl font-bold cursor-pointer ${isActive('/') ? 'text-pink-500' : 'text-gray-700 hover:text-pink-500'}`}>
+          <Link to="/" className="flex items-center">
             <DashboardIcon className="mr-2" />
             Dashboard
           </Link>
@@ -30,8 +30,8 @@ function Sidebar() {
             Statistics
           </Link>
         </li>
-        <li className={`flex items-center text-xl font-bold cursor-pointer ${isActive('/users') ? 'text-pink-500' : 'text-gray-700 hover:text-pink-500'}`}>
-          <Link to="/users" className="flex items-center">
+        <li className={`flex items-center text-xl font-bold cursor-pointer ${isActive('/add-charity') ? 'text-pink-500' : 'text-gray-700 hover:text-pink-500'}`}>
+          <Link to="/add-charity" className="flex items-center">
             <PeopleIcon className="mr-2" />
             Users
           </Link>
