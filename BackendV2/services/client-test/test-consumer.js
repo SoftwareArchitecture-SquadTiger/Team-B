@@ -5,13 +5,15 @@ const kafka = new Kafka ({
     brokers: ['localhost:9093'],
 });
 
+const topic = 'donor-response'
+
 const consumeMessages = async () => {
     const consumer = kafka.consumer({ groupId: 'test-group' });
     await consumer.connect();
 
-    await consumer.subscribe({ topic: 'donor-response', fromBeginning: true });
+    await consumer.subscribe({ topic: `donor-response`, fromBeginning: true });
 
-    console.log(`Listening for message on: donor-response...`);
+    console.log(`Listening for message on: ${topic}...`);
 
     await consumer.run({
         eachMessage: async ({ topic, partition, message }) => {

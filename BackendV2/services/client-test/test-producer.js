@@ -14,7 +14,7 @@ const produceMessage = async () => {
     };
 
     await producer.send({
-        topic: 'client-topic',
+        topic: 'donor-request',
         messages: [{ value: JSON.stringify(message) }]
     });
 
