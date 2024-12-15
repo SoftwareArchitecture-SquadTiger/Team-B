@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon src/server.js"
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js"
   },
   "author": "team B",
   "license": "ISC",
@@ -14,6 +15,7 @@
     "donor-microservice": "file:",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "kafkajs": "^2.2.4",
     "mongoose": "^8.8.4",
     "nodemon": "^3.1.7",
     "team-b": "file:",
