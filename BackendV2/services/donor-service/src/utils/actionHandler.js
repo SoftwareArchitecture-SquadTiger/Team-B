@@ -1,21 +1,21 @@
-import donorService from '../donor.service.js';
+import donorService from '../donor/service.js';
 
 export const actionHandlers = {
   GET_ALL: async () => {
-    const data = await donorService.getAllDonors();
-    return { status: 'success', data };
+    const donors = await donorService.getAllDonors();
+    return { status: 'success', data: donors.map((donor) => donor.toJSON()) };
   },
   GET_BY_ID: async (data) => {
-    const result = await donorService.getDonorById(data.id);
-    return { status: 'success', data: result };
+    const donor = await donorService.getDonorById(data.id);
+    return { status: 'success', data: donor ? donor.toJSON() : null };
   },
   ADD: async (data) => {
     const newDonor = await donorService.addDonor(data);
-    return { status: 'success', data: newDonor };
+    return { status: 'success', data: newDonor.toJSON() };
   },
   UPDATE: async (data) => {
     const updatedDonor = await donorService.updateDonor(data.id, data.update);
-    return { status: 'success', data: updatedDonor };
+    return { status: 'success', data: updatedDonor.toJSON() };
   },
   DELETE: async (data) => {
     await donorService.deleteDonor(data.id);
