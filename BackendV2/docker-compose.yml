@@ -23,20 +23,3 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     ports:
       - "${KAFKA_PORT}:${KAFKA_PORT}"
-  
-  producer:
-    build:
-      context: ./services/producer
-    depends_on:
-      - kafka
-    environment:
-      KAFKA_BROKER: kafka:9092
-  
-  consumer:
-    build: 
-      context: ./services/consumer
-    depends_on:
-      - kafka
-    environment:
-      KAFKA_BROKER: kafka:9092
-  
