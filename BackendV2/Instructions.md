@@ -1,7 +1,7 @@
 # Kafka Setup
 
 ## Requirements
-- Docker and Docker Compose installed.
+- Docker installed (yes install the official version on their website, as well as the UI).
 - Please make sure that team A ports doesn't have any conflicts with the ports written in PORTS.md
 
 ## How to Run
@@ -19,4 +19,11 @@
     docker-compose logs kafka
 5. List Topics
     ```bash
-    docker exec -it kafka kafka-topics.sh --list --bootstrap-server localhost:9092
+    docker exec -it kafka kafka-topics --list --bootstrap-server localhost:9092
+
+## Another way to check Kafka topics
+1. Open the docker desktop UI
+2. Navigate to the Kafka container
+3. Use this script under Exec tab:
+   ```shell
+   kafka-topics --bootstrap-server kafka:9092 --list
