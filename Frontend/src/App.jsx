@@ -4,6 +4,7 @@ import SettingsPage from './modules/Settings/pages/SettingsPage'
 import DashboardPage from './modules/Dashboard/pages/DashboardPage';
 import UsersPage from './modules/Users/pages/UsersPage'
 import ProjectsPage from './modules/Projects/pages/ProjectsPage'
+import SignInPage from './modules/Auth/pages/SignInPage'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './Layout';
 
@@ -11,8 +12,8 @@ function App() {
   return (
     <Router>
       <Routes>
-        {/* Sign-In Page (Without Layout)
-        <Route path="/signin" element={<SignInPage />} /> */}
+        {/* Sign-In Page (Without Layout)*/
+        <Route path="/signin" element={<SignInPage />} /> }
 
         {/* Other Pages (With Layout) */}
         <Route

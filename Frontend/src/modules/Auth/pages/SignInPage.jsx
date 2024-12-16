@@ -1,9 +1,9 @@
 import React from "react";
-import FormField from "./FormField";
-import ForgotPasswordButton from "./ForgotPasswordButton";
-import SubmitButton from "./SubmitButton";
-import SignupPrompt from "./SignupPrompt";
-import BackgroundImage from "./BackgroundImage";
+import FormField from "../components/FormField";
+import ForgotPasswordButton from "../components/ForgotPasswordButton";
+import SubmitButton from "../components/SubmitButton";
+import SignupPrompt from "../components/SignupPrompt";
+import BackgroundImage from "../components/BackgroundImage";
 
 const SignInPage = () => {
   return (
