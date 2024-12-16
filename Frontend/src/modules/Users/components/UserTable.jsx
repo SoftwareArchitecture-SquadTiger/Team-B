@@ -1,7 +1,7 @@
 import React from "react";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
-const UserTable = ({ users }) => (
+const UserTable = ({ users, onDelete }) => (
   <table className="w-full border-collapse mb-4">
     <thead>
       <tr className="bg-gray-200">
@@ -24,7 +24,10 @@ const UserTable = ({ users }) => (
           <td className="border border-gray-300 p-2">{user.country}</td>
           <td className="border border-gray-300 p-2">{user.type}</td>
           <td className="border border-gray-300 p-2">
-            <button className="text-red-500">
+            <button
+              className="text-red-500"
+              onClick={() => onDelete(user.id)} // Pass user ID to handleDelete
+            >
               <DeleteOutlineIcon />
             </button>
           </td>

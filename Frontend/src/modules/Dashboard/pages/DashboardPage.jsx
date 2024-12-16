@@ -1,12 +1,15 @@
 import React from "react";
 import ProjectTable from "../../Projects/components/Dashboard/ProjectTable";
-import DonationAmountChart from "../../Statistics/components/StatisticsDashboard/DonationAmountChart";
+import StatisticsDonationAmount from "../../Statistics/components/StatisticsDashboard/StatisticsDonationAmount"
 import StatisticsPieChartForCategory from "../../Statistics/components/StatisticsPieChart/Category";
 import StatisticsPieChartForCountry from "../../Statistics/components/StatisticsPieChart/Country";
 
 const Dashboard = () => {
   return (
     <div className="flex flex-col flex-1 bg-gray-50 p-6">
+                  <div className="flex justify-between items-center mb-6 p-6">
+                <h2 className="text-2xl font-semibold text-gray-800">Dashboard</h2>
+            </div>
 
       {/* Top Section: Cards and Donation Chart */}
       <div className="flex justify-between mb-8">
@@ -30,7 +33,7 @@ const Dashboard = () => {
         {/* Donation Chart */}
         <div className="bg-white rounded-lg shadow-md p-4 flex-1 ml-8">
           <h3 className="text-lg font-medium text-gray-600 mb-4">Donation Amount</h3>
-          <DonationAmountChart />
+          <StatisticsDonationAmount />
         </div>
       </div>
 
