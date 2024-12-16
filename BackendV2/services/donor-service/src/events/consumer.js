@@ -28,10 +28,10 @@ export const consumeMessages = async () => {
       const response = await withErrorHandling(actionHandler, incomingMessage.data);
 
       // Produce the response message back to Kafka
-      await produceMessage('donor-response', {
+      await produceMessage('donor-response', JSON.parse(JSON.stringify({
         action: incomingMessage.action,
         ...response, // Spread the response to include status, data, or error
-      });
+      })));
     },
   });
 };

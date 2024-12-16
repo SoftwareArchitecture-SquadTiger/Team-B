@@ -18,7 +18,7 @@ const produceMessage = async () => {
         messages: [{ value: JSON.stringify(message) }]
     });
 
-    console.log(`Message sent: ${message}`);
+    console.log(`Message sent: ${message.action}`);
     await producer.disconnect();
 };
 

@@ -16,9 +16,10 @@ export const produceMessage = async (topic, message) => {
       topic: topic,
       messages: [{ value: JSON.stringify(message) }],
     });
-    console.log(`Message sent to topic "${topic}":`, message);
+    console.log(`Message sent to topic "${topic}":`, JSON.stringify(message, null, 2)); // Stringify here for better logging
   } finally {
     await producer.disconnect();
   }
 };
+
 
