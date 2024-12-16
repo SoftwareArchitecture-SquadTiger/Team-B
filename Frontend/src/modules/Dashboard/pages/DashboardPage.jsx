@@ -38,12 +38,12 @@ const Dashboard = () => {
       </div>
 
       {/* Bottom Section: Pie Charts */}
-      <div className="flex justify-between mb-8 ">        
+      <div className="flex  ">        
         {/* Project Table */}
-        <div className="bg-white shadow-md rounded-lg p-6 w-1/2">
+        <div className="bg-white shadow-md rounded-lg p-6 w-1/3">
           <ProjectTable />
         </div>
-        <div className="flex bg-white shadow-md rounded-lg p-6 w-1/2">
+        <div className="flex bg-white shadow-md rounded-lg p-6 w-min">
           <StatisticsPieChartForCategory />
           <StatisticsPieChartForCountry />
         </div>
