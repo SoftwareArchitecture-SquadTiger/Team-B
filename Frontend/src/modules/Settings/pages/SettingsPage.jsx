@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import ThemeToggle from "./ThemeToggle";
-import LanguageSelector from "./LanguageSelector";
-import SettingsHeader from "./SettingsHeader";
+import ThemeToggle from "../components/ThemeToggle";
+import LanguageSelector from "../components/LanguageSelector";
+import SettingsHeader from "../components/SettingsHeader";
 
 function SettingsPage() {
   const [darkMode, setDarkMode] = useState(false); // State for theme toggle
