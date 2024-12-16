@@ -30,6 +30,7 @@ export const consumeMessages = async () => {
       // Produce the response message back to Kafka
       await produceMessage('donor-response', JSON.parse(JSON.stringify({
         action: incomingMessage.action,
+        correlationId: incomingMessage.correlationId,
         ...response, // Spread the response to include status, data, or error
       })));
     },
