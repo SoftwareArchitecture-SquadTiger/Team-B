@@ -3,7 +3,7 @@ import donorService from '../donor/service.js';
 export const actionHandlers = {
   GET_ALL: async () => {
     const donors = await donorService.getAllDonors();
-    return { status: 'success', data: donors.map((donor) => donor.toJSON()) };
+    return { status: 'success', data: donors };
   },
   GET_BY_ID: async (data) => {
     const donor = await donorService.getDonorById(data.id);

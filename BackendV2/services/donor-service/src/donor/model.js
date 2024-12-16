@@ -61,13 +61,6 @@ const donorSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-    toJson: {
-      virtuals: true, 
-      transform: (doc, ret) => {
-        delete ret.__v; 
-        return ret; 
-      },
-    },
   }
 );
 
