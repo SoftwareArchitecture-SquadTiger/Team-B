@@ -1,29 +1,63 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import ProtectedRoutes from "./utils/ProtectedRoutes.jsx";
-
-import Dashboard from "./modules/Dashboard/pages/DashboardPage.jsx";
-import Login from "./modules/Auth/pages/LoginPage.jsx";
-import Projects from "./modules/Projects/pages/ProjectsPage.jsx";
-import Settings from "./modules/Settings/pages/SettingsPage.jsx";
-import Statistics from "./modules/Statistics/pages/StatisticsPage.jsx";
-import Users from "./modules/Users/pages/UsersPage.jsx";
+import React from 'react';
+import StatisticsPage from './modules/Statistics/pages/StatisticsPage';
+import SettingsPage from './modules/Settings/pages/SettingsPage'
+import DashboardPage from './modules/Dashboard/pages/DashboardPage';
+import UsersPage from './modules/Users/pages/UsersPage'
+import ProjectsPage from './modules/Projects/pages/ProjectsPage'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Layout from './Layout';
 
 function App() {
   return (
-    <BrowserRouter>
+    <Router>
       <Routes>
-        <Route element={<Login />} path="/login" />
+        {/* Sign-In Page (Without Layout)
+        <Route path="/signin" element={<SignInPage />} /> */}
 
-        <Route element={<ProtectedRoutes />}>
-          <Route element={<Dashboard />} path="/" />
-          <Route element={<Projects />} path="/projects" />
-          <Route element={<Settings />} path="/settings" />
-          <Route element={<Statistics />} path="/statistics" />
-          <Route element={<Users />} path="/users" />
-        </Route>
+        {/* Other Pages (With Layout) */}
+        <Route
+          path="/dashboard"
+          element={
+            <Layout>
+              <DashboardPage />
+            </Layout>
+          }
+        />
+        <Route
+          path="/users"
+          element={
+            <Layout>
+              <UsersPage />
+            </Layout>
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            <Layout>
+              <SettingsPage />
+            </Layout>
+          }
+        />
+        <Route
+          path="/statistics"
+          element={
+            <Layout>
+              <StatisticsPage />
+            </Layout>
+          }
+        />
+        <Route
+          path="/projects"
+          element={
+            <Layout>
+              <ProjectsPage />
+            </Layout>
+          }
+        />
       </Routes>
-    </BrowserRouter>
+    </Router>
   );
-};
+}
 
 export default App;
