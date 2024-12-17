@@ -1,6 +1,6 @@
-const { Kafka } = require('kafkajs');
-const { handleEncryptResponse } = require('../services/tokenService');
-const { handleRegisterRequest, handleLoginRequest, finalizeTokenCreation } = require('../handlers/messageHandlers');
+import { Kafka } from 'kafkajs';
+import { handleEncryptResponse } from '../tokenService.js';
+import { handleRegisterRequest, handleLoginRequest, finalizeTokenCreation } from '../messageHandler.js';
 
 const kafka = new Kafka({
   clientId: 'auth-service',
@@ -16,12 +16,11 @@ async function startConsumer() {
   await consumer.subscribe({ topic: 'login-request', fromBeginning: false });
   await consumer.subscribe({ topic: 'auth-request', fromBeginning: false });
   await consumer.subscribe({ topic: 'key-response', fromBeginning: false });
-  await consumer.subscribe({ topic: 'encrypt-response', fromBeginning: false }); // New subscription
+  await consumer.subscribe({ topic: 'encrypt-response', fromBeginning: false });
 
   await consumer.run({
     eachMessage: async ({ topic, partition, message }) => {
       const msg = JSON.parse(message.value.toString());
-
       try {
         switch (topic) {
           case 'register-request':
@@ -31,13 +30,12 @@ async function startConsumer() {
             await handleLoginRequest(msg);
             break;
           case 'auth-request':
-            await handleLoginRequest(msg); // Similar logic as login
+            await handleLoginRequest(msg);
             break;
           case 'key-response':
             await finalizeTokenCreation(msg);
             break;
           case 'encrypt-response':
-            // { correlationId, jwe }
             handleEncryptResponse(msg);
             break;
         }
@@ -48,4 +46,4 @@ async function startConsumer() {
   });
 }
 
-module.exports = { startConsumer };
+export { startConsumer };

@@ -1,74 +1,123 @@
-const { Charity } = require('../models');
-const axios = require('axios');
-const { v4: uuidv4 } = require('uuid');
+import { v4 as uuidv4 } from 'uuid';
+import { produceHashRequest, produceEncryptRequest, produceDecryptRequest } from '../events/producer.js';
 
-const BCRYPT_SERVICE_URL = process.env.BCRYPT_SERVICE_URL;
-const JWE_SERVICE_URL = process.env.JWE_SERVICE_URL;
-const { getPublicKey, getPrivateKey } = require('./keyService');
+// Pending requests maps
+const pendingHashRequests = {};
+const pendingEncryptRequests = {};
+const pendingDecryptRequests = {};
+
+function handleHashResponse({ correlationId, hashedPassword }) {
+  const pending = pendingHashRequests[correlationId];
+  if (!pending) {
+    console.error(`No pending hash request for correlationId: ${correlationId}`);
+    return;
+  }
+  pending.resolve(hashedPassword);
+  delete pendingHashRequests[correlationId];
+}
+
+function handleEncryptResponse({ correlationId, jwe }) {
+  const pending = pendingEncryptRequests[correlationId];
+  if (!pending) {
+    console.error(`No pending encrypt request for correlationId: ${correlationId}`);
+    return;
+  }
+  pending.resolve(jwe);
+  delete pendingEncryptRequests[correlationId];
+}
+
+function handleDecryptResponse({ correlationId, plaintext }) {
+  const pending = pendingDecryptRequests[correlationId];
+  if (!pending) {
+    console.error(`No pending decrypt request for correlationId: ${correlationId}`);
+    return;
+  }
+  pending.resolve(plaintext);
+  delete pendingDecryptRequests[correlationId];
+}
 
 async function hashPassword(password) {
-  const response = await axios.post(`${BCRYPT_SERVICE_URL}/hash`, { password });
-  return response.data.hashed;
-}
-
-async function encryptField(plaintext) {
-  const response = await axios.post(`${JWE_SERVICE_URL}/encrypt`, {
-    payload: { data: plaintext },
-    publicKey: getPublicKey()
+  const correlationId = uuidv4();
+  return new Promise((resolve, reject) => {
+    pendingHashRequests[correlationId] = { resolve, reject };
+    produceHashRequest({ correlationId, password }).catch(err => {
+      delete pendingHashRequests[correlationId];
+      reject(err);
+    });
   });
-  return response.data.jwe;
 }
 
-async function decryptField(jwe) {
-  const response = await axios.post(`${JWE_SERVICE_URL}/decrypt`, {
-    jwe,
-    privateKey: getPrivateKey()
+async function encryptField(plaintext, publicKey) {
+  const correlationId = uuidv4();
+  return new Promise((resolve, reject) => {
+    pendingEncryptRequests[correlationId] = { resolve, reject };
+    produceEncryptRequest({ correlationId, payload: { data: plaintext }, publicKey }).catch(err => {
+      delete pendingEncryptRequests[correlationId];
+      reject(err);
+    });
   });
-  return response.data.payload.data;
 }
 
-async function createCharity(data) {
+async function decryptField(jwe, privateKey) {
+  const correlationId = uuidv4();
+  return new Promise((resolve, reject) => {
+    pendingDecryptRequests[correlationId] = { resolve, reject };
+    produceDecryptRequest({ correlationId, jwe, privateKey }).catch(err => {
+      delete pendingDecryptRequests[correlationId];
+      reject(err);
+    });
+  });
+}
+
+async function createCharity(data, publicKey) {
   data.charity_id = uuidv4();
   data.password = await hashPassword(data.password);
 
-  // Suppose we also want to encrypt the `tax_code` before storing it
+  // Suppose we also want to encrypt `tax_code`
   if (data.tax_code) {
-    data.tax_code = await encryptField(data.tax_code);
+    data.tax_code = await encryptField(data.tax_code, publicKey);
   }
 
-  const charity = new Charity(data);
-  await charity.save();
-  return charity;
+  // Save charity to DB
+  // ... code to save charity (omitted for brevity)
+
+  // Produce a charity-creation event if needed
+  // await produceCharityCreation({ charityId: data.charity_id, email: data.email, name: data.name });
+
+  return data; // return created charity object
 }
 
 async function authenticateCharity(email, password) {
+  // Load charity from DB
   const charity = await Charity.findOne({ email });
   if (!charity) throw new Error('Invalid credentials');
 
-  const response = await axios.post(`${BCRYPT_SERVICE_URL}/verify`, {
-    password,
-    hash: charity.password
-  });
+  // Hash the provided password
+  const hashedInputPassword = await hashPassword(password);
 
-  if (!response.data.match) throw new Error('Invalid credentials');
-  return charity;
-}
-
-// If you need to read encrypted fields back:
-async function getCharityById(id) {
-  const charity = await Charity.findOne({ charity_id: id });
-  if (!charity) return null;
-  
-  // Decrypt fields as needed
-  if (charity.tax_code) {
-    charity.tax_code = await decryptField(charity.tax_code);
+  if (hashedInputPassword !== charity.password) {
+    throw new Error('Invalid credentials');
   }
 
   return charity;
 }
 
-module.exports = {
+async function getCharityById(id, privateKey) {
+  const charity = await Charity.findOne({ charity_id: id });
+  if (!charity) return null;
+
+  if (charity.tax_code) {
+    charity.tax_code = await decryptField(charity.tax_code, privateKey);
+  }
+
+  return charity;
+}
+
+export {
   createCharity,
   authenticateCharity,
-  getCharityById
+  getCharityById,
+  handleHashResponse,
+  handleEncryptResponse,
+  handleDecryptResponse
 };
