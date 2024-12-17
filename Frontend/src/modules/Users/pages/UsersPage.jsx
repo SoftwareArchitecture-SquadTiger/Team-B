@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom"; // Import useNavigate
 import SearchBar from "../components/SearchBar";
 import FilterUser from "../components/FilterUser";
@@ -14,28 +14,36 @@ const UsersPage = () => {
 
   const navigate = useNavigate(); // Initialize useNavigate
 
-  const [users, setUsers] = useState([
-    { id: "ADM001", name: "Admin", role: "ADMIN", email: "admin@gmail.com", country: "Vietnam", type: "-" },
-    { id: "DOR001", name: "Dornor 1", role: "DORNOR", email: "dornor1@gmail.com", country: "Germany", type: "-" },
-    { id: "DOR002", name: "Dornor 3", role: "DORNOR", email: "dornor3@gmail.com", country: "USA", type: "-" },
-    { id: "CHA001", name: "Charity 1", role: "CHARITY", email: "charity1@gmail.com", country: "South Africa", type: "Individual" },
-    { id: "CHA002", name: "Charity 2", role: "CHARITY", email: "charity2@gmail.com", country: "Australia", type: "Non-profit" },
-    { id: "ADM001", name: "Admin", role: "ADMIN", email: "admin@gmail.com", country: "Vietnam", type: "-" },
-    { id: "DOR001", name: "Dornor 1", role: "DORNOR", email: "dornor1@gmail.com", country: "Germany", type: "-" },
-    { id: "DOR002", name: "Dornor 3", role: "DORNOR", email: "dornor3@gmail.com", country: "USA", type: "-" },
-    { id: "CHA001", name: "Charity 1", role: "CHARITY", email: "charity1@gmail.com", country: "South Africa", type: "Individual" },
-    { id: "CHA002", name: "Charity 2", role: "CHARITY", email: "charity2@gmail.com", country: "Australia", type: "Non-profit" },
-    { id: "ADM001", name: "Admin", role: "ADMIN", email: "admin@gmail.com", country: "Vietnam", type: "-" },
-    { id: "DOR001", name: "Dornor 1", role: "DORNOR", email: "dornor1@gmail.com", country: "Germany", type: "-" },
-    { id: "DOR002", name: "Dornor 3", role: "DORNOR", email: "dornor3@gmail.com", country: "USA", type: "-" },
-    { id: "CHA001", name: "Charity 1", role: "CHARITY", email: "charity1@gmail.com", country: "South Africa", type: "Individual" },
-    { id: "CHA002", name: "Charity 2", role: "CHARITY", email: "charity2@gmail.com", country: "Australia", type: "Non-profit" },
-    { id: "ADM001", name: "Admin", role: "ADMIN", email: "admin@gmail.com", country: "Vietnam", type: "-" },
-    { id: "DOR001", name: "Dornor 1", role: "DORNOR", email: "dornor1@gmail.com", country: "Germany", type: "-" },
-    { id: "DOR002", name: "Dornor 3", role: "DORNOR", email: "dornor3@gmail.com", country: "USA", type: "-" },
-    { id: "CHA001", name: "Charity 1", role: "CHARITY", email: "charity1@gmail.com", country: "South Africa", type: "Individual" },
-    { id: "CHA002", name: "Charity 2", role: "CHARITY", email: "charity2@gmail.com", country: "Australia", type: "Non-profit" },
-  ]);
+  const [users, setUsers] = useState([]);
+
+  // Fetch data from backend
+  useEffect(() => {
+    const fetchDonors = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/donors/all"); // Adjust your API URL
+        if (!response.ok) {
+          throw new Error("Failed to fetch donors");
+        }
+        const data = await response.json();
+        
+        // Transform donor data into required format
+        const formattedData = data.data.map((donor) => ({
+          id: donor.donor_id,
+          name: `${donor.first_name} ${donor.last_name}`,
+          role: "DORNOR", // Static role
+          email: donor.email,
+          country: donor.country,
+          type: "-", // Type empty as per requirement
+        }));
+
+        setUsers(formattedData);
+      } catch (error) {
+        console.error("Error fetching donors:", error);
+      }
+    };
+
+    fetchDonors();
+  }, []);
 
   const filteredUsers = users.filter((user) => {
     const matchesSearch =
