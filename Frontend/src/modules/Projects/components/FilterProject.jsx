@@ -12,7 +12,7 @@ const FilterProject = ({ showDropdown, onFilterClick, onSelectStatus }) => (
     {showDropdown && (
       <div className="absolute top-full mt-2 left-0 bg-white border border-gray-300 rounded shadow-lg z-10">
         <div className="px-4 py-2 font-bold mt-2">Filter by Status</div>
-        {["All", "Pending", "Running", "Halted"].map((status) => (
+        {["All", "Pending", "Running", "Halted","Completed"].map((status) => (
           <div
             key={status}
             className="px-4 py-2 cursor-pointer hover:bg-gray-100"

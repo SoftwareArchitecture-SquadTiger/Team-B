@@ -1,12 +1,12 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import ProjectTitleInput from "./ProjectTitleInput";
-import ProjectCategoryInput from "./ProjectCategoryInput";
-import CountrySelector from "./CountrySelector";
-import FundingGoalInput from "./FundingGoalInput";
-import ProjectDescription from "./ProjectDescription";
-import FileUpload from "./FileUpload";
-import FormButtons from "./FormButtons";
+import ProjectTitleInput from "../components/ProjectTitleInput";
+import ProjectCategoryInput from "../components/ProjectCategoryInput";
+import CountrySelector from "../components/CountrySelector";
+import FundingGoalInput from "../components/FundingGoalInput";
+import ProjectDescription from "../components/ProjectDescription";
+import FileUpload from "../components/FileUpload";
+import FormButtons from "../components/FormButtons";
 
 const AddProjectForm = () => {
   const navigate = useNavigate();

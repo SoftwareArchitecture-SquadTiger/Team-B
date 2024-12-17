@@ -10,6 +10,8 @@ const ProjectTable = ({ projects, onDelete, onStatusChange }) => {
         return "text-green-500";
       case "Halted":
         return "text-red-500";
+      case "Completed":
+        return "text-blue-800"; // Navy color for Completed status
       default:
         return "text-gray-500";
     }
@@ -47,6 +49,7 @@ const ProjectTable = ({ projects, onDelete, onStatusChange }) => {
                 <option value="Pending">Pending</option>
                 <option value="Running">Running</option>
                 <option value="Halted">Halted</option>
+                <option value="Completed">Completed</option>
               </select>
             </td>
             <td className="border border-gray-300 p-2">

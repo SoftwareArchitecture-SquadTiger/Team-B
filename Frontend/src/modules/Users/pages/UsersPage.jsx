@@ -4,12 +4,16 @@ import FilterUser from "../components/FilterUser";
 import AddUser from "../components/AddUser";
 import UserTable from "../components/UserTable";
 import Pagination from "../components/Pagination";
+import { useNavigate } from "react-router-dom";
+
 
 const UsersPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedRole, setSelectedRole] = useState("");
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+  const navigate = useNavigate();
+
 
   const users = [
     { id: "ADM001", name: "Admin", role: "ADMIN", email: "admin@gmail.com", country: "Vietnam", type: "-" },
@@ -71,7 +75,7 @@ const UsersPage = () => {
             setShowFilterDropdown(false);
           }}
         />
-        <AddUser onAdd={() => alert("Add user functionality")} />
+        <AddUser onAdd={() => navigate("/add-user")} />
       </div>
 
       <UserTable users={paginatedUsers} />

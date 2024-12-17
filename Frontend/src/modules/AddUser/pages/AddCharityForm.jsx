@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import AvatarUpload from "./AvatarUpload";
-import FormInput from "./FormInput";
-import CountrySelector from "./CountrySelector";
-import UserTypeSelector from "./UserTypeSelector";
-import SuccessModal from "./SuccessModal";
+import AvatarUpload from "../components/AvatarUpload";
+import FormInput from "../components/FormInput";
+import CountrySelector from "../components/CountrySelector";
+import UserTypeSelector from "../components/UserTypeSelector";
+import SuccessModal from "../components/SuccessModal";
 
 function AddCharityForm() {
   const [image, setImage] = useState(null);

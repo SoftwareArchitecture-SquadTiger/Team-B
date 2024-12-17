@@ -5,6 +5,8 @@ import DashboardPage from './modules/Dashboard/pages/DashboardPage';
 import UsersPage from './modules/Users/pages/UsersPage'
 import ProjectsPage from './modules/Projects/pages/ProjectsPage'
 import SignInPage from './modules/Auth/pages/SignInPage'
+import AddProjectForm from './modules/AddProject/pages/AddProjectForm'
+import AddCharityForm from './modules/AddUser/pages/AddCharityForm'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './Layout';
 
@@ -65,6 +67,23 @@ function App() {
             </Layout>
           }
         />
+        <Route
+          path="/add-project"
+          element={
+            <Layout>
+              <AddProjectForm />
+            </Layout>
+          }
+        /> 
+        
+        <Route
+          path="/add-user"
+          element={
+            <Layout>
+              <AddCharityForm />
+            </Layout>
+          }
+        /> 
       </Routes>
     </Router>
   );
