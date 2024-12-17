@@ -1,4 +1,4 @@
-import Charity from "./charity.model.js";
+import Charity from "./model.js";
 
 const getAll = async () => {
   return await Charity.find({});

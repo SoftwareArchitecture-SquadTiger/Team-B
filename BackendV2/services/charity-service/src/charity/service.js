@@ -1,4 +1,4 @@
-import charityRepository from "./charity.repository.js";
+import charityRepository from "./repository.js";
 
 const getAllCharities = async () => {
     return await charityRepository.getAll();
