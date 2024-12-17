@@ -11,7 +11,6 @@ async function startProducer() {
 }
 
 async function produceEncryptRequest(msg) {
-  // msg = { correlationId, jws, publicKey }
   await producer.send({
     topic: 'encrypt-request',
     messages: [{ value: JSON.stringify(msg) }]
