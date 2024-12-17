@@ -15,12 +15,12 @@ const UsersPage = () => {
   const navigate = useNavigate(); // Initialize useNavigate
 
   const [users, setUsers] = useState([]);
-
+  const url = `http://${import.meta.env.VITE_HOST}:${import.meta.env.VITE_PORT}`;
   // Fetch data from backend
   useEffect(() => {
     const fetchDonors = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/donors/all"); // Adjust your API URL
+        const response = await fetch(`${url}/admin-server/donors`); // Adjust your API URL
         if (!response.ok) {
           throw new Error("Failed to fetch donors");
         }
@@ -30,10 +30,10 @@ const UsersPage = () => {
         const formattedData = data.data.map((donor) => ({
           id: donor.donor_id,
           name: `${donor.first_name} ${donor.last_name}`,
-          role: "DORNOR", // Static role
+          role: "DORNOR",
           email: donor.email,
           country: donor.country,
-          type: "-", // Type empty as per requirement
+          type: "", //Because donor doesnt have the organization type
         }));
 
         setUsers(formattedData);
