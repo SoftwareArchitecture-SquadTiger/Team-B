@@ -1,7 +1,7 @@
 import React from "react";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
-const ProjectTable = ({ projects, onDelete }) => {
+const ProjectTable = ({ projects, onDelete, onStatusChange }) => {
   const getStatusClass = (status) => {
     switch (status) {
       case "Pending":
@@ -38,10 +38,23 @@ const ProjectTable = ({ projects, onDelete }) => {
             <td className="border border-gray-300 p-2">{project.start}</td>
             <td className="border border-gray-300 p-2">{project.expired}</td>
             <td className={`border border-gray-300 p-2 font-semibold ${getStatusClass(project.status)}`}>
-              {project.status}
+              {/* Status Dropdown */}
+              <select
+                value={project.status}
+                onChange={(e) => onStatusChange(project.id, e.target.value)}
+                className="border rounded p-1"
+              >
+                <option value="Pending">Pending</option>
+                <option value="Running">Running</option>
+                <option value="Halted">Halted</option>
+              </select>
             </td>
             <td className="border border-gray-300 p-2">
-              <button onClick={() => onDelete(project.id)} className="text-red-500">
+              {/* Trash Icon for Delete */}
+              <button
+                onClick={() => onDelete(project.id)}
+                className="text-red-500 hover:text-red-700"
+              >
                 <DeleteOutlineIcon />
               </button>
             </td>
