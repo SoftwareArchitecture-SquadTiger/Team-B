@@ -33,6 +33,15 @@ function App() {
           }
         />
         <Route
+          path="/"
+          element={
+            <Layout>
+              <SettingsPage />
+            </Layout>
+          }
+        />
+
+        <Route
           path="/settings"
           element={
             <Layout>
