@@ -29,7 +29,7 @@ const ProjectManagementPage = () => {
     { id: "PRO010", charity: "Charity 10", scale: "Regional", goal: "$6000", start: "20-Nov-2024", expired: "20-Nov-2024", status: "Running" },
   ]);
 
-  const projectsPerPage = 5;
+  const projectsPerPage = 10;
   const navigate = useNavigate();
 
   // Filter projects based on search query and selected status
