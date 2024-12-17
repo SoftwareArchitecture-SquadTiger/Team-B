@@ -11,7 +11,7 @@ const ProjectTable = ({ projects, onDelete, onStatusChange }) => {
       case "Halted":
         return "text-red-500";
       case "Completed":
-        return "text-blue-800"; // Navy color for Completed status
+        return "text-blue-800"; 
       default:
         return "text-gray-500";
     }

@@ -10,9 +10,11 @@ function Sidebar() {
   return (
     <div className="w-1/5 min-h-screen fixed top-0 left-0 bg-gray-100 p-4 overflow-y-auto shadow-md">
       {/* Logo Section */}
-      <h1 className="text-black text-2xl font-bold mb-14 flex items-center">
-        <FavoriteBorderIcon className="mr-2 text-pink-500" /> Charitan
-      </h1>
+      <Link to="/dashboard">
+        <h1 className="text-black text-2xl font-bold mb-14 flex items-center cursor-pointer">
+          <FavoriteBorderIcon className="mr-2 text-pink-500" /> Charitan
+        </h1>
+      </Link>
 
       {/* Menu Items */}
       <ul className="space-y-12">

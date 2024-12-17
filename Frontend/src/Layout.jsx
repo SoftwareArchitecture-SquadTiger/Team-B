@@ -1,5 +1,6 @@
 import React from 'react';
 import Sidebar from './components/SideBar';
+import { Link } from 'react-router-dom';
 
 function Layout({ children }) {
   return (
@@ -16,11 +17,13 @@ function Layout({ children }) {
           {/* Admin Info - Aligned to the far right */}
           <div className="flex items-center space-x-4">
             <span className="text-gray-800 font-medium">Hi, Admin</span>
-            <img
-              src="https://static.vecteezy.com/system/resources/thumbnails/005/346/410/small_2x/close-up-portrait-of-smiling-handsome-young-caucasian-man-face-looking-at-camera-on-isolated-light-gray-studio-background-photo.jpg"
-              alt="Admin Avatar"
-              className="w-10 h-10 rounded-full border border-gray-300"
-            />
+            <Link to="/settings">
+              <img
+                src="https://static.vecteezy.com/system/resources/thumbnails/005/346/410/small_2x/close-up-portrait-of-smiling-handsome-young-caucasian-man-face-looking-at-camera-on-isolated-light-gray-studio-background-photo.jpg"
+                alt="Admin Avatar"
+                className="w-10 h-10 rounded-full border border-gray-300 cursor-pointer"
+              />
+            </Link>
           </div>
         </div>
 
