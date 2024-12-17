@@ -1,4 +1,4 @@
-import donorRepository from "./donor.repository.js";
+import donorRepository from "./repository.js";
 
 const getAllDonors = async () => {
   return await donorRepository.getAll();

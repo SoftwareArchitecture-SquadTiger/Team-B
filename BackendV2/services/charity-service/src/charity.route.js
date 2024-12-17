@@ -5,10 +5,9 @@ import {
     addCharity,
     updateCharity,
     deleteCharity,
-} from '../Modules/Charity/charity.controller.js';
+} from './charity.controller.js';
 
 const router = express.Router();
-
 router.get('/all', getAllCharities);        // GET all charities
 router.get('/:id', getCharityById);         // GET a specific charity by ID
 router.post('/create', addCharity);         // POST (create) a new charity

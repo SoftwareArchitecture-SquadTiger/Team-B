@@ -1,7 +1,7 @@
 {
-  "name": "team-b",
+  "name": "statistic-service",
   "version": "1.0.0",
-  "description": "Admin application for the charitan project",
+  "description": "Donor Microservice for the charitan project",
   "main": "src/server.js",
   "type": "module",
   "scripts": {
@@ -15,6 +15,7 @@
     "express": "^4.21.2",
     "mongoose": "^8.8.4",
     "nodemon": "^3.1.7",
+    "statistic-service": "file:",
     "team-b": "file:",
     "uuid": "^11.0.3"
   }
