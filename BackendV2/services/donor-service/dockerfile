@@ -5,20 +5,13 @@ FROM node:23
 WORKDIR /usr/src/app
 
 # Copy package files to the container
-COPY package*.json ./
+COPY package.json /usr/src/app/
 
-# Install dependencies (only production dependencies)
-RUN npm install --production
+# Install dependencies 
+RUN npm install 
 
 # Copy the entire application code into the container
 COPY . .
-
-# Expose the application port
-EXPOSE 6969
-
-# Set environment variables (NODE_ENV is mandatory for production optimizations)
-ENV NODE_ENV=production
-ENV PORT=6969
 
 # Start the application
 CMD ["node", "src/server.js"]

@@ -1,27 +1,25 @@
-const { Kafka } = require('kafkajs');
+import { Kafka } from 'kafkajs';
+import "dotenv/config";
 
 // Initialize Kafka client
 const kafka = new Kafka({
   clientId: 'donor-service',
-  brokers: ['localhost:9092'], // Update with your broker addresses
+  brokers: [process.env.KAFKA_BROKER], 
 });
 
 const producer = kafka.producer();
 
-const produceMessage = async (message) => {
+export const produceMessage = async (topic, message) => {
   await producer.connect();
   try {
     await producer.send({
-      topic: 'donations',
+      topic: topic,
       messages: [{ value: JSON.stringify(message) }],
     });
-    console.log('Message sent:', message);
-  } catch (err) {
-    console.error('Error sending message:', err);
+    console.log(`Message sent to topic "${topic}":`, JSON.stringify(message, null, 2)); // Stringify here for better logging
   } finally {
     await producer.disconnect();
   }
 };
 
-// test usage
-// produceMessage({ donorId: '123', charityId: '456', amount: 100 });
+
