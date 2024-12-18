@@ -1,5 +1,5 @@
 import { Kafka } from 'kafkajs';
-import { handleRegisterRequest, handleLoginRequest } from '../messageHandler.js';
+import { handleRegisterRequest, handleLoginRequest } from '../auth.service.js';
 
 const kafka = new Kafka({
   clientId: 'auth-service',

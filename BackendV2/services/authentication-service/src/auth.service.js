@@ -2,73 +2,61 @@ const Credential = require('../models/Credential');
 const { produceUserDataSaveRequest , produceUserDataFetchRequest } = require('../events/producer');
 const { createAndEncryptToken } = require('./token.service');
 
-// Store pending login requests similar to encryption pending requests
+// Store pending login requests 
 // correlationId -> { email, userType, plainPassword }
 const pendingLogins = {};
 
 // correlationId -> { email, userType }
 const pendingUserData = {};
 
-async function initiateLogin(email, password, userType) {
-  const correlationId = uuidv4();
+/**
+ * Handle login request
+ * @param {Object} msg - { userId, email, password, userType }
+ */
+async function handleLoginRequest(msg) {
+  const { userId, email, password, userType } = msg;
 
-  // Store the pending login request
-  pendingLogins[correlationId] = { email, password, userType };
+  try {
+    // Step 1: Fetch the user's credentials
+    const credential = await Credential.findOne({ email, userType });
+    if (!credential) {
+      throw new Error('Invalid credentials');
+    }
 
-  // Request hashing of the provided password to compare with stored credentials
-  await produceHashRequest({ correlationId, password });
-}
+    // Step 2: Hash the provided password using the encryption service
+    const response = await axios.post(`${process.env.ENCRYPTION_SERVICE_URL}/hash`, {
+      password,
+    });
 
-async function handleHashResponse(msg) {
-  // msg = { correlationId, hashedPassword: "..." }
-  const { correlationId, hashedPassword } = msg;
-  const pending = pendingLogins[correlationId];
-  if (!pending) {
-    console.error(`No pending login for correlationId: ${correlationId}`);
-    return;
+    if (response.status !== 200 || !response.data.hashedPassword) {
+      throw new Error('Failed to hash password using encryption service');
+    }
+
+    const hashedPassword = response.data.hashedPassword;
+
+    // Step 3: Compare hashed passwords
+    if (hashedPassword !== credential.hashedPassword) {
+      throw new Error('Invalid credentials');
+    }
+
+    // Step 4: Generate and encrypt the token
+    const payload = { userType, userId }; // Minimal payload
+    const publicKey = credential.publicKey; // Assume publicKey is part of the credential or fetched securely
+
+    const jwe = await createAndEncryptToken(payload, publicKey);
+
+    // Step 5: Log success and return the token
+    console.log(`User ${email} authenticated successfully. JWE token: ${jwe}`);
+    await produceUserDataFetchRequest({
+      correlationId,
+      userType,
+      userId,
+    });
+    return jwe; // Return the token to the API Gateway or client
+  } catch (error) {
+    console.error('Error handling login request:', error.message);
+    throw error;
   }
-
-  const { email, userType } = pending;
-  delete pendingLogins[correlationId];
-
-  // Compare the hashedPassword returned with the stored password in Credentials DB
-  const cred = await Credential.findOne({ email, userType });
-  if (!cred || cred.hashedPassword !== hashedPassword) {
-    console.error('Invalid credentials');
-    // In a real scenario, you'd send a failure response back to the API gateway
-    return;
-  }
-
-  // Credentials match, now request user data
-  const userCorrId = uuidv4();
-  pendingUserData[userCorrId] = { email, userType };
-  await produceUserDataFetchRequest({ correlationId: userCorrId, email, userType });
-}
-
-async function handleUserDataResponse(msg) {
-  // msg = { correlationId, userData: {...}, publicKey: "..." }
-  const { correlationId, userData, publicKey } = msg;
-  const pending = pendingUserData[correlationId];
-  if (!pending) {
-    console.error(`No pending user data request for correlationId: ${correlationId}`);
-    return;
-  }
-
-  const { email, userType } = pending;
-  delete pendingUserData[correlationId];
-
-  // Now we have userData and the publicKey for encryption.
-  // Create token payload
-  const payload = { email, userType, ...userData };
-
-  // Create and encrypt token (JWS -> JWE)
-  const jwe = await createAndEncryptToken(payload, publicKey);
-
-  // Now we have the JWE token. Produce a message back to API gateway or directly respond.
-  // For example, produce a "login-success" topic message:
-  // produceLoginSuccess({ email, userType, userData, token: jwe })
-  // Or call the API gateway response mechanism directly.
-  console.log(`User ${email} logged in successfully. JWE token: ${jwe}`);
 }
 /**
  * Handle register request
@@ -118,4 +106,4 @@ async function handleRegisterRequest(msg) {
     console.error('Error handling register request:', error.message);
   }
 }
-module.exports = { initiateLogin, handleHashResponse, handleUserDataResponse, handleRegisterRequest };
+module.exports = { initiateLogin, handleLoginRequest, handleUserDataResponse, handleRegisterRequest };
