@@ -40,7 +40,7 @@ async function produceUserDataSaveRequest(msg) {
  */
 async function produceLoginSuccess(msg) {
   await producer.send({
-    topic: login-success,
+    topic: login-response,
     messages: [{ value: JSON.stringify(msg) }],
   });
 }

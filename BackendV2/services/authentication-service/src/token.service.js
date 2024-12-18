@@ -1,16 +1,20 @@
 import { v4 as uuidv4 } from 'uuid';
-import fs from 'fs';
-import path from 'path';
 import { SignJWT, importPKCS8 } from 'jose';
 import axios from 'axios';
+import fs from 'fs';
+import path from 'path';
 
 // Load RSA key for JWS signing
-const privateKeyPem = fs.readFileSync(path.join(new URL('.', import.meta.url).pathname, '../keys/jws_private.pem'), 'utf8');
+const privateKeyPath = process.env.JWS_PRIVATE_KEY_PATH;
+const privateKeyPem = fs.readFileSync(privateKeyPath, 'utf8');
+
+// Define privateKeyObject
 let privateKeyObject;
 
 // Import private key asynchronously
 (async () => {
   privateKeyObject = await importPKCS8(privateKeyPem, 'RS256');
+  console.log('Private key loaded successfully');
 })();
 
 /**
