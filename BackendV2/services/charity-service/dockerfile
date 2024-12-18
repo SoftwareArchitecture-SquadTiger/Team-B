@@ -1,24 +1,17 @@
 # Use the official Node.js image as the base image
-FROM node:18
+FROM node:23
 
 # Set the working directory in the container
 WORKDIR /usr/src/app
 
 # Copy package files to the container
-COPY package*.json ./
+COPY package.json /usr/src/app/
 
-# Install dependencies (only production dependencies)
-RUN npm install --production
+# Install dependencies 
+RUN npm install 
 
 # Copy the entire application code into the container
 COPY . .
-
-# Expose the application port
-EXPOSE 8888
-
-# Set environment variables (NODE_ENV is mandatory for production optimizations)
-ENV NODE_ENV=production
-ENV PORT=8888
 
 # Start the application
 CMD ["node", "src/server.js"]

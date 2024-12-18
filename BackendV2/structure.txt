@@ -1,11 +1,11 @@
 BackendV2/
 ├── kafka/
 │   ├── config/
-│   │   ├── kafkaConfig.js
-│   │   └── topics.js
-│   ├── setupTopics.js
-│   └── index.js
-│
+│   │   ├── server.properties
+│   │   └── zookeeper.properties
+│   └── scripts/
+│       └──  create-topics.sh
+│   
 ├── services/
 │   │
 │   ├── donor-service/
@@ -33,6 +33,6 @@ BackendV2/
 │       │   ├── index.js
 │       ├── Dockerfile          
 │       └── package.json
-│
+├── .env
 ├── docker-compose.yml          # Orchestrates all services and Kafka
 └── README.md
