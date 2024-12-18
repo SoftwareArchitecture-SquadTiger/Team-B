@@ -1,11 +1,11 @@
-const { v4: uuidv4 } = require('uuid');
-const fs = require('fs');
-const path = require('path');
-const { SignJWT, importPKCS8 } = require('jose');
-const axios = require('axios');
+import { v4 as uuidv4 } from 'uuid';
+import fs from 'fs';
+import path from 'path';
+import { SignJWT, importPKCS8 } from 'jose';
+import axios from 'axios';
 
 // Load RSA key for JWS signing
-const privateKeyPem = fs.readFileSync(path.join(__dirname, '../keys/jws_private.pem'), 'utf8');
+const privateKeyPem = fs.readFileSync(path.join(new URL('.', import.meta.url).pathname, '../keys/jws_private.pem'), 'utf8');
 let privateKeyObject;
 
 // Import private key asynchronously
@@ -19,7 +19,7 @@ let privateKeyObject;
  * 2. Make a POST request to the Encryption Service to get a JWE.
  * 3. Return the JWE response from the Encryption Service.
  */
-async function createAndEncryptToken(payload, publicKey) {
+export async function createAndEncryptToken(payload, publicKey) {
   if (!privateKeyObject) {
     throw new Error('Private key not yet loaded for JWS signing.');
   }
@@ -35,7 +35,7 @@ async function createAndEncryptToken(payload, publicKey) {
   try {
     const response = await axios.post(`${process.env.ENCRYPTION_SERVICE_URL}/encrypt`, {
       jws,
-      publicKey
+      publicKey,
     });
 
     if (response.status === 200 && response.data && response.data.jwe) {
@@ -47,5 +47,3 @@ async function createAndEncryptToken(payload, publicKey) {
     throw new Error(`Failed to call encryption service: ${err.message}`);
   }
 }
-
-module.exports = { createAndEncryptToken };

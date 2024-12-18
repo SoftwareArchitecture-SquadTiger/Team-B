@@ -45,7 +45,6 @@ async function produceLoginSuccess(msg) {
   });
 }
 
-
 export {
   startProducer,
   produceUserDataFetchRequest,

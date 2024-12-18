@@ -1,13 +1,13 @@
-const Credential = require('../models/Credential');
-const { produceUserDataSaveRequest , produceUserDataFetchRequest } = require('../events/producer');
-const { createAndEncryptToken } = require('./token.service');
+import Credential from './credential.model.js';
+import { produceUserDataSaveRequest, produceUserDataFetchRequest } from './events/producer.js';
+import { createAndEncryptToken } from './token.service.js';
 
-// Store pending login requests 
-// correlationId -> { email, userType, plainPassword }
-const pendingLogins = {};
+// // Store pending login requests 
+// // correlationId -> { email, userType, plainPassword }
+// const pendingLogins = {};
 
-// correlationId -> { email, userType }
-const pendingUserData = {};
+// // correlationId -> { email, userType }
+// const pendingUserData = {};
 
 /**
  * Handle login request
@@ -105,4 +105,4 @@ async function handleRegisterRequest(msg) {
     console.error('Error handling register request:', error.message);
   }
 }
-module.exports = { initiateLogin, handleLoginRequest, handleUserDataResponse, handleRegisterRequest };
+export { handleLoginRequest, handleRegisterRequest };
