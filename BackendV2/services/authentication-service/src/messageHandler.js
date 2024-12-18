@@ -1,7 +1,7 @@
-import { initiateLogin, handleHashResponse, handleUserDataResponse } from '../services/authService.js';
-import { createCharity } from '../services/charityService.js';
-import { createAndEncryptToken } from '../services/tokenService.js';
-import { produceRegisterSuccess, produceLoginSuccess } from '../events/producer.js';
+import { initiateLogin, handleHashResponse, handleUserDataResponse } from './auth.service.js';
+import { createCharity } from './charity.service.js';
+import { createAndEncryptToken } from './token.service.js';
+import { produceRegisterSuccess, produceLoginSuccess } from './events/producer.js';
 
 let pendingTokenRequests = {}; 
 // For finalizeTokenCreation scenario: correlationId -> { payload, keyMaterial, resolve/reject }
@@ -53,7 +53,7 @@ export async function handleLoginRequest(msg) {
 // 2. A correlationId was stored in `pendingTokenRequests`.
 // 3. The key-response message arrives here.
 // 4. We use the keyMaterial and original payload to call `createAndEncryptToken` and then produce a token event.
-export async function finalizeTokenCreation(msg) {
+export async function  finalizeTokenCreation(msg) {
   // msg = { correlationId, keyMaterial }
   const { correlationId, keyMaterial } = msg;
   const pending = pendingTokenRequests[correlationId];

@@ -1,26 +1,42 @@
-const { Kafka } = require('kafkajs');
+import { Kafka } from 'kafkajs';
 
 const kafka = new Kafka({
   clientId: 'auth-service-producer',
   brokers: [process.env.KAFKA_BROKER || 'localhost:9092']
 });
+
 const producer = kafka.producer();
 
 async function startProducer() {
   await producer.connect();
 }
 
-async function produceEncryptRequest(msg) {
+/**
+ * Produce a user-data-fetch-request message
+ * @param {Object} msg - { correlationId, email, userType }
+ */
+async function produceUserDataFetchRequest(msg) {
+  const topic = msg.userType === 'charity' ? 'charity-fetch' : 'donor-fetch';
   await producer.send({
-    topic: 'encrypt-request',
+    topic,
     messages: [{ value: JSON.stringify(msg) }]
   });
 }
 
-// Other produce functions remain the same (produceAdminToken, etc.)
+/**
+ * Produce a user-data-save-request message
+ * @param {Object} msg - { correlationId, userType, userData }
+ */
+async function produceUserDataSaveRequest(msg) {
+  const topic = msg.userType === 'charity' ? 'charity-creation' : 'donor-creation';
+  await producer.send({
+    topic,
+    messages: [{ value: JSON.stringify(msg) }],
+  });
+}
 
-module.exports = {
+export {
   startProducer,
-  produceEncryptRequest,
-  // other produce functions...
+  produceUserDataFetchRequest,
+  produceUserDataSaveRequest,
 };

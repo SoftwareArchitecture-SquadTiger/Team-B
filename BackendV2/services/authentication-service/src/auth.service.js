@@ -1,6 +1,6 @@
 const Credential = require('../models/Credential');
-const { produceHashRequest, produceUserDataRequest } = require('../events/producer');
-const { createAndEncryptToken } = require('./tokenService');
+const { produceUserDataSaveRequest , produceUserDataFetchRequest } = require('../events/producer');
+const { createAndEncryptToken } = require('./token.service');
 
 // Store pending login requests similar to encryption pending requests
 // correlationId -> { email, userType, plainPassword }
@@ -42,7 +42,7 @@ async function handleHashResponse(msg) {
   // Credentials match, now request user data
   const userCorrId = uuidv4();
   pendingUserData[userCorrId] = { email, userType };
-  await produceUserDataRequest({ correlationId: userCorrId, email, userType });
+  await produceUserDataFetchRequest({ correlationId: userCorrId, email, userType });
 }
 
 async function handleUserDataResponse(msg) {
@@ -70,5 +70,52 @@ async function handleUserDataResponse(msg) {
   // Or call the API gateway response mechanism directly.
   console.log(`User ${email} logged in successfully. JWE token: ${jwe}`);
 }
+/**
+ * Handle register request
+ * @param {Object} msg - { email, password, userType, userData }
+ */
+async function handleRegisterRequest(msg) {
+  const { email, password, userType, userData } = msg;
 
-module.exports = { initiateLogin, handleHashResponse, handleUserDataResponse };
+  try {
+    // Step 1: Generate userId
+    const userId = uuidv4();
+
+    // Step 2: Call encryption service API to hash the password
+    const response = await axios.post(`${process.env.ENCRYPTION_SERVICE_URL}/hash`, {
+      password,
+    });
+
+    if (response.status !== 200 || !response.data.hashedPassword) {
+      throw new Error('Failed to hash password using encryption service');
+    }
+
+    const hashedPassword = response.data.hashedPassword;
+
+    // Step 3: Save credentials in Credential collection
+    const credential = new Credential({
+      userId,
+      email,
+      userType,
+      hashedPassword,
+    });
+
+    await credential.save();
+    console.log(`Credentials saved for user ${email}`);
+
+    // Step 4: Produce a message for user data saving
+    const correlationId = uuidv4();
+    const topic = userType === 'charity' ? 'charity-creation' : 'donor-creation';
+
+    await produceUserDataSaveRequest({
+      correlationId,
+      userType,
+      userData: { ...userData, userId, email },
+    });
+
+    console.log(`User data save request produced to topic ${topic} for ${email}`);
+  } catch (error) {
+    console.error('Error handling register request:', error.message);
+  }
+}
+module.exports = { initiateLogin, handleHashResponse, handleUserDataResponse, handleRegisterRequest };
