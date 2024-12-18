@@ -41,3 +41,18 @@ services:
       - ./services/donor-service:/usr/src/app
       - /usr/src/app/node_modules
     command: ["npm", "start"]
+  
+  charity-service:
+    build:
+      context: ./services/charity-service
+      dockerfile: Dockerfile
+    container_name: charity-service
+    depends_on:
+      - kafka
+    environment:
+      KAFKA_BROKER: kafka:${KAFKA_PORT}
+      MONGO_URI: ${MONGO_URI}
+    volumes:
+      - ./services/charity-service:/usr/src/app
+      - /usr/src/app/node_modules
+    command: ["npm", "start"]

@@ -41,12 +41,6 @@ const donorSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
-    password: {
-      type: String,
-      required: true,
-      minlength: 8,
-      select: false,
-    },
     address: {
       street: { type: String, trim: true },
       city: { type: String, trim: true },
