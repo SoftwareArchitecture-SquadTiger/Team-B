@@ -1,4 +1,4 @@
-const handleDelete = async (userId, users, setUsers, url) => {
+const handleDeleteDonor = async (userId, users, setUsers, url) => {
   const confirmDelete = window.confirm(
     `Are you sure you want to delete the user with ID: ${userId}?`
   );
@@ -25,4 +25,4 @@ const handleDelete = async (userId, users, setUsers, url) => {
   }
 };
 
-export default handleDelete;
+export default handleDeleteDonor;

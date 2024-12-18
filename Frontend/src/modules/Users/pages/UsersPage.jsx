@@ -5,10 +5,12 @@ import FilterUser from "../components/FilterUser";
 import AddUser from "../components/AddUser";
 import UserTable from "../components/UserTable";
 import Pagination from "../components/Pagination";
-import fetchDonors from "../services/fetchDornors";
+import fetchUsers from "../services/fetchUsers";
 import filterUsers from "../services/filterUsers";
-import handleDelete from "../services/handleDelete";
+import handleDeleteDonor from "../services/handleDeleteDonor";
+import handleDeleteCharity from "../services/handleDeleteCharity";
 import paginate from "../services/paginate";
+
 const UsersPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -20,9 +22,9 @@ const UsersPage = () => {
 
   const url = `http://${import.meta.env.VITE_HOST}:${import.meta.env.VITE_PORT}`;
 
-  // Fetch donors data
+  // Fetch donors and charities in one useEffect
   useEffect(() => {
-    fetchDonors(url, setUsers);
+    fetchUsers(url, setUsers);
   }, [url]);
 
   const filteredUsers = filterUsers(users, searchQuery, selectedRole);
@@ -49,9 +51,11 @@ const UsersPage = () => {
       </div>
 
       <UserTable
-  users={paginatedItems}
-  onDelete={(userId) => handleDelete(userId, users, setUsers, url)}
-/>
+        users={paginatedItems}
+        onDelete={(userId) => (handleDeleteDonor(userId, users, setUsers, url),
+          handleDeleteCharity(userId, users, setUsers, url))}
+
+      />
 
       <Pagination
         totalPages={totalPages}
