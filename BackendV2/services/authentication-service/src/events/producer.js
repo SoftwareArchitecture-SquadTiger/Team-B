@@ -34,9 +34,21 @@ async function produceUserDataSaveRequest(msg) {
     messages: [{ value: JSON.stringify(msg) }],
   });
 }
+/**
+ * Produce a user-data-save-request message
+ * @param {Object} msg - { correlationId, userType, userData }
+ */
+async function produceLoginSuccess(msg) {
+  await producer.send({
+    topic: login-success,
+    messages: [{ value: JSON.stringify(msg) }],
+  });
+}
+
 
 export {
   startProducer,
   produceUserDataFetchRequest,
   produceUserDataSaveRequest,
+  produceLoginSuccess,
 };

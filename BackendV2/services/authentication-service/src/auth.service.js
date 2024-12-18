@@ -40,19 +40,18 @@ async function handleLoginRequest(msg) {
     }
 
     // Step 4: Generate and encrypt the token
-    const payload = { userType, userId }; // Minimal payload
-    const publicKey = credential.publicKey; // Assume publicKey is part of the credential or fetched securely
-
+    const payload = { userType, userId }; // Minimal payload for the token
+    const publicKey = credential.publicKey; // Ensure this is securely available
     const jwe = await createAndEncryptToken(payload, publicKey);
 
-    // Step 5: Log success and return the token
-    console.log(`User ${email} authenticated successfully. JWE token: ${jwe}`);
-    await produceUserDataFetchRequest({
-      correlationId,
-      userType,
-      userId,
-    });
-    return jwe; // Return the token to the API Gateway or client
+    // Step 5: Produce event to fetch user data
+    const correlationId = userId; // Use userId as the correlationId for consistency
+    await produceUserDataFetchRequest({ correlationId, userType, userId });
+
+    // Step 6: Produce event to API Gateway with the JWE
+    await produceLoginSuccess({ correlationId, jwe });
+
+    console.log(`Login request processed successfully for ${email}. Events sent to fetch user data and verify user.`);
   } catch (error) {
     console.error('Error handling login request:', error.message);
     throw error;
