@@ -11,10 +11,10 @@ import { createAndEncryptToken } from './token.service.js';
 
 /**
  * Handle login request
- * @param {Object} msg - { userId, email, password, userType }
+ * @param {Object} msg - { email, password, userType }
  */
 async function handleLoginRequest(msg) {
-  const { userId, email, password, userType } = msg;
+  const { email, password, userType } = msg;
 
   try {
     // Step 1: Fetch the user's credentials
@@ -22,7 +22,7 @@ async function handleLoginRequest(msg) {
     if (!credential) {
       throw new Error('Invalid credentials');
     }
-
+    const userId = credential.userId
     // Step 2: Hash the provided password using the encryption service
     const response = await axios.post(`${process.env.ENCRYPTION_SERVICE_URL}/hash`, {
       password,
@@ -65,6 +65,11 @@ async function handleRegisterRequest(msg) {
   const { email, password, userType, userData } = msg;
 
   try {
+    // Step 0: Check if email has been used
+    const emailCheck = await Credential.findOne({email});
+    if (emailCheck){
+      throw new Error('This email has already been used');
+    }
     // Step 1: Generate userId
     const userId = uuidv4();
 
