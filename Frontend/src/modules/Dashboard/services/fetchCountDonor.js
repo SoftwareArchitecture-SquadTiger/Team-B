@@ -1,16 +1,19 @@
-const url = `http://${import.meta.env.VITE_HOST}:${import.meta.env.VITE_PORT}`;
-export const fetchCountDonors = async () => {
-    
-    try {
-      const response = await fetch(`${url}/admin-server/donors`);
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
-      }
-      const data = await response.json(); // Parse response JSON
-      return data.data.length;
-    } catch (error) {
-      console.error("Error fetching donors:", error);
-      return 0;
-    }
-  };
-  
+import { useState, useEffect } from "react";
+import { callDonorAPI } from "../hooks/callDonorAPI";
+
+const useDonorCount = () => {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    const getDonorCount = async () => {
+      const donorCount = await callDonorAPI();
+      setCount(donorCount);
+    };
+
+    getDonorCount();
+  }, []);
+
+  return count;
+};
+
+export default useDonorCount;

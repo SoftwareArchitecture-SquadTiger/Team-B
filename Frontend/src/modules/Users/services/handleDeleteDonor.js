@@ -1,3 +1,5 @@
+import { deleteDonorById } from "../hooks/callDeleteAPI";
+
 const handleDeleteDonor = async (userId, users, setUsers, url) => {
   const confirmDelete = window.confirm(
     `Are you sure you want to delete the user with ID: ${userId}?`
@@ -5,22 +7,18 @@ const handleDeleteDonor = async (userId, users, setUsers, url) => {
 
   if (confirmDelete) {
     try {
-      // Correct API endpoint
-      const response = await fetch(`${url}/admin-server/donor/delete/${userId}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to delete the donor");
-      }
+      // Call the API to delete the donor
+      await deleteDonorById(url, userId);
 
       // Update the state after successful deletion
       const updatedUsers = users.filter((user) => user.id !== userId);
       setUsers(updatedUsers);
 
-      console.log(`Donor with ID ${userId} deleted successfully!`);
+      console.log(`User with ID ${userId} deleted successfully!`);
+      alert("User deleted successfully!");
     } catch (error) {
       console.error("Error deleting donor:", error);
+      alert("An error occurred while deleting the donor. Please try again.");
     }
   }
 };

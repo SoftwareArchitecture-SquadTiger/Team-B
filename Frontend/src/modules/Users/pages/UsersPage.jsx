@@ -8,7 +8,7 @@ import Pagination from "../components/Pagination";
 import fetchUsers from "../services/fetchUsers";
 import filterUsers from "../services/filterUsers";
 import handleDeleteDonor from "../services/handleDeleteDonor";
-import handleDeleteCharity from "../services/handleDeleteCharity";
+import handleDeleteCharity from "../services/handleDeleteCharity"
 import paginate from "../services/paginate";
 
 const UsersPage = () => {

@@ -1,16 +1,19 @@
-const url = `http://${import.meta.env.VITE_HOST}:${import.meta.env.VITE_PORT}`;
-export const fetchCountCharities = async () => {
-    
-    try {
-      const response = await fetch(`${url}/admin-server/charities`);
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
-      }
-      const data = await response.json(); // Parse response JSON
-      return data.data.length;
-    } catch (error) {
-      console.error("Error fetching charities:", error);
-      return 0;
-    }
-  };
-  
+import { useState, useEffect } from "react";
+import { callCharityAPI } from "../hooks/callCharityAPI";
+
+const useCharityCount = () => {
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    const getCharityCount = async () => {
+      const charityCount = await callCharityAPI();
+      setCount(charityCount);
+    };
+
+    getCharityCount();
+  }, []);
+
+  return count;
+};
+
+export default useCharityCount;
