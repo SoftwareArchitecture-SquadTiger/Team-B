@@ -51,12 +51,6 @@ const charitySchema = new mongoose.Schema(
       required: true, 
       trim: true,
     },
-    password: {
-      type: String,
-      required: true, 
-      minlength: 8, 
-      select: false, 
-    },
     tax_code: {
       type: String,
       required: true, 
