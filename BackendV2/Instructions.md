@@ -13,13 +13,16 @@
    docker-compose config
 3. Start Kafka and Zookeeper:
    ```bash
-   docker-compose up
+   docker-compose up -d --build
 4. Verify Kafka:
     ```bash
     docker-compose logs kafka
 5. List Topics
     ```bash
     docker exec -it kafka kafka-topics --list --bootstrap-server localhost:9092
+6. To shutdown all containers:
+   ```bash
+   docker-compose down -v
 
 ## Another way to check Kafka topics
 1. Open the docker desktop UI
