@@ -1,6 +1,8 @@
-import donorService from '../donor/service.js';
+import donorService from '../entities/donor/donor.service.js';
+import subscriptionService from "../entities/subscription/subscription.service.js";
 
 export const actionHandlers = {
+  // ======================= Donor Handlers =======================
   GET_ALL: async () => {
     const donors = await donorService.getAllDonors();
     return { status: 'success', data: donors };
@@ -8,6 +10,14 @@ export const actionHandlers = {
   GET_BY_ID: async (data) => {
     const donor = await donorService.getDonorById(data.id);
     return { status: 'success', data: donor ? donor.toJSON() : null };
+  },
+  GET_BY_CATEGORIES: async (data) => {
+    const donors = await donorService.getDonorsBySubscribedCategories(data.categories);
+    return { status: 'success', data: donors };
+  },
+  GET_BY_REGIONS: async (data) => {
+    const donors = await donorService.getDonorsBySubscribedRegions(data.regions);
+    return { status: 'success', data: donors };
   },
   ADD: async (data) => {
     const newDonor = await donorService.addDonor(data);
@@ -20,6 +30,15 @@ export const actionHandlers = {
   DELETE: async (data) => {
     await donorService.deleteDonor(data.id);
     return { status: 'success', message: 'Donor deleted successfully' };
+  },
+  // =================== Subscription Handlers ===================
+  GET_SUBSCRIPTIONS_BY_EMAIL: async (data) => {
+    const subscriptions = await subscriptionService.getSubscriptionsByEmail(data.email);
+    return { status: 'success', data: subscriptions };
+  },
+  GET_EMAILS_BY_CATEGORIES: async (data) => {
+    const emails = await subscriptionService.getEmailsByCategories(data.categories);
+    return { status: 'success', data: emails };
   },
 };
 

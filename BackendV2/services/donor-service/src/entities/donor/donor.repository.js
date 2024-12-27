@@ -1,4 +1,4 @@
-import Donor from "./model.js";
+import Donor from "./donor.model.js";
 
 const getAll = async () => {
   return await Donor.find({});
@@ -6,6 +6,10 @@ const getAll = async () => {
 
 const getById = async (id) => {
   return await Donor.findOne({ donor_id: id });
+};
+
+const getDonorsByEmails = async (emails) => {
+  return await Donor.find({ email: { $in: emails } });
 };
 
 const create = async (donorData) => {
@@ -24,4 +28,4 @@ const remove = async (id) => {
   return await Donor.findOneAndDelete({ donor_id: id });
 };
 
-export default { getAll, getById, create, update, remove };
+export default { getAll, getById, getDonorsByEmails, create, update, remove };
