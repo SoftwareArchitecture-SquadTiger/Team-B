@@ -1,5 +1,5 @@
 import React from "react";
-import ProjectTable from "../../Projects/components/Dashboard/ProjectTable";
+import ProjectTable from "../../Projects/components/ProjectTable";
 import StatisticsDonationAmount from "../../Statistics/components/StatisticsDashboard/StatisticsDonationAmount";
 import StatisticsPieChartForCategory from "../../Statistics/components/StatisticsPieChart/Category";
 import StatisticsPieChartForCountry from "../../Statistics/components/StatisticsPieChart/Country";
