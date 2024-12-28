@@ -3,7 +3,7 @@ import { handleRegisterRequest, handleLoginRequest } from '../auth.service.js';
 
 const kafka = new Kafka({
   clientId: 'auth-service',
-  brokers: ['localhost:9093'], 
+  brokers: ['kafka:9092'], 
 });
 
 const consumer = kafka.consumer({ groupId: 'auth-service-group' });
@@ -18,18 +18,19 @@ async function startConsumer() {
   await consumer.run({
     eachMessage: async ({ topic, partition, message }) => {
       const msg = JSON.parse(message.value.toString());
+      const { id, ...data } = msg; // Extract 'id' if available
 
       try {
         switch (topic) {
           case 'login-request':
-            console.log('Processing login request...');
-            await handleLoginRequest(msg); // Trigger login workflow
+            console.log(`Processing login request with id: ${id}...`);
+            await handleLoginRequest({ id, ...data }); // Trigger login workflow with id
             console.log('Login request processed successfully.');
             break;
 
           case 'register-request':
-            console.log('Processing register request...');
-            await handleRegisterRequest(msg); // Trigger registration workflow
+            console.log(`Processing register request with id: ${id}...`);
+            await handleRegisterRequest({ id, ...data }); // Trigger registration workflow with id
             console.log('Register request processed successfully.');
             break;
 

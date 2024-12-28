@@ -2,19 +2,13 @@ import Credential from './credential.model.js';
 import { produceUserDataSaveRequest, produceUserDataFetchRequest } from './events/producer.js';
 import { createAndEncryptToken } from './token.service.js';
 
-// // Store pending login requests 
-// // correlationId -> { email, userType, plainPassword }
-// const pendingLogins = {};
-
-// // correlationId -> { email, userType }
-// const pendingUserData = {};
 
 /**
  * Handle login request
- * @param {Object} msg - { email, password, userType }
+ * @param {Object} msg - { id, email, password, userType }
  */
 async function handleLoginRequest(msg) {
-  const { email, password, userType } = msg;
+  const { id, email, password, userType } = msg;
 
   try {
     // Step 1: Fetch the user's credentials
@@ -22,7 +16,8 @@ async function handleLoginRequest(msg) {
     if (!credential) {
       throw new Error('Invalid credentials');
     }
-    const userId = credential.userId
+    const userId = credential.userId;
+
     // Step 2: Hash the provided password using the encryption service
     const response = await axios.post(`${process.env.ENCRYPTION_SERVICE_URL}/hash`, {
       password,
@@ -44,11 +39,13 @@ async function handleLoginRequest(msg) {
     const publicKey = credential.publicKey; // Ensure this is securely available
     const jwe = await createAndEncryptToken(payload, publicKey);
 
-    // Step 5: Produce event to fetch user data
-    const correlationId = userId; // Use userId as the correlationId for consistency
+    // Step 5: Use the passed id as the correlationId
+    const correlationId = id;
+
+    // Step 6: Produce event to fetch user data
     await produceUserDataFetchRequest({ correlationId, userType, userId });
 
-    // Step 6: Produce event to API Gateway with the JWE
+    // Step 7: Produce event to API Gateway with the JWE
     await produceLoginSuccess({ correlationId, jwe });
 
     console.log(`Login request processed successfully for ${email}. Events sent to fetch user data and verify user.`);
@@ -57,21 +54,23 @@ async function handleLoginRequest(msg) {
     throw error;
   }
 }
+
 /**
  * Handle register request
- * @param {Object} msg - { email, password, userType, userData }
+ * @param {Object} msg - { id, email, password, userType, userData }
  */
 async function handleRegisterRequest(msg) {
-  const { email, password, userType, userData } = msg;
+  const { id, email, password, userType, userData } = msg;
 
   try {
     // Step 0: Check if email has been used
-    const emailCheck = await Credential.findOne({email});
-    if (emailCheck){
+    const emailCheck = await Credential.findOne({ email });
+    if (emailCheck) {
       throw new Error('This email has already been used');
     }
-    // Step 1: Generate userId
-    const userId = uuidv4();
+
+    // Step 1: Use the passed id as the userId
+    const userId = id;
 
     // Step 2: Call encryption service API to hash the password
     const response = await axios.post(`${process.env.ENCRYPTION_SERVICE_URL}/hash`, {
@@ -95,8 +94,10 @@ async function handleRegisterRequest(msg) {
     await credential.save();
     console.log(`Credentials saved for user ${email}`);
 
-    // Step 4: Produce a message for user data saving
-    const correlationId = uuidv4();
+    // Step 4: Use the passed id as the correlationId
+    const correlationId = id;
+
+    // Step 5: Produce a message for user data saving
     const topic = userType === 'charity' ? 'charity-creation' : 'donor-creation';
 
     await produceUserDataSaveRequest({
@@ -106,8 +107,10 @@ async function handleRegisterRequest(msg) {
     });
 
     console.log(`User data save request produced to topic ${topic} for ${email}`);
+    
   } catch (error) {
     console.error('Error handling register request:', error.message);
   }
 }
-export { handleLoginRequest, handleRegisterRequest };
+
+export { handleLoginRequest, handleRegisterRequest};

@@ -5,7 +5,7 @@ import "dotenv/config";
 
 const clusterURI = process.env.MONGO_URI;
 
-// Get 'charityDB' connection
+// Get 'credentialDB' connection
 const credentialDb = getDbConnection("credentialDB", clusterURI);
 
 const credentialSchema = new mongoose.Schema({
