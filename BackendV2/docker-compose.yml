@@ -56,3 +56,21 @@ services:
       - ./services/charity-service:/usr/src/app
       - /usr/src/app/node_modules
     command: ["npm", "start"]
+    
+  authentication-service:
+    build:
+      context: ./services/authentication-service
+      dockerfile: Dockerfile
+    container_name: authentication-service
+    depends_on:
+      - kafka
+    environment:
+      KAFKA_BROKER: kafka:${KAFKA_PORT}
+      MONGO_URI: ${MONGO_URI}
+      JWS_PRIVATE_KEY_PATH: ./keys/jws_private.pem
+      ENCRYPTION_SERVICE_URL: 192.168.1.4:4000
+    volumes:
+      - ./services/authentication-service:/usr/src/app
+      - /usr/src/app/node_modules
+    command: ["npm", "start"]
+
