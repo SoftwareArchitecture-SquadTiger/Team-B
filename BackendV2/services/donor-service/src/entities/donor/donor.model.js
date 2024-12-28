@@ -1,4 +1,4 @@
-import { getDbConnection } from "../utils/dbConnection.js";
+import { getDbConnection } from "../../utils/dbConnection.js";
 import mongoose from "mongoose";
 import { v4 as uuidv4 } from "uuid";
 import "dotenv/config";
@@ -55,9 +55,11 @@ const donorSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
+    collection: "donors",
   }
 );
 
 const Donor = donorDb.model("Donor", donorSchema);
 
+export { donorDb };
 export default Donor;
