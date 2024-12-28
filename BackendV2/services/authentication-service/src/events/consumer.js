@@ -3,7 +3,7 @@ import { handleRegisterRequest, handleLoginRequest } from '../auth.service.js';
 
 const kafka = new Kafka({
   clientId: 'auth-service',
-  brokers: ['kafka:9092'], 
+  brokers: ['localhost:9093'], 
 });
 
 const consumer = kafka.consumer({ groupId: 'auth-service-group' });

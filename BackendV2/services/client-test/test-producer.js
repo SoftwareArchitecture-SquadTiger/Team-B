@@ -10,15 +10,20 @@ const produceMessage = async () => {
     await producer.connect();
 
     const message = {
-        action: 'GET_ALL'
+        id: '123123123123',
+        userType:'Charity',
+        email: 'test@gmail.com',
+        password: 'password123',
     };
 
     await producer.send({
-        topic: 'donor-request',
+        topic: 'login-request',
         messages: [{ value: JSON.stringify(message) }]
     });
 
-    console.log(`Message sent: ${message.action}`);
+    console.log(`Message sent: ${message.userType}`);
+    console.log(`Message sent: ${message.email}`);
+    console.log(`Message sent: ${message.password}`);
     await producer.disconnect();
 };
 
