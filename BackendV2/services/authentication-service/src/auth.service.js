@@ -1,5 +1,5 @@
 import Credential from './credential.model.js';
-import { produceUserDataSaveRequest, produceUserDataFetchRequest } from './events/producer.js';
+import { produceUserDataSaveRequest, produceUserDataFetchRequest,produceLoginSuccess } from './events/producer.js';
 import { createAndEncryptToken } from './token.service.js';
 import axios from 'axios';
 
@@ -75,23 +75,26 @@ async function handleRegisterRequest(msg) {
     // Step 1: Use the passed id as the userId
     const userId = id;
 
-    // Step 2: Call encryption service API to hash the password
-    const response = await axios.post(`${process.env.ENCRYPTION_SERVICE_URL}/hash`, {
-      password,
-    });
+    // Step 2: Call encryption service API to encrypt the password
+    const encryptDataResponse = await axios.post(
+      `http://192.168.1.4:5001/client-server/keys/encrypt/model/auth/entity/${userId}`,
+      {
+        data: password,
+      }
+    );
 
-    if (response.status !== 200 || !response.data.hashedPassword) {
-      throw new Error('Failed to hash password using encryption service');
+    if (encryptDataResponse.status !== 200 || !encryptDataResponse.data.encryptedData) {
+      throw new Error('Failed to encrypt password using encryption service');
     }
 
-    const hashedPassword = response.data.hashedPassword;
+    const encryptedPassword = encryptDataResponse.data.encryptedData;
 
     // Step 3: Save credentials in Credential collection
     const credential = new Credential({
       userId,
       email,
       userType,
-      hashedPassword,
+      encryptedPassword,
     });
 
     await credential.save();
