@@ -45,10 +45,7 @@ async function handleLoginRequest(msg) {
     // Step 5: Use the passed id as the correlationId
     const correlationId = id;
 
-    // Step 6: Produce event to fetch user data
-    await produceUserDataFetchRequest({ correlationId, userType, userId });
-
-    // Step 7: Produce event to API Gateway with the JWE
+    // Step 6: Produce event to API Gateway with the JWE
     await produceLoginSuccess({ correlationId, jwe });
 
     console.log(`Login request processed successfully for ${email}. Events sent to fetch user data and verify user.`);
