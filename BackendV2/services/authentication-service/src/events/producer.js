@@ -11,63 +11,74 @@ async function startProducer() {
   await producer.connect();
 }
 
-/**
- * Produce a user-data-fetch-request message
- * @param {Object} msg - { correlationId, email, userType }
- */
-async function produceUserDataFetchRequest(msg) {
-  const topic = msg.userType === 'charity' ? 'charity-fetch' : 'donor-fetch';
-  try {
-    await producer.send({
-      topic,
-      messages: [{ value: JSON.stringify(msg) }],
-    });
-    console.log(`Message sent to topic '${topic}' with correlationId '${msg.correlationId}'`);
-  } catch (error) {
-    console.error(`Error sending message to topic '${topic}':`, error.message);
-    throw error;
-  }
-}
 
 /**
  * Produce a user-data-save-request message
  * @param {Object} msg - { correlationId, userType, userData }
  */
 async function produceUserDataSaveRequest(msg) {
-  const topic = register-response;
   try {
+    // Validate the input
+    if (!msg || !msg.correlationId || !msg.userType || !msg.userData) {
+      throw new Error("Invalid message format. Ensure all fields are provided.");
+    }
+
+    // Determine the topic based on userType
+    const topic = msg.userType === 'charity' ? 'charity-request' : 'donor-request';
+    console.log("User Type:", msg.userType); // Debug userType
+    console.log("Determined Topic:", topic); // Debug topic
+    console.log("Message to send:", JSON.stringify(msg)); // Debug message
+
+    if (!topic) {
+      throw new Error("Unable to determine the topic. Check userType.");
+    }
+
+    // Send the message to the Kafka topic
     await producer.send({
-      topic,
-      messages: [{ value: JSON.stringify(msg) }],
+      topic: topic,
+      messages: [
+        {
+          value: JSON.stringify({
+            action: 'ADD',
+            correlationId: msg.correlationId,
+            data: msg.userData,
+          }),
+        },
+      ],
     });
-    console.log(`Message sent to topic '${topic}' with correlationId '${msg.correlationId}'`);
+
+    console.log(`Message sent successfully to topic: ${topic}`);
   } catch (error) {
-    console.error(`Error sending message to topic '${topic}':`, error.message);
-    throw error;
+    console.error("Error in produceUserDataSaveRequest:", error.message);
+    throw error; // Re-throw the error for handling elsewhere
   }
+}
+/**
+ * Produce a user-data-save-request message
+ * @param {Object} msg - { correlationId, userType, userData }
+ */
+async function produceLoginSuccess(msg) {
+  await producer.send({
+    topic: 'login-response',
+    messages: [{ value: JSON.stringify(msg) }],
+  });
 }
 
 /**
- * Produce a login-success message
- * @param {Object} msg - { correlationId, jwe }
+ * Produce a user-data-save-request message
+ * @param {Object} msg - { correlationId, userType, userData }
  */
-async function produceLoginSuccess(msg) {
-  const topic = 'login-response'; // Ensure this matches your topic configuration
-  try {
-    await producer.send({
-      topic,
-      messages: [{ value: JSON.stringify(msg) }],
-    });
-    console.log(`Login success message sent to topic '${topic}' with correlationId '${msg.correlationId}'`);
-  } catch (error) {
-    console.error(`Error sending login success message to topic '${topic}':`, error.message);
-    throw error;
-  }
+async function produceRegisterSuccess(msg) {
+  await producer.send({
+    topic: 'register-response',
+    messages: [{ value: JSON.stringify(msg) }],
+  });
 }
 
 export {
   startProducer,
-  produceUserDataFetchRequest,
   produceUserDataSaveRequest,
   produceLoginSuccess,
+  produceRegisterSuccess,
+  producer,
 };

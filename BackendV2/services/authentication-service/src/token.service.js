@@ -43,7 +43,7 @@ export async function createAndEncryptToken(payload, entityId) {
       `${process.env.ENCRYPTION_SERVICE_URL}/encrypt`,
       {
         jws: jws, // Send the signed JWS as 'data'
-        entityId: entityId, // Pass the entity ID for encryption
+        entityId: entityId, // Send the entity ID for encryption
       }
     );
 
