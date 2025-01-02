@@ -1,5 +1,5 @@
 import { response } from 'express';
-import { producer } from './events/producer.js'; // Import your Kafka producer instance
+import { produceLoginResponse,produceRegisterResponse } from './events/producer.js'; // Import your Kafka producer instance
 
 /**
  * Handle error by sending failure message to Kafka response topic
@@ -11,14 +11,21 @@ export const handleServiceError = async (topic, correlationId, errorMessage) => 
   try {
     const failureMessage = {
       correlationId,
-      success: false,
+      status: 'error',
       error: errorMessage,
     };
+    switch (topic) {
+      case 'login-response':
+        await produceLoginResponse(failureMessage);
+        break;
 
-    await producer.send({
-      topic: 'login-response',
-      messages: [{ value: JSON.stringify(failureMessage) }],
-    });
+      case 'register-response':
+        await produceRegisterResponse(failureMessage);
+        break;
+
+      default:
+        throw new Error(`Invalid topic: ${topic}`);
+    }
 
     console.log(`Error notification sent to topic ${topic}:`, failureMessage);
   } catch (error) {

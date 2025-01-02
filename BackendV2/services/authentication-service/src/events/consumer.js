@@ -1,12 +1,12 @@
 import { Kafka } from 'kafkajs';
 import { handleRegisterRequest, handleLoginRequest } from '../auth.service.js';
-
+import { resolvePendingRequest } from '../requestHandler.js';
 const kafka = new Kafka({
   clientId: 'auth-service',
   brokers: ['localhost:9093'], 
 });
 
-const consumer = kafka.consumer({ groupId: 'auth-service-group',  heartbeatInterval: 3000, //Sends heartbeat frequently to make sure consumer is alive
+const consumer = kafka.consumer({ groupId: 'auth-service-group', heartbeatInterval: 3000,   //Sends heartbeat frequently to make sure consumer is alive
 });
 
 async function startConsumer() {
@@ -17,10 +17,9 @@ async function startConsumer() {
   await consumer.subscribe({ topic: 'register-request', fromBeginning: false });
 
   await consumer.run({
-    eachMessage: async ({ topic, action, message }) => {
+    eachMessage: async ({ topic, message }) => {
       const msg = JSON.parse(message.value.toString());
       const { correlationId, ...data } = msg; // Extract 'id' if available
-
       try {
         switch (topic) {
           case 'login-request':
@@ -28,15 +27,11 @@ async function startConsumer() {
             await handleLoginRequest({ correlationId, ...data }); // Trigger login workflow with id
             console.log('Login request processed successfully.');
             break;
-
           case 'register-request':
             console.log(`Processing register request with id: ${correlationId}...`);
             await handleRegisterRequest({ correlationId, ...data }); // Trigger registration workflow with id
             console.log('Register request processed successfully.');
             break;
-
-          default:
-            console.error(`No handler defined for topic: ${topic}`);
         }
       } catch (err) {
         console.error(`Error processing topic: ${topic}`, err);

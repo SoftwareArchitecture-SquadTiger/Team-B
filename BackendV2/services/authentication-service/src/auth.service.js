@@ -1,9 +1,10 @@
 import Credential from './credential.model.js';
-import { produceUserDataSaveRequest, produceLoginSuccess, produceRegisterSuccess } from './events/producer.js';
+import {produceLoginResponse, produceRegisterResponse, produceSaveRequest } from './events/producer.js';
 import { createAndEncryptToken } from './token.service.js';
 import axios from 'axios';
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import { handleServiceError } from './errorHandler.js';
+// import { produceSaveRequest } from './saveRequestResolver.js';
 /**
  * Handle login request
  * @param {Object} msg - { correlationId, email, password, userType }
@@ -29,6 +30,7 @@ async function handleLoginRequest(msg) {
         encryptedData: credential.password,
       }
     );
+    console.log(decryptDataResponse);
     if (decryptDataResponse.status !== 200 || !decryptDataResponse.data.decryptedData) {
       throw new Error('Failed to decrypt password using encryption service');
     }
@@ -43,12 +45,13 @@ async function handleLoginRequest(msg) {
     // Step 4: Generate and encrypt the token
     const payload = { userType, userId }; // Minimal payload for the token
     const jwe = await createAndEncryptToken(payload, userId);
-
+    console.log('JWE:', jwe);
     // Step 6: Produce event to API Gateway with the JWE
-    await produceLoginSuccess({ correlationId: correlationId, JWE:jwe });
+    await produceLoginResponse({ correlationId: correlationId, JWE:jwe });
 
     console.log(`Login request processed successfully for ${email}. Events sent to fetch user data and verify user.`);
   } catch (error) {
+    console.log('Error:', error);
     await handleServiceError('login-response', correlationId, error.message);
   }
 }
@@ -60,7 +63,6 @@ async function handleLoginRequest(msg) {
 async function handleRegisterRequest(msg) {
   const { correlationId, data } = msg;
   const { email, password, userType, ...userData } = data; // Extract required fields from the data object
-
   try {
     // Step 0: Check if email has been used
     const emailCheck = await Credential.findOne({ email });
@@ -85,10 +87,18 @@ async function handleRegisterRequest(msg) {
     ) {
       throw new Error("Failed to encrypt password using encryption service");
     }
-
     const encryptedPassword = encryptDataResponse.data.encryptedData;
-
-    // Step 3: Save credentials in Credential collection
+    // Step 3: Produce save request and wait for response
+    const saveRequest = {
+      correlationId,
+      userData: { ...userData, userId, email },
+    };
+    console.log("1"); 
+    const topic = msg.userType === 'Charity' ? 'charity-request' : 'donor-request';
+    const result = await produceSaveRequest(topic, saveRequest);
+    console.log(result);
+    console.log(`Save request sent for user ${email}`);
+    // Step 4: Save credentials in Credential collection
     const credential = new Credential({
       userId,
       email,
@@ -99,17 +109,8 @@ async function handleRegisterRequest(msg) {
     await credential.save();
     console.log(`Credentials saved for user ${email}`);
 
-    // Step 4: Produce a user data save request
-    await produceUserDataSaveRequest({
-      correlationId, // Correlation ID for tracking
-      userType,
-      userData: { ...userData, userId, email }, // Include user-specific data and userId
-    });
-
-    console.log(`User data save request produced to topic for ${email}`);
-
     // Step 5: Produce register success response
-    produceRegisterSuccess({ correlationId, userId, userType });
+    produceRegisterResponse({ correlationId, userId, userType });
 
   } catch (error) {
     await handleServiceError('register-response', correlationId, error.message);
