@@ -1,9 +1,9 @@
-import Credential from './credential.model.js';
-import {produceLoginResponse, produceRegisterResponse, produceSaveRequest } from './events/producer.js';
+import Credential from '../model/credential.model.js';
+import {produceLoginResponse, produceRegisterResponse, produceSaveRequest } from '../events/producer.js';
 import { createAndEncryptToken } from './token.service.js';
 import axios from 'axios';
 import { v4 as uuidv4 } from "uuid";
-import { handleServiceError } from './errorHandler.js';
+import { handleServiceError } from '../utils/errorHandler.js';
 // import { produceSaveRequest } from './saveRequestResolver.js';
 /**
  * Handle login request

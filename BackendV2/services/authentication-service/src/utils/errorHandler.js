@@ -1,5 +1,5 @@
 import { response } from 'express';
-import { produceLoginResponse,produceRegisterResponse } from './events/producer.js'; // Import your Kafka producer instance
+import { produceLoginResponse,produceRegisterResponse } from '../events/producer.js'; // Import your Kafka producer instance
 
 /**
  * Handle error by sending failure message to Kafka response topic

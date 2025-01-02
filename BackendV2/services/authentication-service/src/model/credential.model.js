@@ -1,4 +1,4 @@
-import { getDbConnection } from './dbConnection.js';
+import { getDbConnection } from '../dbConnection.js';
 import mongoose from 'mongoose';
 import { v4 as uuidv4 } from "uuid";
 import "dotenv/config";

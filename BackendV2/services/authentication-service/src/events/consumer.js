@@ -1,6 +1,6 @@
 import { Kafka } from 'kafkajs';
-import { handleRegisterRequest, handleLoginRequest } from '../auth.service.js';
-import { resolvePendingRequest } from '../requestHandler.js';
+import { handleRegisterRequest, handleLoginRequest } from '../service/auth.service.js';
+import { resolvePendingRequest } from '../utils/requestHandler.js';
 const kafka = new Kafka({
   clientId: 'auth-service',
   brokers: ['localhost:9093'], 

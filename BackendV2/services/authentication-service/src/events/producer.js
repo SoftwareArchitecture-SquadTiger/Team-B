@@ -1,6 +1,6 @@
 import { Kafka } from 'kafkajs';
 import { v4 as uuidv4 } from "uuid";
-import {addPendingRequest, deletePendingRequest} from "../requestHandler.js";
+import {addPendingRequest, deletePendingRequest} from "../utils/requestHandler.js";
 const kafka = new Kafka({
   clientId: 'auth-service-producer',
   brokers: ['localhost:9093'], // Use localhost, not kafka

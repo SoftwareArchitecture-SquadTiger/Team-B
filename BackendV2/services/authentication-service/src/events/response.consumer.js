@@ -1,6 +1,6 @@
 // response.consumer.js
 import { Kafka } from 'kafkajs';
-import { resolvePendingRequest } from '../requestHandler.js';
+import { resolvePendingRequest } from '../utils/requestHandler.js';
 
 // Create a separate Kafka instance and consumer (different groupId)
 const kafka = new Kafka({
