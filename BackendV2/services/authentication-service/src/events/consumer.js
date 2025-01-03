@@ -3,7 +3,7 @@ import { handleRegisterRequest, handleLoginRequest } from '../service/auth.servi
 import { resolvePendingRequest } from '../utils/requestHandler.js';
 const kafka = new Kafka({
   clientId: 'auth-service',
-  brokers: ['localhost:9093'], 
+  brokers: [process.env.KAFKA_BROKER], 
 });
 
 const consumer = kafka.consumer({ groupId: 'auth-service-group', heartbeatInterval: 3000,   //Sends heartbeat frequently to make sure consumer is alive

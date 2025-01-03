@@ -67,10 +67,11 @@ services:
     environment:
       KAFKA_BROKER: kafka:${KAFKA_PORT}
       MONGO_URI: ${MONGO_URI}
-      JWS_PRIVATE_KEY_PATH: ./keys/jws_private.pem
-      ENCRYPTION_SERVICE_URL: 192.168.1.4:4000
+      JWS_PRIVATE_KEY_PATH: /usr/src/app/keys/jws_private.pem
+      ENCRYPTION_SERVICE_URL: http://192.168.1.4:5001/client-server/
     volumes:
       - ./services/authentication-service:/usr/src/app
       - /usr/src/app/node_modules
+      - ./keys:/usr/src/app/keys
     command: ["npm", "start"]
 

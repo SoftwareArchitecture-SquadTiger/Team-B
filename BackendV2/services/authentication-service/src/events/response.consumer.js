@@ -5,7 +5,7 @@ import { resolvePendingRequest } from '../utils/requestHandler.js';
 // Create a separate Kafka instance and consumer (different groupId)
 const kafka = new Kafka({
   clientId: 'auth-service-response',
-  brokers: ['localhost:9093'],
+  brokers: [process.env.KAFKA_BROKER],
 });
 
 const responseConsumer = kafka.consumer({

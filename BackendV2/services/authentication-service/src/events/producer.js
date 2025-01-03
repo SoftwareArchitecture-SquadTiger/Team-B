@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import {addPendingRequest, deletePendingRequest} from "../utils/requestHandler.js";
 const kafka = new Kafka({
   clientId: 'auth-service-producer',
-  brokers: ['localhost:9093'], // Use localhost, not kafka
+  brokers: [process.env.KAFKA_BROKER], // Use localhost, not kafka
 });
 
 const producer = kafka.producer();
@@ -84,10 +84,17 @@ const produceSaveRequest = async (topic, message) => {
  * Produce a user-data-save-request message
  * @param {Object} msg - { correlationId, userType, userData }
  */
-async function produceLoginResponse(msg) {
+async function produceLoginResponse(status, msg) {
+  const messageWithStatus = {
+    ...msg,
+    status: status,
+  };
+  
   await producer.send({
     topic: 'login-response',
-    messages: [{ value: JSON.stringify(msg) }],
+    messages: [
+      { value: JSON.stringify(messageWithStatus) },
+    ],
   });
 }
 
@@ -95,10 +102,17 @@ async function produceLoginResponse(msg) {
  * Produce a user-data-save-request message
  * @param {Object} msg - { correlationId, userType, userData }
  */
-async function produceRegisterResponse(msg) {
+async function produceRegisterResponse(status ,msg) {
+  const messageWithStatus = {
+    ...msg,
+    status: status,
+  };
+  
   await producer.send({
     topic: 'register-response',
-    messages: [{ value: JSON.stringify(msg) }],
+    messages: [
+      { value: JSON.stringify(messageWithStatus) },
+    ],
   });
 }
 

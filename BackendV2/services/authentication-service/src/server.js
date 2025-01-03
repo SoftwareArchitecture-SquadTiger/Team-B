@@ -1,13 +1,9 @@
-import app from './app.js';
 import "dotenv/config"
 import { startConsumer } from './events/consumer.js';
 import { startResponseConsumer } from './events/response.consumer.js';
+import { startProducer } from './events/producer.js';
 
-const PORT = process.env.PORT;
-
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on port ${PORT}`);
-});
+startProducer().then(() => console.log('Producer connected'));
 
 startConsumer().catch((error) => {
   console.error('Error starting consumer:', error);

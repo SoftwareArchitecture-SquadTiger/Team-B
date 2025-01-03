@@ -47,7 +47,7 @@ async function handleLoginRequest(msg) {
     const jwe = await createAndEncryptToken(payload, userId);
     console.log('JWE:', jwe);
     // Step 6: Produce event to API Gateway with the JWE
-    await produceLoginResponse({ correlationId: correlationId, JWE:jwe });
+    await produceLoginResponse('success',{ correlationId: correlationId, JWE:jwe });
 
     console.log(`Login request processed successfully for ${email}. Events sent to fetch user data and verify user.`);
   } catch (error) {
@@ -94,8 +94,13 @@ async function handleRegisterRequest(msg) {
       userData: { ...userData, userId, email },
     };
     console.log("1"); 
-    const topic = msg.userType === 'Charity' ? 'charity-request' : 'donor-request';
+    const topic = userType === 'Charity' ? 'charity-request' : 'donor-request';
+    console.log(topic);
     const result = await produceSaveRequest(topic, saveRequest);
+    const {status} = result;
+    if (status === 'error') {
+      throw new Error("Failed to save user data");
+    }
     console.log(result);
     console.log(`Save request sent for user ${email}`);
     // Step 4: Save credentials in Credential collection
@@ -105,12 +110,11 @@ async function handleRegisterRequest(msg) {
       userType,
       password: encryptedPassword, // Store the encrypted password
     });
-
     await credential.save();
     console.log(`Credentials saved for user ${email}`);
 
     // Step 5: Produce register success response
-    produceRegisterResponse({ correlationId, userId, userType });
+    produceRegisterResponse('success',{ correlationId, userId, userType });
 
   } catch (error) {
     await handleServiceError('register-response', correlationId, error.message);

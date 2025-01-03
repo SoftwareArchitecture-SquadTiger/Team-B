@@ -16,11 +16,11 @@ export const handleServiceError = async (topic, correlationId, errorMessage) => 
     };
     switch (topic) {
       case 'login-response':
-        await produceLoginResponse(failureMessage);
+        await produceLoginResponse('error',failureMessage);
         break;
 
       case 'register-response':
-        await produceRegisterResponse(failureMessage);
+        await produceRegisterResponse('error',failureMessage);
         break;
 
       default:
