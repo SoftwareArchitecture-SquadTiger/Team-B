@@ -1,30 +1,32 @@
-import { v4 as uuidv4 } from 'uuid';
-import { SignJWT, importPKCS8 } from 'jose';
-import axios from 'axios';
+import { SignJWT, importPKCS8, generateKeyPair, compactEncrypt } from 'jose';
 import fs from 'fs';
 
-// Load RSA key for JWS signing
+// Load RSA private key for signing JWS
 const privateKeyPath = process.env.JWS_PRIVATE_KEY_PATH;
 const privateKeyPem = fs.readFileSync(privateKeyPath, 'utf8');
 
-// Define privateKeyObject
-let privateKeyObject;
+// Load public key for JWE encryption
+const publicKeyPath = process.env.JWE_PUBLIC_KEY_PATH;
+const publicKeyPem = fs.readFileSync(publicKeyPath, 'utf8');
 
-// Import private key asynchronously
+// Define privateKeyObject and publicKeyObject
+let privateKeyObject, publicKeyObject;
+
+// Import private and public keys asynchronously
 (async () => {
   privateKeyObject = await importPKCS8(privateKeyPem, 'RS256');
-  console.log('Private key loaded successfully');
+  publicKeyObject = await generateKeyPair('RSA-OAEP', { modulusLength: 2048 }); // If you generate locally
+  console.log('Keys loaded successfully');
 })();
 
 /**
- * createAndEncryptToken:
- * 1. Sign the payload as JWS locally using JOSE.
- * 2. Make a POST request to encrypt the JWS using the encryption service.
- * 3. Return the JWE response from the encryption service.
+ * Create, Sign, and Encrypt a JWT (JWE).
+ * 1. Sign the payload as JWS using JOSE.
+ * 2. Encrypt the signed JWS into a JWE using JOSE.
  */
 export async function createAndEncryptToken(payload, entityId) {
-  if (!privateKeyObject) {
-    throw new Error('Private key not yet loaded for JWS signing.');
+  if (!privateKeyObject || !publicKeyObject) {
+    throw new Error('Keys not yet loaded for JWT processing.');
   }
 
   // Step 1: Sign the payload locally as JWS
@@ -34,25 +36,11 @@ export async function createAndEncryptToken(payload, entityId) {
     .setExpirationTime('1h')
     .sign(privateKeyObject);
 
-  // Step 2: Call the encryption service via REST API to encrypt the JWS
-  try {
-    const model = 'auth'; // Replace with your specific model name
-    const entityId = uuidv4(); // Generate or pass the entity ID dynamically
+  // Step 2: Encrypt the JWS as a JWE
+  const encoder = new TextEncoder();
+  const jwe = await new compactEncrypt(encoder.encode(jws))
+    .setProtectedHeader({ alg: 'RSA-OAEP', enc: 'A256GCM' })
+    .encrypt(publicKeyObject.publicKey);
 
-    const response = await axios.post(
-      `${process.env.ENCRYPTION_SERVICE_URL}/encrypt`,
-      {
-        jws: jws, // Send the signed JWS as 'data'
-        entityId: entityId, // Send the entity ID for encryption
-      }
-    );
-
-    if (response.status === 200 && response.data && response.data.encryptedToken) {
-      return response.data.encryptedToken; // Return the encrypted JWE token
-    } else {
-      throw new Error('Invalid response from encryption service');
-    }
-  } catch (err) {
-    throw new Error(`Failed to call encryption service: ${err.message}`);
-  }
+  return jwe; // Return the JWE
 }
