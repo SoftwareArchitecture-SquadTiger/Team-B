@@ -18,6 +18,7 @@
     "kafkajs": "^2.2.4",
     "mongoose": "^8.8.4",
     "nodemon": "^3.1.7",
+    "redis": "^4.7.0",
     "team-b": "file:",
     "uuid": "^11.0.3"
   }

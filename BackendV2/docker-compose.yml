@@ -56,3 +56,9 @@ services:
       - ./services/charity-service:/usr/src/app
       - /usr/src/app/node_modules
     command: ["npm", "start"]
+  
+
+
+    
+
+

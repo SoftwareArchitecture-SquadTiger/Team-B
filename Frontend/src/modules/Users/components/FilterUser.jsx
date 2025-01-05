@@ -11,7 +11,7 @@ const FilterUser = ({ showDropdown, onFilterClick, onSelectRole }) => (
     </button>
     {showDropdown && (
       <div className="absolute top-full mt-2 left-0 bg-white border border-gray-300 rounded shadow-lg z-10">
-        {["", "ADMIN", "DORNOR", "CHARITY"].map((role, index) => (
+        {["", "ADMIN", "DONOR", "CHARITY"].map((role, index) => (
           <div
             key={index}
             className="px-4 py-2 cursor-pointer hover:bg-gray-100"
