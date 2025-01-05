@@ -57,41 +57,7 @@ services:
       - /usr/src/app/node_modules
     command: ["npm", "start"]
   
-  redis-master:
-    image: redis:latest
-    container_name: redis-master 
-    command: ["redis-server", "/usr/local/etc/redis/redis.conf"]
-    volumes:
-      - ./redis/config/redis-master.conf:/usr/local/etc/redis/redis.conf
-    ports:
-      - "${REDIS_MASTER_PORT}:${REDIS_MASTER_PORT}"
-    environment:
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
-  
-  redis-replica:
-    image: redis:latest
-    container_name: redis-replica
-    command: ["redis-server", "/usr/local/etc/redis/redis.conf", "--replicaof", "redis-master", "${REDIS_MASTER_PORT}"]
-    volumes:
-      - ./redis/config/redis-replica.conf:/usr/local/etc/redis/redis.conf
-    ports:
-      - "${REDIS_REPLICA_PORT}:${REDIS_MASTER_PORT}"
-    environment:
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
-    
-  redis-sentinel:
-    image: redis:latest
-    container_name: redis-sentinel
-    command: ["redis-sentinel", "/usr/local/etc/redis/sentinel.conf"]
-    volumes:
-      - ./redis/config/sentinel.conf:/usr/local/etc/redis/sentinel.conf
-    ports:
-      - "${REDIS_SENTINEL_PORT}:${REDIS_SENTINEL_PORT}"
-    depends_on:
-      - redis-master
-      - redis-replica
-    environment:
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
+
 
     
 
