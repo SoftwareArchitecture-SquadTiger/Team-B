@@ -1,4 +1,4 @@
-import { SignJWT, importPKCS8, generateKeyPair, compactEncrypt } from 'jose';
+import { SignJWT, EncryptJWT, importPKCS8, importSPKI } from 'jose';
 import fs from 'fs';
 
 // Load RSA private key for signing JWS
@@ -14,8 +14,12 @@ let privateKeyObject, publicKeyObject;
 
 // Import private and public keys asynchronously
 (async () => {
+  // Import the private key for signing JWS
   privateKeyObject = await importPKCS8(privateKeyPem, 'RS256');
-  publicKeyObject = await generateKeyPair('RSA-OAEP', { modulusLength: 2048 }); // If you generate locally
+
+  // Import the public key for encrypting JWE
+  publicKeyObject = await importSPKI(publicKeyPem, 'RSA-OAEP');
+
   console.log('Keys loaded successfully');
 })();
 
@@ -24,7 +28,9 @@ let privateKeyObject, publicKeyObject;
  * 1. Sign the payload as JWS using JOSE.
  * 2. Encrypt the signed JWS into a JWE using JOSE.
  */
-export async function createAndEncryptToken(payload, entityId) {
+export async function createAndEncryptToken(payload) {
+  const { userId, role } = payload;
+
   if (!privateKeyObject || !publicKeyObject) {
     throw new Error('Keys not yet loaded for JWT processing.');
   }
@@ -37,10 +43,9 @@ export async function createAndEncryptToken(payload, entityId) {
     .sign(privateKeyObject);
 
   // Step 2: Encrypt the JWS as a JWE
-  const encoder = new TextEncoder();
-  const jwe = await new compactEncrypt(encoder.encode(jws))
+  const jwe = await new EncryptJWT({ jws })
     .setProtectedHeader({ alg: 'RSA-OAEP', enc: 'A256GCM' })
-    .encrypt(publicKeyObject.publicKey);
+    .encrypt(publicKeyObject);
 
-  return jwe; // Return the JWE
+  return jwe;
 }
