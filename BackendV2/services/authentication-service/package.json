@@ -1,7 +1,7 @@
 {
-  "name": "donor-microservice",
+  "name": "authentication-service",
   "version": "1.0.0",
-  "description": "Donor Microservice for the charitan project",
+  "description": "Authentication Microservice for the charitan project",
   "main": "src/server.js",
   "type": "module",
   "scripts": {
@@ -12,14 +12,18 @@
   "author": "team B",
   "license": "ISC",
   "dependencies": {
-    "donor-microservice": "file:",
+    "authentication-service": "file:",
+    "axios": "^1.7.9",
+    "bcrypt": "^5.1.1",
+    "bcryptjs": "^2.4.3",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "jose": "^5.9.6",
     "kafkajs": "^2.2.4",
     "mongoose": "^8.8.4",
     "nodemon": "^3.1.7",
-    "redis": "^4.7.0",
     "team-b": "file:",
     "uuid": "^11.0.3"
-  }
+  },
+  "keywords": []
 }

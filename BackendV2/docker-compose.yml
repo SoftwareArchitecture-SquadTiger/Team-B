@@ -18,14 +18,14 @@ services:
     environment:
       KAFKA_BROKER_ID: ${KAFKA_BROKER_ID}
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:${ZOOKEEPER_PORT}
-      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:${KAFKA_PORT},EXTERNAL://localhost:9093
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:${KAFKA_PORT},EXTERNAL://${KAFKA_EXTERNAL_ADVERTISED_HOSTNAME}:9093
       KAFKA_LISTENERS: INTERNAL://0.0.0.0:${KAFKA_PORT},EXTERNAL://0.0.0.0:9093
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
     ports:
       - "${KAFKA_PORT}:${KAFKA_PORT}"
-      - "9093:9093" #External localhost
+      - "9093:9093" #External port
     
   donor-service:
     build:
@@ -56,3 +56,26 @@ services:
       - ./services/charity-service:/usr/src/app
       - /usr/src/app/node_modules
     command: ["npm", "start"]
+    
+  authentication-service:
+    build:
+      context: ./services/authentication-service
+      dockerfile: Dockerfile
+    container_name: authentication-service
+    depends_on:
+      - kafka
+      - charity-service
+      - donor-service
+    environment:
+      KAFKA_BROKER: kafka:${KAFKA_PORT}
+      MONGO_URI: ${MONGO_URI}
+      JWS_PRIVATE_KEY_PATH: ${KEY_PATH}jws_private.pem
+      JWE_PUBLIC_KEY_PATH: ${KEY_PATH}jwe_public.pem
+      RSA_PRIVATE_KEY_PATH: ${KEY_PATH}rsa_private.pem
+      ENCRYPTION_SERVICE_URL: http://192.168.1.4:5001/client-server/
+    volumes:
+      - ./services/authentication-service:/usr/src/app
+      - /usr/src/app/node_modules
+      - ./keys:/usr/src/app/keys
+    command: ["npm", "start"]
+
