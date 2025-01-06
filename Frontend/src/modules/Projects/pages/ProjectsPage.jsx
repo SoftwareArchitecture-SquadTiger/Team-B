@@ -10,6 +10,7 @@ import { fetchProjectById } from "../services/fetchProjects";
 import { updateProjectStatusAPI } from "../services/updateProjectStatus";
 import { fetchProjectByRegion } from "../services/fetchProjectbyRegion";
 import { fetchProjectsByStatus } from "../services/fetchProjectsByStatus";
+import { useNavigate } from "react-router-dom";
 
 
 const ProjectsPage = () => {
@@ -19,6 +20,7 @@ const ProjectsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [projectsPerPage] = useState(10);
   const [filter, setFilter] = useState({ region: "", status: "" });
+  const navigate = useNavigate();
 
   // Fetch all projects on mount
   useEffect(() => {
@@ -205,7 +207,12 @@ const ProjectsPage = () => {
       <div className="flex gap-4 mb-4">
         <SearchBar searchQuery={searchQuery} onSearch={(e) => handleSearch(e.target.value)} />
         <FilterProject onFilter={setFilter} onRegionChange={handleRegionFilter} onStatusChange={handleStatusFilter} />
-        <AddProject />
+        <button
+          onClick={() => navigate("/add-project")}
+          className="bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-600"
+        >
+          + Add Project
+        </button>
       </div>
 
       <ProjectTable

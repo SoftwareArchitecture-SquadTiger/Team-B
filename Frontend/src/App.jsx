@@ -6,6 +6,7 @@ import UsersPage from './modules/Users/pages/UsersPage'
 import ProjectsPage from './modules/Projects/pages/ProjectsPage'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './Layout';
+import AddProjectForm from "./modules/AddProject/pages/AddProjectForm";
 
 function App() {
   return (
@@ -52,6 +53,15 @@ function App() {
           element={
             <Layout>
               <ProjectsPage />
+            </Layout>
+          }
+        />
+
+        <Route
+          path="/add-project"
+          element={
+            <Layout>
+              <AddProjectForm />
             </Layout>
           }
         />
