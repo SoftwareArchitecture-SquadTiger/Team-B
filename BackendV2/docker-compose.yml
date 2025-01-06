@@ -64,6 +64,8 @@ services:
     container_name: authentication-service
     depends_on:
       - kafka
+      - charity-service
+      - donor-service
     environment:
       KAFKA_BROKER: kafka:${KAFKA_PORT}
       MONGO_URI: ${MONGO_URI}
