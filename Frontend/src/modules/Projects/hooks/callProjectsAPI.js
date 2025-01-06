@@ -1,13 +1,17 @@
 import axios from "axios";
+import { handleDeleteProject } from "../services/handleDeleteProject";
 
+const BASE_URL = `http://${import.meta.env.VITE_HOST}:${import.meta.env.VITE_PORT}/client-server`;
+
+// Fetch Projects API
 export const fetchProjectsAPI = async () => {
-  const apiUrl = `http://${import.meta.env.VITE_HOST}:${import.meta.env.VITE_PORT}/client-server/projects`;
+  const apiUrl = `${BASE_URL}/projects`;
   console.log("API URL:", apiUrl); // Debugging the API URL
   try {
     const response = await axios.get(apiUrl, {
       headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
+        Accept: "application/json",
+        "Content-Type": "application/json",
       },
     });
     console.log("Fetched response:", response.data); // Check the actual response
@@ -22,21 +26,26 @@ export const fetchProjectsAPI = async () => {
 
 
 
-const response = await axios.get(`http://192.168.20.6:5000/client-server/projects`);
 
-
-
-export const deleteProjectAPI = async (id) => {
-  const response = await axios.delete(
-    `${import.meta.env.VITE_HOST}:${import.meta.env.VITE_PORT}/client-server/project/delete/${id}`
-  );
-  return response.data;
-};
-
+// Update Project Status API
 export const updateProjectStatusAPI = async (id, status) => {
-  const response = await axios.put(
-    `${import.meta.env.VITE_HOST}:${import.meta.env.VITE_PORT}/client-server/project/update/${id}`,
-    { status }
-  );
-  return response.data;
+  const apiUrl = `${BASE_URL}/project/update/${id}`;
+  console.log("Updating project status:", apiUrl, "with status:", status); // Debugging
+  try {
+    const response = await axios.put(
+      apiUrl,
+      { status },
+      {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    console.log("Updated project status response:", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error in updateProjectStatusAPI:", error);
+    throw error;
+  }
 };

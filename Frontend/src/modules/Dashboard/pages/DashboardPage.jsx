@@ -30,9 +30,9 @@ const Dashboard = () => {
 
       <div className="flex flex-wrap gap-4">
         {/* Project Table */}
-        <div className="bg-white shadow-md rounded-lg p-6 w-full md:w-1/3">
+        {/* <div className="bg-white shadow-md rounded-lg p-6 w-full md:w-1/3">
           <ProjectTable />
-        </div>
+        </div> */}
 
         {/* Pie Charts */}
         <div className="flex flex-wrap bg-white shadow-md rounded-lg p-6 w-full md:w-2/3">
