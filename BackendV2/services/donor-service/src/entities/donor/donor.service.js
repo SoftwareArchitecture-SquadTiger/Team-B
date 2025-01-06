@@ -25,6 +25,10 @@ const getDonorsBySubscribedRegions = async (regions) => {
   return await donorRepository.getDonorsByEmails(emails);
 };
 
+const getFilteredDonors = async (filters) => {
+  return await donorRepository.getFilteredDonors(filters);
+};
+
 const addDonor = async (donorData) => {
   return await donorRepository.create(donorData);
 };
@@ -42,6 +46,7 @@ export default {
   getDonorById,
   getDonorsBySubscribedCategories,
   getDonorsBySubscribedRegions,
+  getFilteredDonors,
   addDonor,
   updateDonor,
   deleteDonor,
