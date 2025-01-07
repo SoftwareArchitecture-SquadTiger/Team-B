@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import AvatarUpload from "../components/AvatarUpload";
 import FormInput from "../components/FormInput";
-import CountrySelector from "../components/CountrySelector";
 import UserTypeSelector from "../components/UserTypeSelector";
 import SuccessModal from "../components/SuccessModal";
 
@@ -9,19 +8,23 @@ function AddCharityForm() {
   const [image, setImage] = useState(null);
   const [formData, setFormData] = useState({
     email: "",
-    country: "Vietnam",
+    country: "",
     taxCode: "",
     password: "",
     confirmPassword: "",
     companyName: "",
     phoneNumber: "",
-    address: "",
+    address: {
+      street: "",
+      city: "",
+      state: "",
+      postalCode: "",
+    },
   });
+  const [userType, setUserType] = useState("Charity User");
   const [errors, setErrors] = useState({});
   const [showSuccessModal, setShowSuccessModal] = useState(false);
-  const [userType, setUserType] = useState("Charity User");
 
-  // Handle image upload
   const handleImageUpload = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -30,68 +33,52 @@ function AddCharityForm() {
     }
   };
 
-  // Handle form data change
   const handleInputChange = (e) => {
     const { id, value } = e.target;
-    setFormData({ ...formData, [id]: value });
+    if (id.startsWith("address-")) {
+      const key = id.split("-")[1];
+      setFormData({
+        ...formData,
+        address: { ...formData.address, [key]: value },
+      });
+    } else {
+      setFormData({ ...formData, [id]: value });
+    }
   };
 
-  // Validate form inputs
-  const validateForm = () => {
-    const newErrors = {};
-
-    if (!formData.email) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Invalid email format";
-    }
-
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    }
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
-    }
-
-    if (!formData.phoneNumber) {
-      newErrors.phoneNumber = "Phone number is required";
-    } else if (!/^\d{10,}$/.test(formData.phoneNumber)) {
-      newErrors.phoneNumber = "Phone number must be at least 10 digits and contain only numbers";
-    }
-
-    if (!formData.companyName) newErrors.companyName = "Company name is required";
-    if (!formData.taxCode) newErrors.taxCode = "Tax code is required";
-    if (!formData.address) newErrors.address = "Address is required";
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  // Handle form submission
   const handleSubmit = (event) => {
     event.preventDefault();
-    if (validateForm()) {
-      setShowSuccessModal(true);
-    }
+    setShowSuccessModal(true);
   };
 
   return (
-    <div className="flex justify-center items-center h-screen bg-gray-50">
-      <div className="bg-white shadow-md rounded-lg p-8 w-full max-w-4xl">
-        <UserTypeSelector value={userType} onChange={(e) => setUserType(e.target.value)} />
-
-        <form className="grid grid-cols-2 gap-4" onSubmit={handleSubmit}>
-          <AvatarUpload image={image} handleImageUpload={handleImageUpload} />
-          <FormInput
-            id="email"
-            label="Email Address"
-            type="email"
-            value={formData.email}
-            onChange={handleInputChange}
-            placeholder="Enter email"
-            error={errors.email}
-          />
-          <CountrySelector id="country" value={formData.country} onChange={handleInputChange} />
+    <div className="p-6 max-w-3xl mx-auto bg-white shadow rounded">
+      <h2 className="text-2xl font-bold mb-6 text-gray-800">Add New User</h2>
+      <form onSubmit={handleSubmit}>
+        <UserTypeSelector
+          value={userType}
+          onChange={(e) => setUserType(e.target.value)}
+        />
+        <AvatarUpload image={image} handleImageUpload={handleImageUpload} />
+        <FormInput
+          id="email"
+          label="Email Address"
+          type="email"
+          value={formData.email}
+          onChange={handleInputChange}
+          placeholder="Enter email"
+          className="mb-4"
+        />
+        <FormInput
+          id="country"
+          label="Country"
+          type="text"
+          value={formData.country}
+          onChange={handleInputChange}
+          placeholder="Enter country"
+          className="mb-4"
+        />
+        {userType === "Charity User" && (
           <FormInput
             id="taxCode"
             label="Tax Code"
@@ -99,65 +86,96 @@ function AddCharityForm() {
             value={formData.taxCode}
             onChange={handleInputChange}
             placeholder="Enter tax code"
-            error={errors.taxCode}
+            className="mb-4"
           />
-          <FormInput
-            id="password"
-            label="Password"
-            type="password"
-            value={formData.password}
-            onChange={handleInputChange}
-            placeholder="Enter password"
-            error={errors.password}
-          />
-          <FormInput
-            id="confirmPassword"
-            label="Password Confirmation"
-            type="password"
-            value={formData.confirmPassword}
-            onChange={handleInputChange}
-            placeholder="Confirm password"
-            error={errors.confirmPassword}
-          />
-          <FormInput
-            id="companyName"
-            label="Company Name"
+        )}
+        <FormInput
+          id="password"
+          label="Password"
+          type="password"
+          value={formData.password}
+          onChange={handleInputChange}
+          placeholder="Enter password"
+          className="mb-4"
+        />
+        <FormInput
+          id="confirmPassword"
+          label="Confirm Password"
+          type="password"
+          value={formData.confirmPassword}
+          onChange={handleInputChange}
+          placeholder="Confirm password"
+          className="mb-4"
+        />
+        <FormInput
+          id="companyName"
+          label="Company Name"
+          type="text"
+          value={formData.companyName}
+          onChange={handleInputChange}
+          placeholder="Enter company name"
+          className="mb-4"
+        />
+        <FormInput
+          id="phoneNumber"
+          label="Phone Number"
+          type="text"
+          value={formData.phoneNumber}
+          onChange={handleInputChange}
+          placeholder="Enter phone number"
+          className="mb-4"
+        />
+        <div className="mb-4">
+          <label className="block mb-1 text-gray-600">Address</label>
+          <input
+            id="address-street"
             type="text"
-            value={formData.companyName}
+            value={formData.address.street}
             onChange={handleInputChange}
-            placeholder="Enter company name"
-            error={errors.companyName}
+            placeholder="Street"
+            className="w-full p-2 border border-gray-300 rounded mb-2"
           />
-          <FormInput
-            id="phoneNumber"
-            label="Phone Number"
-            type="tel"
-            value={formData.phoneNumber}
-            onChange={handleInputChange}
-            placeholder="Enter phone number"
-            error={errors.phoneNumber}
-          />
-          <FormInput
-            id="address"
-            label="Address"
+          <input
+            id="address-city"
             type="text"
-            value={formData.address}
+            value={formData.address.city}
             onChange={handleInputChange}
-            placeholder="Enter address"
-            error={errors.address}
+            placeholder="City"
+            className="w-full p-2 border border-gray-300 rounded mb-2"
           />
-          <div className="col-span-2 flex justify-center">
-            <button
-              type="submit"
-              className="px-6 py-2 bg-pink-500 text-white rounded-md shadow hover:bg-pink-600 focus:outline-none focus:ring-2 focus:ring-pink-500 focus:ring-offset-2"
-            >
-              Create account
-            </button>
-          </div>
-        </form>
-
-        {showSuccessModal && <SuccessModal onClose={() => setShowSuccessModal(false)} />}
-      </div>
+          <input
+            id="address-state"
+            type="text"
+            value={formData.address.state}
+            onChange={handleInputChange}
+            placeholder="State"
+            className="w-full p-2 border border-gray-300 rounded mb-2"
+          />
+          <input
+            id="address-postalCode"
+            type="text"
+            value={formData.address.postalCode}
+            onChange={handleInputChange}
+            placeholder="Postal Code"
+            className="w-full p-2 border border-gray-300 rounded"
+          />
+        </div>
+        <div className="flex justify-between">
+          <button
+            type="button"
+            className="px-4 py-2 bg-gray-300 text-gray-800 rounded shadow hover:bg-gray-400"
+          >
+            Return
+          </button>
+          <button
+            type="submit"
+            className="px-6 py-2 bg-pink-500 text-white rounded shadow hover:bg-pink-600"
+          >
+            Create Account
+          </button>
+        </div>
+      </form>
+      {showSuccessModal && <SuccessModal onClose={() => setShowSuccessModal(false)} />}
     </div>
   );
 }
