@@ -26,6 +26,7 @@ const deleteCharity = async (id) => {
 export default {
   getAllCharities,
   getCharityById,
+  getFilteredCharities,
   addCharity,
   updateCharity,
   deleteCharity,
