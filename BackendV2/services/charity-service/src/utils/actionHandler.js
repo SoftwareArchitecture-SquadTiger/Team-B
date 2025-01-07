@@ -9,6 +9,10 @@ export const actionHandlers = {
     const charity = await charityService.getCharityById(data.id);
     return { status: "success", data: charity ? charity.toJSON() : null };
   },
+  GET_BY_FILTERS: async (data) => {
+    const charities = await charityService.getFilteredCharities(data);
+    return { status: "success", data: charities };
+  },
   ADD: async (data) => {
     const newCharity = await charityService.addCharity(data);
     return { status: "success", data: newCharity.toJSON() };

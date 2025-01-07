@@ -26,7 +26,7 @@ const getDonorsBySubscribedRegions = async (regions) => {
 };
 
 const getFilteredDonors = async (filters) => {
-  return await donorRepository.getFilteredDonors(filters);
+  return await donorRepository.getByFilter(filters);
 };
 
 const addDonor = async (donorData) => {
