@@ -23,7 +23,7 @@ export const actionHandlers = {
     );
     return { status: "success", data: donors };
   },
-  GET_FILTERED: async (data) => {
+  GET_BY_FILTERS: async (data) => {
     const donors = await donorService.getFilteredDonors(data);
     return { status: "success", data: donors };
   },
