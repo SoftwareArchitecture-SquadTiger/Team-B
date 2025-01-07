@@ -8,6 +8,8 @@ import AddCharityForm from './modules/AddUser/pages/AddCharityForm';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './Layout';
 import AddProjectForm from "./modules/AddProject/pages/AddProjectForm";
+import CloudinaryGallery from './modules/Image/pages/CloudinaryGallery';
+
 
 function App() {
   return (
@@ -74,7 +76,18 @@ function App() {
             </Layout>
           }
         />
+
+        <Route
+          path="/gallery"
+          element={
+            <Layout>
+              <CloudinaryGallery />
+            </Layout>
+          }
+        />
       </Routes>
+
+      
     </Router>
   );
 }
