@@ -23,10 +23,6 @@ export const fetchProjectsAPI = async () => {
   }
 };
 
-
-
-
-
 // Update Project Status API
 export const updateProjectStatusAPI = async (id, status) => {
   const apiUrl = `${BASE_URL}/project/update/${id}`;

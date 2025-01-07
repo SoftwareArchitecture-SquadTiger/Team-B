@@ -1,10 +1,15 @@
-export const callDeleteCharityApi = async (url, userId) => {
-    const response = await fetch(`${url}/admin-server/charity/delete/${userId}`, {
-      method: "DELETE",
-    });
-    if (!response.ok) {
-      throw new Error("Failed to delete the charity");
-    }
-    return true;
-  };
-  
+import { DELETE_CHARITY_SERVICE_URL } from "../../../../services/BackendUrlConfig";
+
+async function callDeleteCharityApi(userId) {
+  const response = await fetch(`${DELETE_CHARITY_SERVICE_URL}/${userId}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to delete the charity with ID: ${userId}`);
+  }
+
+  return true;
+}
+
+export default callDeleteCharityApi;

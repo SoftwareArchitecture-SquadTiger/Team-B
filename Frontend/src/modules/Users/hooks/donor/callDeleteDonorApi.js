@@ -1,10 +1,15 @@
-export const callDeleteDonorApi = async (url, userId) => {
-    const response = await fetch(`${url}/admin-server/donor/delete/${userId}`, {
-      method: "DELETE",
-    });
-    if (!response.ok) {
-      throw new Error("Failed to delete the donor");
-    }
-    return true;
-  };
-  
+import { DELETE_DONOR_SERVICE_URL } from "../../../../services/BackendUrlConfig";
+
+async function callDeleteDonorApi(userId) {
+  const response = await fetch(`${DELETE_DONOR_SERVICE_URL}/${userId}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    throw new Error(`Failed to delete the donor with ID: ${userId}`);
+  }
+
+  return true;
+}
+
+export default callDeleteDonorApi;

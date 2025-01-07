@@ -5,7 +5,6 @@ const UserTable = ({ users, onDelete }) => (
   <table className="w-full border-collapse mb-4">
     <thead>
       <tr className="bg-gray-200">
-        <th className="border border-gray-300 p-2 text-left">ID</th>
         <th className="border border-gray-300 p-2 text-left">NAME</th>
         <th className="border border-gray-300 p-2 text-left">ROLE</th>
         <th className="border border-gray-300 p-2 text-left">EMAIL</th>
@@ -17,7 +16,6 @@ const UserTable = ({ users, onDelete }) => (
     <tbody>
       {users.map((user, index) => (
         <tr key={index} className="odd:bg-white even:bg-gray-50">
-          <td className="border border-gray-300 p-2">{user.id}</td>
           <td className="border border-gray-300 p-2">{user.name}</td>
           <td className="border border-gray-300 p-2">{user.role}</td>
           <td className="border border-gray-300 p-2">{user.email}</td>

@@ -1,6 +1,8 @@
-export const callCharitiesApi = async (url) => {
+import { GET_CHARITIES_SERVICE_URL } from "../../../../services/BackendUrlConfig";
+
+async function callCharitiesApi(){
     try {
-        const charitiesResponse = await fetch( (`${url}/admin-server/charities`),);
+        const charitiesResponse = await fetch( GET_CHARITIES_SERVICE_URL);
     
         if (!charitiesResponse.ok) throw new Error("Failed to fetch charities");
     
@@ -19,4 +21,6 @@ export const callCharitiesApi = async (url) => {
         throw error;
       }
     };
+
+    export default callCharitiesApi;
   

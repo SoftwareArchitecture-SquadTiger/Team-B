@@ -8,28 +8,27 @@ import { fetchCharities } from "../services/charity/fetchCharities";
 import { fetchDonors } from "../services/donor/fetchDonors";
 import { handleDeleteCharity } from "../services/charity/deleteCharity";
 import { handleDeleteDonor } from "../services/donor/deleteDonor";
-import filterUsers from "../services/filterUsers";
-import paginate from "../services/paginate";
 import searchCharities from "../services/charity/searchCharities";
 import searchDonors from "../services/donor/searchDonors";
+import paginate from "../services/paginate";
 
 const UsersPage = () => {
   const [searchQueryDonor, setSearchQueryDonor] = useState("");
-  const [searchQueryCharity, setSearchQueryCharity] = useState("");  
+  const [searchQueryCharity, setSearchQueryCharity] = useState("");
+  const [donorCountryFilter, setDonorCountryFilter] = useState("");
+  const [charityCountryFilter, setCharityCountryFilter] = useState("");
+  const [charityTypeFilter, setCharityTypeFilter] = useState("");
   const [currentDonorPage, setCurrentDonorPage] = useState(1);
   const [currentCharityPage, setCurrentCharityPage] = useState(1);
   const navigate = useNavigate();
   const [donors, setDonors] = useState([]);
   const [charities, setCharities] = useState([]);
 
-  const url = `http://${import.meta.env.VITE_HOST}:${import.meta.env.VITE_PORT}`;
-
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch donors and charities concurrently
-        const donorsPromise = fetchDonors(url, setDonors);
-        const charitiesPromise = fetchCharities(url, setCharities);
+        const donorsPromise = fetchDonors(setDonors);
+        const charitiesPromise = fetchCharities(setCharities);
 
         await Promise.all([donorsPromise, charitiesPromise]);
       } catch (error) {
@@ -38,25 +37,43 @@ const UsersPage = () => {
     };
 
     fetchData();
-  }, [url]);
+  }, []);
 
-  // Filter and paginate donors
-  const filteredDonors = searchDonors(donors, searchQueryDonor, "DONOR");
+  // Filter donors by search query and country
+  const filteredDonors = searchDonors(
+    donors.filter((donor) =>
+      donorCountryFilter
+        ? donor.country.toLowerCase().includes(donorCountryFilter.toLowerCase())
+        : true
+    ),
+    searchQueryDonor,
+    "DONOR"
+  );
   const { paginatedItems: paginatedDonors, totalPages: donorTotalPages } = paginate(
     filteredDonors,
     currentDonorPage,
     10
   );
 
-  // Filter and paginate charities
-  const filteredCharities = searchCharities(charities, searchQueryCharity, "CHARITY");
+  // Filter charities by search query, country, and type
+  const filteredCharities = searchCharities(
+    charities.filter((charity) => {
+      const countryMatch = charityCountryFilter
+        ? charity.country.toLowerCase().includes(charityCountryFilter.toLowerCase())
+        : true;
+      const typeMatch = charityTypeFilter
+        ? charity.type.toLowerCase().includes(charityTypeFilter.toLowerCase())
+        : true;
+      return countryMatch && typeMatch;
+    }),
+    searchQueryCharity,
+    "CHARITY"
+  );
   const { paginatedItems: paginatedCharities, totalPages: charityTotalPages } = paginate(
     filteredCharities,
     currentCharityPage,
     10
   );
-
-  
 
   return (
     <div className="p-4">
@@ -64,7 +81,6 @@ const UsersPage = () => {
         <h2 className="text-2xl font-semibold text-gray-800">Users</h2>
       </div>
       <div className="flex gap-4 mb-4">
-
         <AddUser onAdd={() => navigate("/users/add")} />
       </div>
 
@@ -72,16 +88,21 @@ const UsersPage = () => {
       <div className="mb-8">
         <h3 className="text-xl font-semibold text-gray-800 mb-4">Donors</h3>
         <div className="flex gap-4 mb-4">
-        <SearchBar
-          searchQuery={searchQueryDonor}
-          onSearch={(e) => setSearchQueryDonor(e.target.value)}
-        />
-      </div>
+          <SearchBar
+            searchQuery={searchQueryDonor}
+            onSearch={(e) => setSearchQueryDonor(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Filter by country"
+            value={donorCountryFilter}
+            onChange={(e) => setDonorCountryFilter(e.target.value)}
+            className="border p-2"
+          />
+        </div>
         <UserTable
           users={paginatedDonors}
-          onDelete={(userId) =>
-            handleDeleteDonor(userId, donors, setDonors, url)
-          }
+          onDelete={(userId) => handleDeleteDonor(userId, donors, setDonors)}
         />
         <Pagination
           totalPages={donorTotalPages}
@@ -94,16 +115,28 @@ const UsersPage = () => {
       <div>
         <h3 className="text-xl font-semibold text-gray-800 mb-4">Charities</h3>
         <div className="flex gap-4 mb-4">
-        <SearchBar
-          searchQuery={searchQueryCharity}
-          onSearch={(e) => setSearchQueryCharity(e.target.value)}
-        />
-      </div>
+          <SearchBar
+            searchQuery={searchQueryCharity}
+            onSearch={(e) => setSearchQueryCharity(e.target.value)}
+          />
+          <input
+            type="text"
+            placeholder="Filter by country"
+            value={charityCountryFilter}
+            onChange={(e) => setCharityCountryFilter(e.target.value)}
+            className="border p-2"
+          />
+          <input
+            type="text"
+            placeholder="Filter by type"
+            value={charityTypeFilter}
+            onChange={(e) => setCharityTypeFilter(e.target.value)}
+            className="border p-2"
+          />
+        </div>
         <UserTable
           users={paginatedCharities}
-          onDelete={(userId) =>
-            handleDeleteCharity(userId, charities, setCharities, url)
-          }
+          onDelete={(userId) => handleDeleteCharity(userId, charities, setCharities)}
         />
         <Pagination
           totalPages={charityTotalPages}

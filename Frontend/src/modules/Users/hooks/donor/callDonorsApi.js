@@ -1,6 +1,8 @@
-export const callDonorsApi = async (url) => {
+import { GET_DONORS_SERVICE_URL } from "../../../../services/BackendUrlConfig";
+
+async function callDonorsApi(){
     try {
-        const donorsResponse = await fetch( (`${url}/admin-server/donors`),);
+        const donorsResponse = await fetch( GET_DONORS_SERVICE_URL);
     
         if (!donorsResponse.ok) throw new Error("Failed to fetch donors");
     
@@ -19,4 +21,5 @@ export const callDonorsApi = async (url) => {
         throw error;
       }
     };
-    
+
+    export default callDonorsApi;

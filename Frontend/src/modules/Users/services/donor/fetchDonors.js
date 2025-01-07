@@ -1,12 +1,12 @@
-import { callDonorsApi } from "../../hooks/donor/callDonorsApi";
+import callDonorsApi from "../../hooks/donor/callDonorsApi";
 
-export const fetchDonors = async (url, setDonors) => {
+export const fetchDonors = async (setDonors) => {
   try {
-    const { donorsData = []} = await callDonorsApi(url);
+    const { donorsData = []} = await callDonorsApi();
 
     // Transform donor data
     const formattedDonors = donorsData.map((donor) => ({
-      id: donor._id,
+      id: donor.donor_id,
       name: `${donor.first_name} ${donor.last_name}`,
       role: "DONOR",
       email: donor.email,

@@ -1,12 +1,12 @@
-import { callCharitiesApi } from "../../hooks/charity/callCharitiesApi";
+import callCharitiesApi from "../../hooks/charity/callCharitiesApi";
 
-export const fetchCharities = async (url, setCharities) => {
+export const fetchCharities = async (setCharities) => {
   try {
-    const { charitiesData = []} = await callCharitiesApi(url);
+    const { charitiesData = []} = await callCharitiesApi();
 
     // Transform charity data
     const formattedCharities = charitiesData.map((charity) => ({
-        id: charity._id,
+        id: charity.charity_id,
         name: charity.name,
         type: charity.type,
         email: charity.email,
