@@ -1,36 +1,62 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import SearchBar from "../components/SearchBar";
-import FilterUser from "../components/FilterUser";
 import AddUser from "../components/AddUser";
 import UserTable from "../components/UserTable";
 import Pagination from "../components/Pagination";
-import fetchUsers from "../services/fetchUsers";
+import { fetchCharities } from "../services/charity/fetchCharities";
+import { fetchDonors } from "../services/donor/fetchDonors";
+import { handleDeleteCharity } from "../services/charity/deleteCharity";
+import { handleDeleteDonor } from "../services/donor/deleteDonor";
 import filterUsers from "../services/filterUsers";
-import handleDeleteDonor from "../services/handleDeleteDonor";
-import handleDeleteCharity from "../services/handleDeleteCharity"
 import paginate from "../services/paginate";
+import searchCharities from "../services/charity/searchCharities";
+import searchDonors from "../services/donor/searchDonors";
 
 const UsersPage = () => {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [selectedRole, setSelectedRole] = useState("");
-  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
-
+  const [searchQueryDonor, setSearchQueryDonor] = useState("");
+  const [searchQueryCharity, setSearchQueryCharity] = useState("");  
+  const [currentDonorPage, setCurrentDonorPage] = useState(1);
+  const [currentCharityPage, setCurrentCharityPage] = useState(1);
   const navigate = useNavigate();
-  const [users, setUsers] = useState([]);
+  const [donors, setDonors] = useState([]);
+  const [charities, setCharities] = useState([]);
 
   const url = `http://${import.meta.env.VITE_HOST}:${import.meta.env.VITE_PORT}`;
 
-  // Fetch donors and charities in one useEffect
   useEffect(() => {
-    fetchUsers(url, setUsers);
+    const fetchData = async () => {
+      try {
+        // Fetch donors and charities concurrently
+        const donorsPromise = fetchDonors(url, setDonors);
+        const charitiesPromise = fetchCharities(url, setCharities);
+
+        await Promise.all([donorsPromise, charitiesPromise]);
+      } catch (error) {
+        console.error("Error fetching users:", error.message);
+      }
+    };
+
+    fetchData();
   }, [url]);
 
-  const filteredUsers = filterUsers(users, searchQuery, selectedRole);
+  // Filter and paginate donors
+  const filteredDonors = searchDonors(donors, searchQueryDonor, "DONOR");
+  const { paginatedItems: paginatedDonors, totalPages: donorTotalPages } = paginate(
+    filteredDonors,
+    currentDonorPage,
+    10
+  );
 
-  // Use the paginate utility
-  const { paginatedItems, totalPages } = paginate(filteredUsers, currentPage, 10);
+  // Filter and paginate charities
+  const filteredCharities = searchCharities(charities, searchQueryCharity, "CHARITY");
+  const { paginatedItems: paginatedCharities, totalPages: charityTotalPages } = paginate(
+    filteredCharities,
+    currentCharityPage,
+    10
+  );
+
+  
 
   return (
     <div className="p-4">
@@ -38,30 +64,53 @@ const UsersPage = () => {
         <h2 className="text-2xl font-semibold text-gray-800">Users</h2>
       </div>
       <div className="flex gap-4 mb-4">
-        <SearchBar searchQuery={searchQuery} onSearch={(e) => setSearchQuery(e.target.value)} />
-        <FilterUser
-          showDropdown={showFilterDropdown}
-          onFilterClick={() => setShowFilterDropdown(!showFilterDropdown)}
-          onSelectRole={(role) => {
-            setSelectedRole(role);
-            setShowFilterDropdown(false);
-          }}
-        />
+
         <AddUser onAdd={() => navigate("/users/add")} />
       </div>
 
-      <UserTable
-        users={paginatedItems}
-        onDelete={(userId) => (handleDeleteDonor(userId, users, setUsers, url),
-          handleDeleteCharity(userId, users, setUsers, url))}
+      {/* Donors Table */}
+      <div className="mb-8">
+        <h3 className="text-xl font-semibold text-gray-800 mb-4">Donors</h3>
+        <div className="flex gap-4 mb-4">
+        <SearchBar
+          searchQuery={searchQueryDonor}
+          onSearch={(e) => setSearchQueryDonor(e.target.value)}
+        />
+      </div>
+        <UserTable
+          users={paginatedDonors}
+          onDelete={(userId) =>
+            handleDeleteDonor(userId, donors, setDonors, url)
+          }
+        />
+        <Pagination
+          totalPages={donorTotalPages}
+          currentPage={currentDonorPage}
+          onPageChange={setCurrentDonorPage}
+        />
+      </div>
 
-      />
-
-      <Pagination
-        totalPages={totalPages}
-        currentPage={currentPage}
-        onPageChange={setCurrentPage}
-      />
+      {/* Charities Table */}
+      <div>
+        <h3 className="text-xl font-semibold text-gray-800 mb-4">Charities</h3>
+        <div className="flex gap-4 mb-4">
+        <SearchBar
+          searchQuery={searchQueryCharity}
+          onSearch={(e) => setSearchQueryCharity(e.target.value)}
+        />
+      </div>
+        <UserTable
+          users={paginatedCharities}
+          onDelete={(userId) =>
+            handleDeleteCharity(userId, charities, setCharities, url)
+          }
+        />
+        <Pagination
+          totalPages={charityTotalPages}
+          currentPage={currentCharityPage}
+          onPageChange={setCurrentCharityPage}
+        />
+      </div>
     </div>
   );
 };

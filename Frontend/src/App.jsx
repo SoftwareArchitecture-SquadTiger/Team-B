@@ -4,6 +4,7 @@ import SettingsPage from './modules/Settings/pages/SettingsPage'
 import DashboardPage from './modules/Dashboard/pages/DashboardPage';
 import UsersPage from './modules/Users/pages/UsersPage'
 import ProjectsPage from './modules/Projects/pages/ProjectsPage'
+import AddCharityForm from './modules/AddUser/pages/AddCharityForm';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './Layout';
 import AddProjectForm from "./modules/AddProject/pages/AddProjectForm";
@@ -29,6 +30,14 @@ function App() {
           element={
             <Layout>
               <UsersPage />
+            </Layout>
+          }
+        />
+        <Route
+          path="/users/add"
+          element={
+            <Layout>
+              <AddCharityForm />
             </Layout>
           }
         />

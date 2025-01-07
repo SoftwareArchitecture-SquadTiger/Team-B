@@ -26,7 +26,7 @@ const UserTable = ({ users, onDelete }) => (
           <td className="border border-gray-300 p-2">
             <button
               className="text-red-500"
-              onClick={() => onDelete(user.id)} // Pass user ID to handleDelete
+              onClick={() => onDelete(user.id)} 
             >
               <DeleteOutlineIcon />
             </button>

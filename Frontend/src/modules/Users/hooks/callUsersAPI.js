@@ -1,22 +1,21 @@
 export const callUsersAPI = async (url) => {
-    try {
-      // Fetch donors and charities simultaneously
-      const [donorsResponse, charitiesResponse] = await Promise.all([
-        fetch(`${url}/admin-server/donors`),
-        fetch(`${url}/admin-server/charities`),
-      ]);
-  
-      // Check if responses are OK
-      if (!donorsResponse.ok) throw new Error("Failed to fetch donors");
-      if (!charitiesResponse.ok) throw new Error("Failed to fetch charities");
-  
-      // Parse JSON responses
-      const donorsData = await donorsResponse.json();
-      const charitiesData = await charitiesResponse.json();
-  
-      return { donorsData: donorsData.data, charitiesData: charitiesData.data };
-    } catch (error) {
-      throw error; // Pass the error up the chain for handling
-    }
-  };
-  
+  try {
+    const donorsResponse = await fetch( (`${url}/admin-server/donors`),);
+
+    if (!donorsResponse.ok) throw new Error("Failed to fetch donors");
+
+    const donorsData = await donorsResponse.json();
+
+
+    console.log("Donors Data:", donorsData); // Debug log
+
+
+    return {
+      donorsData: donorsData.data || [], // Ensure fallback
+
+    };
+  } catch (error) {
+    console.error("API Error:", error.message);
+    throw error;
+  }
+};
