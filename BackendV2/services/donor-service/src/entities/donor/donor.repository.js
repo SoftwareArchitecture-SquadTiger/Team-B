@@ -8,7 +8,7 @@ const getById = async (id) => {
   return await Donor.findOne({ donor_id: id });
 };
 
-const getFilteredDonors = async (filters) => {
+const getByFilter = async (filters) => {
   const query = {};
 
   //Build the query dynamically
@@ -43,7 +43,7 @@ export default {
   getAll,
   getById,
   getDonorsByEmails,
-  getFilteredDonors,
+  getByFilter,
   create,
   update,
   remove,
