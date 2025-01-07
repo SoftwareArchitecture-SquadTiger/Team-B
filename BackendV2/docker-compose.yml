@@ -35,7 +35,7 @@ services:
     depends_on:
       - kafka
     environment:
-      KAFKA_BROKER: kafka:${KAFKA_PORT}
+      KAFKA_BROKER: ${KAFKA_EXTERNAL_ADVERTISED_HOSTNAME}:${KAFKA_EXTERNAL_PORT}
       MONGO_URI: ${MONGO_URI} 
     volumes:
       - ./services/donor-service:/usr/src/app
@@ -50,7 +50,7 @@ services:
     depends_on:
       - kafka
     environment:
-      KAFKA_BROKER: kafka:${KAFKA_PORT}
+      KAFKA_BROKER: ${KAFKA_EXTERNAL_ADVERTISED_HOSTNAME}:${KAFKA_EXTERNAL_PORT}
       MONGO_URI: ${MONGO_URI}
     volumes:
       - ./services/charity-service:/usr/src/app
@@ -67,7 +67,7 @@ services:
       - charity-service
       - donor-service
     environment:
-      KAFKA_BROKER: kafka:${KAFKA_PORT}
+      KAFKA_BROKER: ${KAFKA_EXTERNAL_ADVERTISED_HOSTNAME}:${KAFKA_EXTERNAL_PORT}
       MONGO_URI: ${MONGO_URI}
       JWS_PRIVATE_KEY_PATH: ${KEY_PATH}jws_private.pem
       JWE_PUBLIC_KEY_PATH: ${KEY_PATH}jwe_public.pem
