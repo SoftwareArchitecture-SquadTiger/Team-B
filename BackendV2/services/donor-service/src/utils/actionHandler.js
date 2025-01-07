@@ -23,6 +23,10 @@ export const actionHandlers = {
     );
     return { status: "success", data: donors };
   },
+  GET_BY_FILTERS: async (data) => {
+    const donors = await donorService.getFilteredDonors(data);
+    return { status: "success", data: donors };
+  },
   ADD: async (data) => {
     const newDonor = await donorService.addDonor(data);
     return { status: "success", data: newDonor.toJSON() };
@@ -53,7 +57,10 @@ export const actionHandlers = {
     return { status: "success", data: newSubscription };
   },
   UPDATE_SUBSCRIPTION: async (data) => {
-    const updatedSubscriptions = await subscriptionService.updateSubscriptions(data.email, data.update);
+    const updatedSubscriptions = await subscriptionService.updateSubscriptions(
+      data.email,
+      data.update
+    );
     return { status: "success", data: updatedSubscriptions.toJSON() };
   },
   CLEAR_SUBSCRIPTION: async (data) => {

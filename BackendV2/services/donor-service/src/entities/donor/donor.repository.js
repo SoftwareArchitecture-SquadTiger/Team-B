@@ -8,6 +8,17 @@ const getById = async (id) => {
   return await Donor.findOne({ donor_id: id });
 };
 
+const getByFilter = async (filters) => {
+  const query = {};
+
+  //Build the query dynamically
+  for (const [key, value] of Object.entries(filters)) {
+    query[key] = value
+  }
+
+  return await Donor.find(query).exec();
+};
+
 const getDonorsByEmails = async (emails) => {
   return await Donor.find({ email: { $in: emails } });
 };
@@ -28,4 +39,12 @@ const remove = async (id) => {
   return await Donor.findOneAndDelete({ donor_id: id });
 };
 
-export default { getAll, getById, getDonorsByEmails, create, update, remove };
+export default {
+  getAll,
+  getById,
+  getDonorsByEmails,
+  getByFilter,
+  create,
+  update,
+  remove,
+};
