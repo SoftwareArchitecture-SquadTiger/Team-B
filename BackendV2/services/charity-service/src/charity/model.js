@@ -35,7 +35,7 @@ const charitySchema = new mongoose.Schema(
     type: {
       type: String,
       required: true, 
-      enum: ["Individual", "Corporation", "Non-Profit"],
+      enum: ["Individual", "Company", "Non-Profit"],
     },
     address: {
       type: {
@@ -61,10 +61,6 @@ const charitySchema = new mongoose.Schema(
       default: null, 
       trim: true,
     },
-    paypal_email: {
-      type: String,
-      trim: true,
-    }
   },
   {
     timestamps: true, 
