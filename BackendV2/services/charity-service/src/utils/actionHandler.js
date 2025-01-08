@@ -1,32 +1,17 @@
-import charityService from "../charity/service.js";
+import statisticsService from "../service/statisticsService.js";
 
 export const actionHandlers = {
-  GET_ALL: async () => {
-    const charities = await charityService.getAllCharities();
-    return { status: "success", data: charities };
+  GET_TOTAL_DONATIONS_BY_DAY: async () => {
+    const donationsByDay = await statisticsService.getTotalDonationsByDay();
+    return { status: "success", data: donationsByDay };
   },
-  GET_BY_ID: async (data) => {
-    const charity = await charityService.getCharityById(data.id);
-    return { status: "success", data: charity ? charity.toJSON() : null };
+  GET_TOTAL_DONATIONS_BY_DONOR: async (data) => {
+    const totalDonations = await statisticsService.getTotalDonationByDonor(data.donorId, data.lastUpdated);
+    return { status: "success", data: totalDonations };
   },
-  GET_BY_FILTERS: async (data) => {
-    const charities = await charityService.getFilteredCharities(data);
-    return { status: "success", data: charities };
-  },
-  ADD: async (data) => {
-    const newCharity = await charityService.addCharity(data);
-    return { status: "success", data: newCharity.toJSON() };
-  },
-  UPDATE: async (data) => {
-    const updatedCharity = await charityService.updateCharity(
-      data.id,
-      data.update
-    );
-    return { status: "success", data: updatedCharity.toJSON() };
-  },
-  DELETE: async (data) => {
-    await charityService.deleteCharity(data.id);
-    return { status: "success", message: "Charity deleted successfully" };
+  GET_DONOR_LEADERBOARD: async (data) => {
+    const leaderboard = await statisticsService.getDonorLeaderboard(data.limit, data.lastUpdated);
+    return { status: "success", data: leaderboard };
   },
 };
 

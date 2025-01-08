@@ -1,7 +1,7 @@
 import express from 'express';
 import mongoose from 'mongoose';
-import { fetchAndUpdateDonations, fetchAndUpdateCharities } from './updateFunctions';
-import { getLastUpdateTimestamp } from './syncUtils';
+import { fetchAndUpdateDonations, fetchAndUpdateCharities } from './service/dataFetcher.js';
+import { getLastUpdateTimestamp } from './utils/syncHandler.js';
 
 const app = express();
 const PORT = 3000;
@@ -41,12 +41,6 @@ const syncOnBoot = async () => {
 // Connect to MongoDB and start the server
 const startServer = async () => {
   try {
-    // Connect to the database
-    await mongoose.connect('mongodb://localhost:27017/stats', {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-
     // Perform boot-time synchronization
     await syncOnBoot();
 

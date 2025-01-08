@@ -1,4 +1,4 @@
-import Metadata from '../models/metadata.js';
+import Metadata from '../model/metadata.js';
 
 // Get the last update timestamp for a given key
 export const getLastUpdateTimestamp = async (key) => {

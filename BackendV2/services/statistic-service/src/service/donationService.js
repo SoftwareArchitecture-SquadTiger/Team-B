@@ -1,4 +1,4 @@
-import Donation from './models/Donation.js';
+import Donation from '../models/Donation.js';
 
 /**
  * Calculate the total donation amount for a specific donor by combining local and latest data.

@@ -52,3 +52,5 @@ const fetchAndUpdateCharities = async () => {
   await updateLastUpdateTimestamp('charity_last_update', new Date());
   console.log('Charities updated successfully.');
 };
+
+export { fetchAndUpdateDonations, fetchAndUpdateCharities };
