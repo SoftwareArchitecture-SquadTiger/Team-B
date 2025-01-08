@@ -68,6 +68,7 @@ const charitySchema = new mongoose.Schema(
   },
   {
     timestamps: true, 
+    collection: "charities",
   }
 );
 
