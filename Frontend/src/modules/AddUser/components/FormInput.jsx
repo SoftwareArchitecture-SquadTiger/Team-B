@@ -3,7 +3,7 @@ import React from "react";
 const FormInput = ({ id, label, type, value, onChange, placeholder, error }) => {
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700" htmlFor={id}>
+      <label className="block mb-1 text-gray-600" htmlFor={id}>
         {label}
       </label>
       <input

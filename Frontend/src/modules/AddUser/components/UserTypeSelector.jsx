@@ -6,7 +6,7 @@ const UserTypeSelector = ({ value, onChange }) => {
       <select
         value={value}
         onChange={onChange}
-        className="text-lg font-semibold text-gray-800 bg-transparent border-none focus:outline-none"
+        className="border border-gray-300 rounded p-2"
       >
         <option value="Charity User">Charity User</option>
         <option value="Donor User">Donor User</option>
