@@ -54,7 +54,7 @@ TQIDAQAB
       };
 
       // Send data to the server
-      const response = await fetch("http://192.168.0.107:5001/admin-server/auth/login", {
+      const response = await fetch("http://192.168.1.2:5001/admin-server/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(dataToSend),

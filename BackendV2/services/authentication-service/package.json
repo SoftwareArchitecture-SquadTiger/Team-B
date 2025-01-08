@@ -22,6 +22,7 @@
     "kafkajs": "^2.2.4",
     "mongoose": "^8.8.4",
     "nodemon": "^3.1.7",
+    "node-forge": "^1.3.1",
     "team-b": "file:",
     "uuid": "^11.0.3"
   },
