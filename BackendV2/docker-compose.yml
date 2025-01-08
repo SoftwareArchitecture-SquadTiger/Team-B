@@ -72,7 +72,6 @@ services:
       JWS_PRIVATE_KEY_PATH: ${KEY_PATH}jws_private.pem
       JWE_PUBLIC_KEY_PATH: ${KEY_PATH}jwe_public.pem
       RSA_PRIVATE_KEY_PATH: ${KEY_PATH}rsa_private.pem
-      ENCRYPTION_SERVICE_URL: http://192.168.1.4:5001/client-server/
     volumes:
       - ./services/authentication-service:/usr/src/app
       - /usr/src/app/node_modules

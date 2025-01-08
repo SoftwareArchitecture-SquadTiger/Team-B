@@ -8,4 +8,6 @@
 .vscode
 /*/keys
 *.pem
-.codegpt
+node_modules
+package.json
+package-lock.json
