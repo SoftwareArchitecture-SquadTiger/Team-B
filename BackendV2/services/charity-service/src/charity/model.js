@@ -35,7 +35,7 @@ const charitySchema = new mongoose.Schema(
     type: {
       type: String,
       required: true, 
-      enum: ["Individual", "Company", "Non-Profit"],
+      enum: ["Individual", "Corporation", "Non-Profit"],
     },
     address: {
       type: {
