@@ -61,6 +61,10 @@ const charitySchema = new mongoose.Schema(
       default: null, 
       trim: true,
     },
+    paypal_email: {
+      type: String,
+      trim: true,
+    },
   },
   {
     timestamps: true, 
