@@ -7,5 +7,5 @@
 .codegpt
 .vscode
 /*/keys
-
+*.pem
 .codegpt

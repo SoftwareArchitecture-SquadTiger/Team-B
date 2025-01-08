@@ -9,6 +9,7 @@ import Layout from './Layout';
 import AddProjectForm from "./modules/AddProject/pages/AddProjectForm";
 import CloudinaryGallery from './modules/Image/pages/CloudinaryGallery';
 import AddUserPage from './modules/AddUser/pages/AddUserPage';
+import LoginForm from './modules/Login/component/loginForm';
 
 
 function App() {
@@ -41,6 +42,16 @@ function App() {
             <Layout>
               <AddUserPage />
             </Layout>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+           
+            <div className="min-h-screen flex items-center justify-center bg-gray-100">
+            <LoginForm />
+          </div>
+          
           }
         />
         <Route
@@ -85,6 +96,7 @@ function App() {
             </Layout>
           }
         />
+        
       </Routes>
 
       

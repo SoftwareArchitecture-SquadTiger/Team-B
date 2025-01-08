@@ -32,7 +32,9 @@ async function handleLoginRequest(msg) {
   try {
     // Step 1: Check if the userType is Admin
     if (userType === 'Admin') {
-      if (email !== process.env.ADMIN_USERNAME || password !== process.env.ADMIN_PASSWORD) {
+      const decryptedPassword = decryptPassword(password); // Decrypts the password sent from the frontend
+    console.log(decryptedPassword);
+      if (email !== process.env.ADMIN_USERNAME || decryptedPassword !== process.env.ADMIN_PASSWORD) {
         throw new Error('Invalid admin credentials');
       }
       console.log('Admin credentials are correct');
