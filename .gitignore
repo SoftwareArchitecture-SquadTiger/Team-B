@@ -7,5 +7,7 @@
 .codegpt
 .vscode
 /*/keys
-
-.codegpt
+*.pem
+node_modules
+package.json
+package-lock.json
