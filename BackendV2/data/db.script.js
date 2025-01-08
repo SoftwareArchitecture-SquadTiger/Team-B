@@ -180,6 +180,25 @@ const donorData = [
   })),
 ];
 
+const subscriptionData = [
+  {
+    categories: ["Health", "Education"],
+    regions: ["Asia", "Europe"],
+  },
+  {
+    categories: ["Environment", "Animal Welfare"],
+    regions: ["Africa", "North America"],
+  },
+  {
+    categories: ["Poverty Alleviation", "Disaster Relief"],
+    regions: ["South America", "Middle East"],
+  },
+  {
+    categories: ["Human Rights", "Arts & Culture"],
+    regions: ["Global"],
+  },
+];
+
 const seedDatabase = async () => {
   const client = new MongoClient(clusterURI);
 
@@ -193,9 +212,10 @@ const seedDatabase = async () => {
     // Clear existing data
     await charityDb.collection("charities").deleteMany({});
     await donorDb.collection("donors").deleteMany({});
+    await donorDb.collection("subscriptions").deleteMany({});
     console.log("Databases cleared");
 
-    // Insert new data
+    // Insert charities
     await charityDb.collection("charities").insertMany(
       charityData.map((charity) => ({
         ...charity,
@@ -205,16 +225,30 @@ const seedDatabase = async () => {
       }))
     );
 
-    await donorDb.collection("donors").insertMany(
-      donorData.map((donor) => ({
-        ...donor,
-        donor_id: uuidv4(),
+    // Insert donors
+    const donors = donorData.map((donor) => ({
+      ...donor,
+      donor_id: uuidv4(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }));
+    await donorDb.collection("donors").insertMany(donors);
+    console.log("Donors and charities inserted successfully");
+
+    // Insert subscriptions linked to donor emails
+    const subscriptions = donors.map((donor, index) => {
+      const subscriptionTemplate = subscriptionData[index % subscriptionData.length]; 
+      return {
+        email: donor.email, 
+        categories: subscriptionTemplate.categories,
+        regions: subscriptionTemplate.regions,
         createdAt: new Date(),
         updatedAt: new Date(),
-      }))
-    );
+      };
+    });
+    await donorDb.collection("subscriptions").insertMany(subscriptions);
+    console.log("Subscriptions inserted successfully");
 
-    console.log("Data inserted successfully");
   } catch (error) {
     console.error("Error seeding database:", error);
   } finally {
