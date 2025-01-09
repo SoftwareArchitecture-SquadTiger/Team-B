@@ -69,9 +69,11 @@ services:
     environment:
       KAFKA_BROKER: ${KAFKA_EXTERNAL_ADVERTISED_HOSTNAME}:${KAFKA_EXTERNAL_PORT}
       MONGO_URI: ${MONGO_URI}
-      JWS_PRIVATE_KEY_PATH: ${KEY_PATH}jws_private.pem
-      JWE_PUBLIC_KEY_PATH: ${KEY_PATH}jwe_public.pem
-      RSA_PRIVATE_KEY_PATH: ${KEY_PATH}rsa_private.pem
+      RSA_PRIVATE_KEY_PATH: ${RSA_PRIVATE_KEY_PATH}
+      JWE_PUBLIC_KEY_PATH: ${JWE_PUBLIC_KEY_PATH}
+      JWS_PRIVATE_KEY_PATH: ${JWS_PRIVATE_KEY_PATH}
+      ADMIN_USERNAME: ${ADMIN_USERNAME}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD}
     volumes:
       - ./services/authentication-service:/usr/src/app
       - /usr/src/app/node_modules
