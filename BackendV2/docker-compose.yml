@@ -4,8 +4,6 @@ services:
       context: ./services/donor-service
       dockerfile: Dockerfile
     container_name: donor-service
-    depends_on:
-      - kafka
     environment:
       KAFKA_BROKER: ${KAFKA_EXTERNAL_ADVERTISED_HOSTNAME}:${KAFKA_EXTERNAL_PORT}
       MONGO_URI: ${MONGO_URI} 
@@ -19,8 +17,6 @@ services:
       context: ./services/charity-service
       dockerfile: Dockerfile
     container_name: charity-service
-    depends_on:
-      - kafka
     environment:
       KAFKA_BROKER: ${KAFKA_EXTERNAL_ADVERTISED_HOSTNAME}:${KAFKA_EXTERNAL_PORT}
       MONGO_URI: ${MONGO_URI}
@@ -35,7 +31,6 @@ services:
       dockerfile: Dockerfile
     container_name: authentication-service
     depends_on:
-      - kafka
       - charity-service
       - donor-service
     environment:
