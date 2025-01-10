@@ -8,6 +8,9 @@ import { fetchCharities } from "../services/charity/fetchCharities";
 import { fetchDonors } from "../services/donor/fetchDonors";
 import { handleDeleteCharity } from "../services/charity/deleteCharity";
 import { handleDeleteDonor } from "../services/donor/deleteDonor";
+import { filterCharitiesByCountry } from "../hooks/charity/callFilterCharityByCountryApi";
+import { filterCharitiesByType } from "../hooks/charity/callFilterCharityByTypeApi";
+import { filterDonorsByCountry } from "../hooks/donor/callFilterDonorByCountryApi";
 import searchCharities from "../services/charity/searchCharities";
 import searchDonors from "../services/donor/searchDonors";
 import paginate from "../services/paginate";
@@ -39,36 +42,82 @@ const UsersPage = () => {
     fetchData();
   }, []);
 
-  // Filter donors by search query and country
-  const filteredDonors = searchDonors(
-    donors.filter((donor) =>
-      donorCountryFilter
-        ? donor.country.toLowerCase().includes(donorCountryFilter.toLowerCase())
-        : true
-    ),
-    searchQueryDonor,
-    "DONOR"
-  );
+  const handleDonorCountryFilterChange = async (country) => {
+    try {
+      setDonorCountryFilter(country);
+      if (country === "") {
+        await fetchDonors(setDonors);
+      } else {
+        const filteredDonors = await filterDonorsByCountry(country);
+        const formattedDonors = filteredDonors.map((donor) => ({
+          id: donor.donor_id,
+          name: `${donor.first_name} ${donor.last_name}`,
+          role: "DONOR",
+          email: donor.email,
+          country: donor.country,
+          type: "N/A",
+        }));
+        setDonors(formattedDonors);
+      }
+    } catch (error) {
+      console.error("Error fetching filtered donors by country:", error.message);
+    }
+  };
+
+  const handleCharityCountryFilterChange = async (country) => {
+    try {
+      setCharityCountryFilter(country);
+      if (country === "") {
+        await fetchCharities(setCharities);
+      } else {
+        const filteredCharities = await filterCharitiesByCountry(country);
+        const formattedCharities = filteredCharities.map((charity) => ({
+          id: charity.charity_id,
+          name: charity.name,
+          type: charity.type,
+          email: charity.email,
+          country: charity.country,
+          role: "CHARITY",
+        }));
+        setCharities(formattedCharities);
+      }
+    } catch (error) {
+      console.error("Error fetching filtered charities by country:", error.message);
+    }
+  };
+  
+
+  const handleCharityTypeFilterChange = async (type) => {
+    try {
+      setCharityTypeFilter(type);
+      if (type === "") {
+        await fetchCharities(setCharities);
+      } else {
+        const filteredCharities = await filterCharitiesByType(type);
+        const formattedCharities = filteredCharities.map((charity) => ({
+          id: charity.charity_id,
+          name: charity.name,
+          type: charity.type,
+          email: charity.email,
+          country: charity.country,
+          role: "CHARITY",
+        }));
+        setCharities(formattedCharities);
+      }
+    } catch (error) {
+      console.error("Error fetching filtered charities by type:", error.message);
+    }
+  };
+  
+
+  const filteredDonors = searchDonors(donors, searchQueryDonor);
   const { paginatedItems: paginatedDonors, totalPages: donorTotalPages } = paginate(
     filteredDonors,
     currentDonorPage,
     10
   );
 
-  // Filter charities by search query, country, and type
-  const filteredCharities = searchCharities(
-    charities.filter((charity) => {
-      const countryMatch = charityCountryFilter
-        ? charity.country.toLowerCase().includes(charityCountryFilter.toLowerCase())
-        : true;
-      const typeMatch = charityTypeFilter
-        ? charity.type.toLowerCase().includes(charityTypeFilter.toLowerCase())
-        : true;
-      return countryMatch && typeMatch;
-    }),
-    searchQueryCharity,
-    "CHARITY"
-  );
+  const filteredCharities = searchCharities(charities, searchQueryCharity);
   const { paginatedItems: paginatedCharities, totalPages: charityTotalPages } = paginate(
     filteredCharities,
     currentCharityPage,
@@ -92,13 +141,25 @@ const UsersPage = () => {
             searchQuery={searchQueryDonor}
             onSearch={(e) => setSearchQueryDonor(e.target.value)}
           />
-          <input
-            type="text"
-            placeholder="Filter by country"
+          <select
             value={donorCountryFilter}
-            onChange={(e) => setDonorCountryFilter(e.target.value)}
-            className="border p-2"
-          />
+            onChange={(e) => handleDonorCountryFilterChange(e.target.value)}
+            className="border p-2 rounded"
+          >
+            <option value="">All Countries</option>
+            {[
+              "Vietnam",
+              "Germany",
+              "Qatar",
+              "USA",
+              "Cameroon",
+              "Singapore",
+            ].map((country) => (
+              <option key={country} value={country}>
+                {country}
+              </option>
+            ))}
+          </select>
         </div>
         <UserTable
           users={paginatedDonors}
@@ -119,20 +180,41 @@ const UsersPage = () => {
             searchQuery={searchQueryCharity}
             onSearch={(e) => setSearchQueryCharity(e.target.value)}
           />
-          <input
-            type="text"
-            placeholder="Filter by country"
+          <select
             value={charityCountryFilter}
-            onChange={(e) => setCharityCountryFilter(e.target.value)}
-            className="border p-2"
-          />
-          <input
-            type="text"
-            placeholder="Filter by type"
+            onChange={(e) => handleCharityCountryFilterChange(e.target.value)}
+            className="border p-2 rounded"
+          >
+            <option value="">All Countries</option>
+            {[
+              "Vietnam",
+              "USA",
+              "South Africa",
+              "Germany",
+              "Ukraine",
+              "Israel",
+            ].map((country) => (
+              <option key={country} value={country}>
+                {country}
+              </option>
+            ))}
+          </select>
+          <select
             value={charityTypeFilter}
-            onChange={(e) => setCharityTypeFilter(e.target.value)}
-            className="border p-2"
-          />
+            onChange={(e) => handleCharityTypeFilterChange(e.target.value)}
+            className="border p-2 rounded"
+          >
+            <option value="">All Types</option>
+            {[
+              "Non-Profit",
+              "Company",
+              "Individual",
+            ].map((type) => (
+              <option key={type} value={type}>
+                {type}
+              </option>
+            ))}
+          </select>
         </div>
         <UserTable
           users={paginatedCharities}
@@ -149,3 +231,10 @@ const UsersPage = () => {
 };
 
 export default UsersPage;
+
+
+
+
+
+
+

@@ -5,17 +5,21 @@ import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from "uuid";
 import { handleServiceError } from '../utils/errorHandler.js';
 import fs from 'fs';
-
+import forge from 'node-forge';
 // Load RSA private key for signing JWS
 const privateKeyPath = process.env.RSA_PRIVATE_KEY_PATH;
 const privateKey = fs.readFileSync(privateKeyPath, 'utf8');
 
 function decryptPassword(encryptedPassword) {
   try {
-    const rsa = new NodeRSA(privateKey);
-    return rsa.decrypt(encryptedPassword, 'utf8'); // Decrypts to plain text
+    const privateDecryptionKey = forge.pki.privateKeyFromPem(privateKey);
+  const encryptedBinary = forge.util.decode64(encryptedPassword);
+  const decrypted = privateDecryptionKey.decrypt(encryptedBinary, "RSA-OAEP", {
+    md: forge.md.sha256.create(),
+  });
+  return decrypted;
   } catch (error) {
-    throw new Error('Failed to decrypt password');
+    throw new Error('Failed to decrypt password', error);
   }
 }
 
@@ -32,7 +36,10 @@ async function handleLoginRequest(msg) {
   try {
     // Step 1: Check if the userType is Admin
     if (userType === 'Admin') {
-      if (email !== process.env.ADMIN_USERNAME || password !== process.env.ADMIN_PASSWORD) {
+      const decryptedPassword = decryptPassword(password); // Decrypts the password sent from the frontend
+    console.log(decryptedPassword);
+    console.log(process.env.ADMIN_USERNAME, process.env.ADMIN_PASSWORD);
+      if (email !== process.env.ADMIN_USERNAME || decryptedPassword !== process.env.ADMIN_PASSWORD) {
         throw new Error('Invalid admin credentials');
       }
       console.log('Admin credentials are correct');
