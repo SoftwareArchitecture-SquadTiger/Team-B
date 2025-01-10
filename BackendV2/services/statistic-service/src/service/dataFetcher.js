@@ -2,13 +2,13 @@ import axios from 'axios';
 import { getLastUpdateTimestamp, updateLastUpdateTimestamp } from '../utils/syncHandler.js';
 import Donation from '../model/donation.js';
 import Charity from '../model/charity.js';
-
+const TeamAPath = process.env.TEAM_B_SERVICE_URL;
 const fetchAndUpdateDonations = async () => {
   const lastUpdate = await getLastUpdateTimestamp('donation_last_update');
 
   // Fetch new donations
   const response = await axios.get(
-    `https://api.example.com/donations?updated_after=${lastUpdate.toISOString()}`
+    `${TeamAPath}/donations`
   );
   const donations = response.data;
 
@@ -33,7 +33,7 @@ const fetchAndUpdateCharities = async () => {
 
   // Fetch new charities
   const response = await axios.get(
-    `https://api.example.com/charities?updated_after=${lastUpdate.toISOString()}`
+    `${TeamAPath}/charities`
   );
   const charities = response.data;
 

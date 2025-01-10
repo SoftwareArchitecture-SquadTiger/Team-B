@@ -4,17 +4,17 @@ import { withErrorHandling } from '../utils/withErrorHandling.js';
 import { produceMessage } from './producer.js';
 
 const kafka = new Kafka({
-  clientId: 'charity-service',
+  clientId: 'statistics-service',
   brokers: [process.env.KAFKA_BROKER],
 });
 
-const consumer = kafka.consumer({ groupId: 'charity-group' });
+const consumer = kafka.consumer({ groupId: 'statistics-group' });
 
 export const consumeMessages = async () => {
   await consumer.connect();
   await consumer.subscribe({ topic: 'statistics-request', fromBeginning: true });
 
-  console.log('Consumer is listening to messages on "charity-request"...');
+  console.log('Consumer is listening to messages on "statistics-request"...');
 
   await consumer.run({
     eachMessage: async ({ topic, partition, message }) => {
@@ -28,7 +28,7 @@ export const consumeMessages = async () => {
       const response = await withErrorHandling(actionHandler, incomingMessage.data);
 
       // Produce the response message back to Kafka
-      await produceMessage('charity-response', JSON.parse(JSON.stringify({
+      await produceMessage('statistics-response', JSON.parse(JSON.stringify({
         action: incomingMessage.action,
         correlationId: incomingMessage.correlationId,
         ...response, // Spread the response to include status, data, or error
