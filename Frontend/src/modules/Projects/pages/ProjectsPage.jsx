@@ -6,7 +6,7 @@ import ProjectTable from "../components/ProjectTable";
 import Pagination from "../components/Pagination";
 import { fetchProjectsAPI } from "../hooks/callProjectsAPI";
 import { handleDeleteProject } from "../services/handleDeleteProject";
-import { fetchProjectById } from "../services/fetchProjects";
+import { fetchProjectByTitle } from "../services/fetchProjects";
 import { updateProjectStatusAPI } from "../services/updateProjectStatus";
 import { fetchProjectByRegion } from "../services/fetchProjectbyRegion";
 import { fetchProjectsByStatus } from "../services/fetchProjectsByStatus";
@@ -56,7 +56,7 @@ const ProjectsPage = () => {
       setFilteredProjects(projects);
     } else {
       try {
-        const result = await fetchProjectById(query.trim());
+        const result = await fetchProjectByTitle(query.trim());
         if (result.projectResponse && result.projectResponse.length > 0) {
           const transformedProject = result.projectResponse.map((project) => ({
             id: project.project_id,

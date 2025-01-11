@@ -22,6 +22,14 @@ function App() {
 
         {/* Other Pages (With Layout) */}
         <Route
+          path="/"
+          element={
+            <Layout>
+              <DashboardPage />
+            </Layout>
+          }
+        />
+        <Route
           path="/dashboard"
           element={
             <Layout>
