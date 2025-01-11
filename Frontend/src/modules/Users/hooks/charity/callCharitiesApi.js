@@ -5,6 +5,10 @@ async function callCharitiesApi() {
   try {
     const charitiesResponse = await fetchWithAuth(GET_CHARITIES_SERVICE_URL, {
       method: "GET", // HTTP method
+      headers: {
+        Accept: "application/json", // Accept JSON response
+        "Content-Type": "application/json", // Content type
+      },
     });
 
     if (!charitiesResponse.ok) {

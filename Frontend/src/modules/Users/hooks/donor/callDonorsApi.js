@@ -5,6 +5,10 @@ async function callDonorsApi() {
   try {
     const donorsResponse = await fetchWithAuth(GET_DONORS_SERVICE_URL, {
       method: "GET", // HTTP method
+      headers: {
+        Accept: "application/json", // Request JSON response
+        "Content-Type": "application/json", // Content type for the request
+      },
     });
 
     if (!donorsResponse.ok) {
