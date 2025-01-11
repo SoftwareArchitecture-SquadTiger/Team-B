@@ -13,6 +13,18 @@ import {
 } from "../hooks/useFormHandlers";
 import { handleSubmit } from "../hooks/useSubmitHandler";
 
+// Hardcoded categories with names and IDs
+const categoryOptions = [
+  { name: "Environment", id: "59215391-9637-440b-8979-ccf51e8bfde2" },
+  { name: "Food", id: "b97a617a-4a01-45a0-bd98-74130fd2d4da" },
+  { name: "Health", id: "31e97d2c-e42f-4cb1-b1a5-cc467cf598ca" },
+  { name: "Education", id: "35d4d6f4-432e-4c15-b1ea-99fb235625e0" },
+  { name: "Religion", id: "50b947f8-5343-4e6d-a5e9-4009c2c8b879" },
+  { name: "Humanitarian", id: "7e08d9ce-e615-4b66-a92b-9aee0467beaa" },
+  { name: "Housing", id: "ec3fb229-21e2-4295-ad52-5d05bd858c69" },
+  { name: "Other", id: "da148b21-3bff-4e7d-8667-316ddd8b7b76" },
+];
+
 const AddProjectForm = () => {
   const navigate = useNavigate();
   const [projectData, setProjectData] = useState({
@@ -56,17 +68,24 @@ const AddProjectForm = () => {
         />
         <div className="mb-4">
           <label htmlFor="category_id" className="block mb-1 text-gray-600">
-            Category ID
+            Category
           </label>
-          <input
-            type="text"
+          <select
             name="category_id"
             value={projectData.category_id}
             onChange={(e) => handleChange(e, projectData, setProjectData)}
             className="w-full p-2 border border-gray-300 rounded"
-            placeholder="Enter Category ID"
             required
-          />
+          >
+            <option value="" disabled>
+              Select Category
+            </option>
+            {categoryOptions.map((category) => (
+              <option key={category.id} value={category.id}>
+                {category.name}
+              </option>
+            ))}
+          </select>
         </div>
         <div className="mb-4">
           <label htmlFor="target_amount" className="block mb-1 text-gray-600">

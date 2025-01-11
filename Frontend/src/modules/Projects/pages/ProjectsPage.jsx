@@ -4,6 +4,7 @@ import FilterProject from "../components/FilterProject";
 import AddProject from "../components/AddProject";
 import ProjectTable from "../components/ProjectTable";
 import Pagination from "../components/Pagination";
+import HaltProjectForm from "../components/HaltProjectForm"; // Import HaltProjectForm
 import { fetchProjectsAPI } from "../hooks/callProjectsAPI";
 import { handleDeleteProject } from "../services/handleDeleteProject";
 import { fetchProjectByTitle } from "../services/fetchProjects";
@@ -12,7 +13,6 @@ import { fetchProjectByRegion } from "../services/fetchProjectbyRegion";
 import { fetchProjectsByStatus } from "../services/fetchProjectsByStatus";
 import { useNavigate } from "react-router-dom";
 
-
 const ProjectsPage = () => {
   const [projects, setProjects] = useState([]); // All projects data
   const [filteredProjects, setFilteredProjects] = useState([]); // Filtered or searched data
@@ -20,6 +20,8 @@ const ProjectsPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [projectsPerPage] = useState(10);
   const [filter, setFilter] = useState({ region: "", status: "" });
+  const [selectedProject, setSelectedProject] = useState(null); // Selected project for halting
+  const [showHaltModal, setShowHaltModal] = useState(false); // To toggle modal visibility
   const navigate = useNavigate();
 
   // Fetch all projects on mount
@@ -82,14 +84,13 @@ const ProjectsPage = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this project?")) {
       try {
-        console.log("Attempting to delete project with ID:", id);
         const isDeleted = await handleDeleteProject(id);
-
         if (isDeleted) {
           // Update frontend state after successful deletion
           setProjects((prev) => prev.filter((project) => project.id !== id));
-          setFilteredProjects((prev) => prev.filter((project) => project.id !== id));
-          console.log("Project deleted successfully.");
+          setFilteredProjects((prev) =>
+            prev.filter((project) => project.id !== id)
+          );
           alert(`Project with ID: ${id} deleted successfully.`);
         }
       } catch (error) {
@@ -101,6 +102,16 @@ const ProjectsPage = () => {
 
   // Handle update status
   const handleUpdateStatus = async (id, status) => {
+    if (status === "Halted") {
+      const confirm = window.confirm("Are you sure you want to halt this project?");
+      if (confirm) {
+        const projectToHalt = projects.find((project) => project.id === id);
+        setSelectedProject(projectToHalt);
+        setShowHaltModal(true);
+      }
+      return; // Stop further execution
+    }
+
     try {
       await updateProjectStatusAPI(id, status);
       setProjects((prev) =>
@@ -113,7 +124,6 @@ const ProjectsPage = () => {
           project.id === id ? { ...project, status } : project
         )
       );
-      console.log(`Project status updated to '${status}' successfully.`);
       alert(`Project status updated to '${status}' successfully.`);
     } catch (error) {
       console.error("Error updating project status:", error);
@@ -123,16 +133,13 @@ const ProjectsPage = () => {
 
   // Apply filters when filter state changes
   const handleRegionFilter = async (region) => {
-    console.log("Region filter selected:", region); // Debugging
-  
     if (region === "All Regions") {
       setFilteredProjects(projects); // Reset to all projects
       return;
     }
-  
+
     try {
       const result = await fetchProjectByRegion(region);
-  
       if (result.projectResponse && result.projectResponse.length > 0) {
         const transformedProjects = result.projectResponse.map((project) => ({
           id: project.project_id,
@@ -144,29 +151,23 @@ const ProjectsPage = () => {
           expired: new Date(project.end_date).toLocaleDateString(),
           status: project.status || "Pending",
         }));
-  
-        console.log("Filtered projects by region:", transformedProjects); // Debugging
         setFilteredProjects(transformedProjects);
       } else {
-        console.log("No projects found for the selected region."); // Debugging
         setFilteredProjects([]);
       }
     } catch (error) {
       console.error("Error filtering projects by region:", error);
     }
   };
-  
+
   const handleStatusFilter = async (status) => {
-    console.log("Status filter selected:", status); // Debugging
-  
     if (status === "All Status") {
       setFilteredProjects(projects); // Reset to all projects
       return;
     }
-  
+
     try {
       const result = await fetchProjectsByStatus(status);
-  
       if (result.projectResponse && result.projectResponse.length > 0) {
         const transformedProjects = result.projectResponse.map((project) => ({
           id: project.project_id,
@@ -178,20 +179,15 @@ const ProjectsPage = () => {
           expired: new Date(project.end_date).toLocaleDateString(),
           status: project.status || "Pending",
         }));
-  
-        console.log("Filtered projects by status:", transformedProjects); // Debugging
         setFilteredProjects(transformedProjects);
       } else {
-        console.log("No projects found for the selected status."); // Debugging
         setFilteredProjects([]);
       }
     } catch (error) {
       console.error("Error filtering projects by status:", error);
     }
   };
-  
-  
-  
+
   // Paginated projects
   const paginatedProjects = filteredProjects.slice(
     (currentPage - 1) * projectsPerPage,
@@ -205,8 +201,15 @@ const ProjectsPage = () => {
       </div>
 
       <div className="flex gap-4 mb-4">
-        <SearchBar searchQuery={searchQuery} onSearch={(e) => handleSearch(e.target.value)} />
-        <FilterProject onFilter={setFilter} onRegionChange={handleRegionFilter} onStatusChange={handleStatusFilter} />
+        <SearchBar
+          searchQuery={searchQuery}
+          onSearch={(e) => handleSearch(e.target.value)}
+        />
+        <FilterProject
+          onFilter={setFilter}
+          onRegionChange={handleRegionFilter}
+          onStatusChange={handleStatusFilter}
+        />
         <button
           onClick={() => navigate("/add-project")}
           className="bg-pink-500 text-white px-4 py-2 rounded hover:bg-pink-600"
@@ -226,6 +229,29 @@ const ProjectsPage = () => {
         currentPage={currentPage}
         onPageChange={setCurrentPage}
       />
+
+      {showHaltModal && selectedProject && (
+        <HaltProjectForm
+        projectId={selectedProject.id}
+        projectTitle={selectedProject.title}
+        charityId={selectedProject.charity}
+        onClose={() => setSelectedProject(null)}
+        onUpdate={(id, status) => {
+          setProjects((prev) =>
+            prev.map((project) =>
+              project.id === id ? { ...project, status } : project
+            )
+          );
+          setFilteredProjects((prev) =>
+            prev.map((project) =>
+              project.id === id ? { ...project, status } : project
+            )
+          );
+        }}
+      />
+      
+      
+      )}
     </div>
   );
 };

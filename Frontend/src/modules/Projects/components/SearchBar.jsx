@@ -5,7 +5,13 @@ const SearchBar = ({ searchQuery, onSearch }) => (
     <SearchIcon className="absolute top-1/2 transform -translate-y-1/2 left-3 text-gray-500" />
     <input
       type="text"
-      placeholder="Search the Title..."
+      placeholder="Search the Title
+      
+      
+      
+      
+      
+      ..."
       value={searchQuery} // Controlled value
       onChange={onSearch} // Updates the state
       className="w-full p-2 pl-10 border border-gray-300 rounded"
