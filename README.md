@@ -97,3 +97,6 @@ The frontend handles the user interface for the admin portal
 4. Start the web app:
    ```bash
    npm run dev
+
+## License
+This project is licensed under the [MIT License](LICENSE).
