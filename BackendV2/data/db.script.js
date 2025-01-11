@@ -1,7 +1,9 @@
 import { MongoClient } from "mongodb";
-import { v4 as uuidv4 } from "uuid"
+import { v4 as uuidv4 } from "uuid";
+import bcrypt from "bcrypt";
 
-const clusterURI = "mongodb+srv://admin:iamadmin@monolithic-cluster.xgeha.mongodb.net/?retryWrites=true&w=majority&appName=Monolithic-Cluster";
+const clusterURI =
+  "mongodb+srv://admin:iamadmin@monolithic-cluster.xgeha.mongodb.net/?retryWrites=true&w=majority&appName=Monolithic-Cluster";
 
 const charityData = [
   {
@@ -103,96 +105,108 @@ const charityData = [
 ];
 
 const donorData = [
-  ...Array(5).fill().map((_, index) => ({
-    first_name: `Donor${index + 1}`,
-    last_name: "Vietnam",
-    email: `donor${index + 1}_vn@example.com`,
-    phone: `123456789${index + 1}`,
-    country: "Vietnam",
-    address: {
-      street: "123 Nguyen Trai",
-      city: "Hanoi",
-      state: "Hanoi",
-      postal_code: "100000",
+  ...Array(5)
+    .fill()
+    .map((_, index) => ({
+      first_name: `Donor${index + 1}`,
+      last_name: "Vietnam",
+      email: `donor${index + 1}_vn@example.com`,
+      phone: `123456789${index + 1}`,
       country: "Vietnam",
-    },
-    img_url: null,
-  })),
-  ...Array(5).fill().map((_, index) => ({
-    first_name: `Donor${index + 1}`,
-    last_name: "Germany",
-    email: `donor${index + 1}_de@example.com`,
-    phone: `234567890${index + 1}`,
-    country: "Germany",
-    address: {
-      street: "123 Goethe Street",
-      city: "Berlin",
-      state: "Berlin",
-      postal_code: "10117",
+      address: {
+        street: "123 Nguyen Trai",
+        city: "Hanoi",
+        state: "Hanoi",
+        postal_code: "100000",
+        country: "Vietnam",
+      },
+      img_url: null,
+    })),
+  ...Array(5)
+    .fill()
+    .map((_, index) => ({
+      first_name: `Donor${index + 1}`,
+      last_name: "Germany",
+      email: `donor${index + 1}_de@example.com`,
+      phone: `234567890${index + 1}`,
       country: "Germany",
-    },
-    img_url: null,
-  })),
-  ...Array(5).fill().map((_, index) => ({
-    first_name: `Donor${index + 1}`,
-    last_name: "Qatar",
-    email: `donor${index + 1}_qa@example.com`,
-    phone: `345678901${index + 1}`,
-    country: "Qatar",
-    address: {
-      street: "123 Doha Street",
-      city: "Doha",
-      state: "Doha",
-      postal_code: "00000",
+      address: {
+        street: "123 Goethe Street",
+        city: "Berlin",
+        state: "Berlin",
+        postal_code: "10117",
+        country: "Germany",
+      },
+      img_url: null,
+    })),
+  ...Array(5)
+    .fill()
+    .map((_, index) => ({
+      first_name: `Donor${index + 1}`,
+      last_name: "Qatar",
+      email: `donor${index + 1}_qa@example.com`,
+      phone: `345678901${index + 1}`,
       country: "Qatar",
-    },
-    img_url: null,
-  })),
-  ...Array(5).fill().map((_, index) => ({
-    first_name: `Donor${index + 1}`,
-    last_name: "USA",
-    email: `donor${index + 1}_us@example.com`,
-    phone: `456789012${index + 1}`,
-    country: "USA",
-    address: {
-      street: "123 Elm Street",
-      city: "New York",
-      state: "NY",
-      postal_code: "10001",
+      address: {
+        street: "123 Doha Street",
+        city: "Doha",
+        state: "Doha",
+        postal_code: "00000",
+        country: "Qatar",
+      },
+      img_url: null,
+    })),
+  ...Array(5)
+    .fill()
+    .map((_, index) => ({
+      first_name: `Donor${index + 1}`,
+      last_name: "USA",
+      email: `donor${index + 1}_us@example.com`,
+      phone: `456789012${index + 1}`,
       country: "USA",
-    },
-    img_url: null,
-  })),
-  ...Array(5).fill().map((_, index) => ({
-    first_name: `Donor${index + 1}`,
-    last_name: "Cameroon",
-    email: `donor${index + 1}_cm@example.com`,
-    phone: `567890123${index + 1}`,
-    country: "Cameroon",
-    address: {
-      street: "123 Yaounde Ave",
-      city: "Yaounde",
-      state: "Center",
-      postal_code: "00001",
+      address: {
+        street: "123 Elm Street",
+        city: "New York",
+        state: "NY",
+        postal_code: "10001",
+        country: "USA",
+      },
+      img_url: null,
+    })),
+  ...Array(5)
+    .fill()
+    .map((_, index) => ({
+      first_name: `Donor${index + 1}`,
+      last_name: "Cameroon",
+      email: `donor${index + 1}_cm@example.com`,
+      phone: `567890123${index + 1}`,
       country: "Cameroon",
-    },
-    img_url: null,
-  })),
-  ...Array(5).fill().map((_, index) => ({
-    first_name: `Donor${index + 1}`,
-    last_name: "Singapore",
-    email: `donor${index + 1}_sg@example.com`,
-    phone: `678901234${index + 1}`,
-    country: "Singapore",
-    address: {
-      street: "123 Orchard Road",
-      city: "Singapore",
-      state: "Singapore",
-      postal_code: "238000",
+      address: {
+        street: "123 Yaounde Ave",
+        city: "Yaounde",
+        state: "Center",
+        postal_code: "00001",
+        country: "Cameroon",
+      },
+      img_url: null,
+    })),
+  ...Array(5)
+    .fill()
+    .map((_, index) => ({
+      first_name: `Donor${index + 1}`,
+      last_name: "Singapore",
+      email: `donor${index + 1}_sg@example.com`,
+      phone: `678901234${index + 1}`,
       country: "Singapore",
-    },
-    img_url: null,
-  })),
+      address: {
+        street: "123 Orchard Road",
+        city: "Singapore",
+        state: "Singapore",
+        postal_code: "238000",
+        country: "Singapore",
+      },
+      img_url: null,
+    })),
 ];
 
 const subscriptionData = [
@@ -230,6 +244,11 @@ const subscriptionData = [
   },
 ];
 
+const generateHashedPassword = async (password) => {
+  const saltRounds = 10;
+  return await bcrypt.hash(password, saltRounds);
+};
+
 const seedDatabase = async () => {
   const client = new MongoClient(clusterURI);
 
@@ -239,38 +258,40 @@ const seedDatabase = async () => {
 
     const charityDb = client.db("charityDB");
     const donorDb = client.db("donorDB");
+    const credentialsDb = client.db("authenticationDB");
 
     // Clear existing data
     await charityDb.collection("charities").deleteMany({});
     await donorDb.collection("donors").deleteMany({});
     await donorDb.collection("subscriptions").deleteMany({});
+    await credentialsDb.collection("credentials").deleteMany({});
     console.log("Databases cleared");
 
     // Insert charities
-    await charityDb.collection("charities").insertMany(
-      charityData.map((charity) => ({
-        ...charity,
-        charity_id: uuidv4(),
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      }))
-    );
+    const charityInsertions = charityData.map((charity) => ({
+      ...charity,
+      charity_id: uuidv4(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }));
+    await charityDb.collection("charities").insertMany(charityInsertions);
 
     // Insert donors
-    const donors = donorData.map((donor) => ({
+    const donorInsertions = donorData.map((donor) => ({
       ...donor,
       donor_id: uuidv4(),
       createdAt: new Date(),
       updatedAt: new Date(),
     }));
-    await donorDb.collection("donors").insertMany(donors);
+    await donorDb.collection("donors").insertMany(donorInsertions);
     console.log("Donors and charities inserted successfully");
 
     // Insert subscriptions linked to donor emails
-    const subscriptions = donors.map((donor, index) => {
-      const subscriptionTemplate = subscriptionData[index % subscriptionData.length]; 
+    const subscriptions = donorInsertions.map((donor, index) => {
+      const subscriptionTemplate =
+        subscriptionData[index % subscriptionData.length];
       return {
-        email: donor.email, 
+        email: donor.email,
         categories: subscriptionTemplate.categories,
         regions: subscriptionTemplate.regions,
         createdAt: new Date(),
@@ -280,6 +301,49 @@ const seedDatabase = async () => {
     await donorDb.collection("subscriptions").insertMany(subscriptions);
     console.log("Subscriptions inserted successfully");
 
+    // Generate credentials for charities and donors
+    const charityCredentials = await Promise.all(
+      charityInsertions.map(async (charity) => ({
+        email: charity.email,
+        userType: "Charity",
+        userId: charity.charity_id,
+        password: await generateHashedPassword("defaultPassword123"),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }))
+    );
+
+    const donorCredentials = await Promise.all(
+      donorInsertions.map(async (donor) => ({
+        email: donor.email,
+        userType: "Donor",
+        userId: donor.donor_id,
+        password: await generateHashedPassword("defaultPassword123"),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      }))
+    );
+
+    // Generate admin credential
+    const adminCredential = {
+      email: "masteradmin@gmail.com",
+      userType: "Admin",
+      userId: uuidv4(),
+      password: await generateHashedPassword("admin"),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    // Insert credentials into authDB
+    await credentialsDb
+      .collection("credentials")
+      .insertMany([
+        ...charityCredentials,
+        ...donorCredentials,
+        adminCredential,
+      ]);
+
+    console.log("Credentials inserted successfully");
   } catch (error) {
     console.error("Error seeding database:", error);
   } finally {
