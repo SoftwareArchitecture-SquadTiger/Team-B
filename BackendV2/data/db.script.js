@@ -253,6 +253,8 @@ const seedDatabase = async () => {
   const client = new MongoClient(clusterURI);
 
   try {
+    console.log("Database script starts!");
+
     await client.connect();
     console.log("Connected to MongoDB");
 
@@ -349,6 +351,7 @@ const seedDatabase = async () => {
   } finally {
     await client.close();
     console.log("Connection closed");
+    console.log("Database script ends!");
   }
 };
 
