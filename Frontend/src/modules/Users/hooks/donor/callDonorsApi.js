@@ -16,10 +16,17 @@ async function callDonorsApi() {
 
     const donorsData = await donorsResponse.json();
 
-    console.log("Donors Data:", donorsData); // Debug log
+    // Debug log for fetched data
+    console.log("Donors Data:", donorsData);
+
+    // Format data to include Cloudinary image URLs (optional if already provided in `img_url`)
+    const formattedDonors = (donorsData.data || []).map((donor) => ({
+      ...donor,
+      img_url: donor.img_url || null, // Ensure `img_url` is set or null
+    }));
 
     return {
-      donorsData: donorsData.data || [], // Ensure fallback
+      donorsData: formattedDonors, // Return formatted data
     };
   } catch (error) {
     console.error("API Error:", error.message);

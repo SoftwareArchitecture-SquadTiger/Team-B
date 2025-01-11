@@ -2,7 +2,7 @@ import callDonorsApi from "../../hooks/donor/callDonorsApi";
 
 export const fetchDonors = async (setDonors) => {
   try {
-    const { donorsData = []} = await callDonorsApi();
+    const { donorsData = [] } = await callDonorsApi();
 
     // Transform donor data
     const formattedDonors = donorsData.map((donor) => ({
@@ -12,7 +12,9 @@ export const fetchDonors = async (setDonors) => {
       email: donor.email,
       country: donor.country,
       type: "N/A",
+      img_url: donor.img_url || null, // Include avatar image URL
     }));
+
     // Update the state
     setDonors(formattedDonors);
   } catch (error) {
