@@ -61,7 +61,8 @@ async function handleLoginRequest(msg) {
     // Step 2: Fetch the user's credentials for non-admin users
     const decryptedEmail = decryptCredentials(email); // Decrypts the email
     console.log(decryptedEmail, userType);
-    const credential = await Credential.findOne({ decryptedEmail, userType });
+    const credential = await Credential.findOne({ email:decryptedEmail, userType });
+  
     if (!credential) {
       throw new Error('Email not found in the database');
     }
