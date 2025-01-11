@@ -42,7 +42,7 @@ async function handleLoginRequest(msg) {
     const decryptedPassword = decryptCredentials(password); // Decrypts the password
     console.log(decryptedPassword);
     console.log(process.env.ADMIN_USERNAME, process.env.ADMIN_PASSWORD);
-      if (email !== process.env.ADMIN_USERNAME || decryptedPassword !== process.env.ADMIN_PASSWORD) {
+      if (decryptedEmail !== process.env.ADMIN_USERNAME || decryptedPassword !== process.env.ADMIN_PASSWORD) {
         throw new Error('Invalid admin credentials');
       }
       console.log('Admin credentials are correct');
