@@ -62,7 +62,7 @@ const ProjectTable = ({ projects, onDelete, onUpdateStatus }) => {
             </td>
 
 
-            <td className="p-2">
+            <td className="p-2 text-center">
               <button
                 onClick={() => onDelete(project.id)}
                 className="text-red-500"
@@ -70,6 +70,7 @@ const ProjectTable = ({ projects, onDelete, onUpdateStatus }) => {
                 <DeleteOutlineIcon />
               </button>
             </td>
+
           </tr>
         ))}
       </tbody>
