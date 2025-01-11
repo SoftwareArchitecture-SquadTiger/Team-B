@@ -121,14 +121,18 @@ async function handleRegisterRequest(msg) {
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(decryptedPassword, saltRounds);
     console.log('Hashed password:', hashedPassword);
-
-    // Step 5: Produce save request and wait for response
-    const saveRequest = {
-      correlationId,
-      userData: { ...userData, userId, email: decryptedEmail },
-    };
     const topic = userType === 'Charity' ? 'charity-request' : 'donor-request';
     console.log(topic);
+// Step 5: Produce save request and wait for response
+const saveRequest = {
+  correlationId,
+  userData: {
+    ...userData,
+    email: decryptedEmail,
+    ...(topic === 'charity-request' ? { charityId: userId } : { donorId: userId }),
+  },
+};
+
     const result = await produceSaveRequest(topic, saveRequest);
     const {status} = result;
     if (status === 'error') {

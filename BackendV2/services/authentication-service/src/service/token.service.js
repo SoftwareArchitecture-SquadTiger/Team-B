@@ -1,4 +1,4 @@
-import { SignJWT, EncryptJWT, importPKCS8, importSPKI } from 'jose';
+import { EncryptJWT, importSPKI } from 'jose';
 import fs from 'fs';
 
 // Load public key for JWE encryption
@@ -6,7 +6,7 @@ const publicKeyPath = process.env.JWE_PUBLIC_KEY_PATH;
 const publicKeyPem = fs.readFileSync(publicKeyPath, 'utf8');
 
 // Define privateKeyObject and publicKeyObject
-let privateKeyObject, publicKeyObject;
+let publicKeyObject;
 
 // Import private and public keys asynchronously
 (async () => {

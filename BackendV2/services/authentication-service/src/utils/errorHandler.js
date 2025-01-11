@@ -1,4 +1,3 @@
-import { response } from 'express';
 import { produceLoginResponse,produceRegisterResponse } from '../events/producer.js'; // Import your Kafka producer instance
 
 /**
