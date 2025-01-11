@@ -12,6 +12,9 @@ const credentialSchema = new mongoose.Schema({
     email: { type: String, unique: true, required: true },
     userType: { type: String, required: true },
     password: { type: String, required: true } // received from encryption service
+}   ,
+ {
+    timestamps: true
 });
 
 const Credential = credentialDb.model("Credential", credentialSchema);
