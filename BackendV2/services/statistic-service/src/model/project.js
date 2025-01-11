@@ -7,8 +7,8 @@ const clusterURI = process.env.MONGO_URI;
 // Get 'statsDB' connection
 const statsDb = getDbConnection("statsDB", clusterURI);
 
-const CharitySchema = new mongoose.Schema({
-  charity_id: { type: String, unique: true },
+const ProjectSchema = new mongoose.Schema({
+  project_id: { type: String, unique: true },
   category_id: String,
   title: String,
   current_amount: Number,
@@ -21,8 +21,8 @@ const CharitySchema = new mongoose.Schema({
   country: String,
   images: Array,
   videos: Array,
-  project_id: String,
+  related_charity_id: String, // If projects are related to charities
 });
 
-const Charity = statsDb.model('Charity', CharitySchema);
-export default Charity;
+const Project = statsDb.model('Project', ProjectSchema);
+export default Project;

@@ -1,8 +1,8 @@
 import express from 'express';
-import mongoose from 'mongoose';
-import { fetchAndUpdateDonations, fetchAndUpdateCharities } from './service/dataFetcher.js';
+import { fetchAndUpdateDonations, fetchAndUpdateProjects } from './service/dataFetcher.js';
 import { getLastUpdateTimestamp } from './utils/syncHandler.js';
-
+import { consumeMessages } from './events/consumer.js';
+import dotenv from 'dotenv';
 const app = express();
 const PORT = 3000;
 
@@ -23,13 +23,13 @@ const syncOnBoot = async () => {
       console.log('Donation data is up-to-date.');
     }
 
-    // Check the last sync timestamp for charities
-    const lastCharitySync = await getLastUpdateTimestamp('charity_last_update');
-    if (!lastCharitySync || lastCharitySync < yesterday) {
-      console.log('Charity data is outdated. Fetching updates...');
-      await fetchAndUpdateCharities();
+    // Check the last sync timestamp for projects
+    const lastProjectSync = await getLastUpdateTimestamp('project_last_update');
+    if (!lastProjectSync || lastProjectSync < yesterday) {
+      console.log('Project data is outdated. Fetching updates...');
+      await fetchAndUpdateProjects(); // Ensure this function is implemented
     } else {
-      console.log('Charity data is up-to-date.');
+      console.log('Project data is up-to-date.');
     }
 
     console.log('Boot-time synchronization completed.');
@@ -41,9 +41,10 @@ const syncOnBoot = async () => {
 // Connect to MongoDB and start the server
 const startServer = async () => {
   try {
+    dotenv.config();
     // Perform boot-time synchronization
     await syncOnBoot();
-
+    await consumeMessages();
     // Start the Express server
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);

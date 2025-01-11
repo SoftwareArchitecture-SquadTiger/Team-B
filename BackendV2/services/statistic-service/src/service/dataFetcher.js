@@ -1,16 +1,25 @@
 import axios from 'axios';
 import { getLastUpdateTimestamp, updateLastUpdateTimestamp } from '../utils/syncHandler.js';
 import Donation from '../model/donation.js';
-import Charity from '../model/charity.js';
+import Project from '../model/project.js';
 const TeamAPath = process.env.TEAM_B_SERVICE_URL;
+
+
 const fetchAndUpdateDonations = async () => {
   const lastUpdate = await getLastUpdateTimestamp('donation_last_update');
-
-  // Fetch new donations
-  const response = await axios.get(
-    `${TeamAPath}/donations`
-  );
-  const donations = response.data;
+const lastUpdateString = lastUpdate.toISOString();
+// Fetch new donations
+const response = await axios.get(
+  `${TeamAPath}donation`,
+  {
+    params: {
+      'internal-api': process.env.INTERNAL_API_KEY,
+      startDate: lastUpdateString
+    }
+  }
+);
+const donations = response.data.donationResponse;
+console.log(donations);
 
   // Save unique donations
   await Promise.all(
@@ -28,29 +37,36 @@ const fetchAndUpdateDonations = async () => {
   console.log('Donations updated successfully.');
 };
 
-const fetchAndUpdateCharities = async () => {
-  const lastUpdate = await getLastUpdateTimestamp('charity_last_update');
+const fetchAndUpdateProjects = async () => {
+  const lastUpdate = await getLastUpdateTimestamp('project_last_update');
 
-  // Fetch new charities
+  // Fetch new projects
   const response = await axios.get(
-    `${TeamAPath}/charities`
+    `${TeamAPath}projects`,
+    {
+      params: {
+        'internal-api': process.env.INTERNAL_API_KEY,
+        updated_after: lastUpdate.toISOString
+      }
+    }
   );
-  const charities = response.data;
+  const projects = response.data.projectResponse;
 
-  // Save unique charities
+  // Save unique projects
   await Promise.all(
-    charities.map(async (charity) => {
-      await Charity.updateOne(
-        { charity_id: charity.charity_id },
-        charity,
+    projects.map(async (project) => {
+      await Project.updateOne(
+        { project_id: project.project_id },
+        project,
         { upsert: true } // Insert new or update existing
       );
     })
   );
 
   // Update the last update timestamp
-  await updateLastUpdateTimestamp('charity_last_update', new Date());
-  console.log('Charities updated successfully.');
+  await updateLastUpdateTimestamp('project_last_update', new Date()); 
+  console.log('Projects updated successfully.');
 };
 
-export { fetchAndUpdateDonations, fetchAndUpdateCharities };
+
+export { fetchAndUpdateDonations, fetchAndUpdateProjects };

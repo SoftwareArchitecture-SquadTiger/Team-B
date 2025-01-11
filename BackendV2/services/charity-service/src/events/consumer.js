@@ -12,7 +12,7 @@ const consumer = kafka.consumer({ groupId: 'charity-group' });
 
 export const consumeMessages = async () => {
   await consumer.connect();
-  await consumer.subscribe({ topic: 'statistics-request', fromBeginning: true });
+  await consumer.subscribe({ topic: 'charity-request', fromBeginning: true });
 
   console.log('Consumer is listening to messages on "charity-request"...');
 

@@ -5,7 +5,7 @@ import { produceMessage } from './producer.js';
 
 const kafka = new Kafka({
   clientId: 'statistics-service',
-  brokers: [process.env.KAFKA_BROKER],
+  brokers: ['10.247.205.104:9093'],
 });
 
 const consumer = kafka.consumer({ groupId: 'statistics-group' });
@@ -33,6 +33,7 @@ export const consumeMessages = async () => {
         correlationId: incomingMessage.correlationId,
         ...response, // Spread the response to include status, data, or error
       })));
+      console.log('Response sent' + JSON.stringify(response));
     },
   });
 };

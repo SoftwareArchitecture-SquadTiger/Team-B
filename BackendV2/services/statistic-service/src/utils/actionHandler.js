@@ -1,34 +1,48 @@
-import charityService from "../charity/service.js";
+import { getTotalDonationByDonor, getDonorLeaderboard, getTotalDonationsByDay,  getTotalDonationForProject} from "../service/donationService.js";
+import {
+  getProjectsCreatedPerMonth,
+  getProjectsByCountry,
+getProjectsByCategory,
+getProjectsByMonth,
+} from "../service/projectService.js";
 
 export const actionHandlers = {
-  GET_ALL: async () => {
-    const charities = await charityService.getAllCharities();
-    return { status: "success", data: charities };
+  // Donation Service Handlers
+  GET_TOTAL_DONATIONS_BY_DAY: async (data) => {
+    const donationsByDay = await getTotalDonationsByDay(data.startDate, data.endDate);
+    return { status: "success", data: donationsByDay };
   },
-  GET_BY_ID: async (data) => {
-    const charity = await charityService.getCharityById(data.id);
-    return { status: "success", data: charity ? charity.toJSON() : null };
+  GET_TOTAL_DONATIONS_BY_DONOR: async (data) => {
+    const totalDonations = await getTotalDonationByDonor(data.donorId);
+    return { status: "success", data: totalDonations };
   },
-  GET_BY_FILTERS: async (data) => {
-    const charities = await charityService.getFilteredCharities(data);
-    return { status: "success", data: charities };
+  GET_DONOR_LEADERBOARD: async () => {
+    const leaderboard = await getDonorLeaderboard();
+    return { status: "success", data: leaderboard };
   },
-  ADD: async (data) => {
-    const newCharity = await charityService.addCharity(data);
-    return { status: "success", data: newCharity.toJSON() };
+  // Project Service Handlers
+  GET_TOTAL_DONATION_FOR_PROJECT: async (data) => {
+    const totalDonation = await getTotalDonationForProject(data.projectId);
+    return { status: "success", data: totalDonation };
   },
-  UPDATE: async (data) => {
-    const updatedCharity = await charityService.updateCharity(
-      data.id,
-      data.update
-    );
-    return { status: "success", data: updatedCharity.toJSON() };
+  GET_PROJECTS_CREATED_PER_MONTH: async () => {
+    const projectsPerMonth = await getProjectsCreatedPerMonth();
+    return { status: "success", data: projectsPerMonth };
   },
-  DELETE: async (data) => {
-    await charityService.deleteCharity(data.id);
-    return { status: "success", message: "Charity deleted successfully" };
+  GET_PROJECTS_BY_COUNTRY: async (data) => {
+    const projectsByCountry = await getProjectsByCountry();
+    return { status: "success", data: projectsByCountry };
   },
+  GET_PROJECTS_BY_CATEGORY: async (data) => {
+    const projectsByCategory = await getProjectsByCategory();
+    return { status: "success", data: projectsByCategory };
+  },
+  GET_PROJECTS_BY_MONTH: async (data) => {
+    const projectsByMonth = await getProjectsByMonth(data.startMonth,data.endMonth);
+    return { status: "success", data: projectsByMonth };
+  }
 };
+
 
 export const defaultHandler = async () => {
   return { status: "error", message: "Unknown action" };
