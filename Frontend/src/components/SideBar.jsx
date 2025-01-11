@@ -3,45 +3,55 @@ import { useLocation, Link } from 'react-router-dom';
 import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 
 function Sidebar() {
-  const location = useLocation(); // Get the current route
+  const location = useLocation();
 
-  const isActive = (path) => location.pathname === path; // Check if the current route matches
+  const isActive = (path) => location.pathname === path;
 
   return (
-    <div className="w-1/5 h-screen bg-gray-100 p-4">
-      <h1 className="text-black text-2xl font-bold mb-14">
-        <FavoriteBorderIcon className="mr-2 text-pink-500" /> Charitan
-      </h1>
+    <div className="w-1/5 min-h-screen fixed top-0 left-0 bg-gray-100 p-4 overflow-y-auto shadow-md">
+      {/* Logo Section */}
+      <Link to="/dashboard">
+        <h1 className="text-black text-2xl font-bold mb-14 flex items-center cursor-pointer">
+          <FavoriteBorderIcon className="mr-2 text-pink-500" /> Charitan
+        </h1>
+      </Link>
+
+      {/* Menu Items */}
       <ul className="space-y-12">
-        <li className={`flex items-center text-xl font-bold cursor-pointer ${isActive('/dashboard') ? 'text-pink-500' : 'text-gray-700 hover:text-pink-500'}`}>
-          <Link to="/dashboard" className="flex items-center">
-
-            Dashboard
-          </Link>
+        <li
+          className={`text-xl font-bold ${
+            isActive('/dashboard') ? 'text-pink-500' : 'text-gray-700 hover:text-pink-500'
+          }`}
+        >
+          <Link to="/dashboard">Dashboard</Link>
         </li>
-        <li className={`flex items-center text-xl font-bold cursor-pointer ${isActive('/statistics') ? 'text-pink-500' : 'text-gray-700 hover:text-pink-500'}`}>
-          <Link to="/statistics" className="flex items-center">
-
-            Statistics
-          </Link>
+        <li
+          className={`text-xl font-bold ${
+            isActive('/statistics') ? 'text-pink-500' : 'text-gray-700 hover:text-pink-500'
+          }`}
+        >
+          <Link to="/statistics">Statistics</Link>
         </li>
-        <li className={`flex items-center text-xl font-bold cursor-pointer ${isActive('/users') ? 'text-pink-500' : 'text-gray-700 hover:text-pink-500'}`}>
-          <Link to="/users" className="flex items-center">
-
-            Users
-          </Link>
+        <li
+          className={`text-xl font-bold ${
+            isActive('/users') ? 'text-pink-500' : 'text-gray-700 hover:text-pink-500'
+          }`}
+        >
+          <Link to="/users">Users</Link>
         </li>
-        <li className={`flex items-center text-xl font-bold cursor-pointer ${isActive('/projects') ? 'text-pink-500' : 'text-gray-700 hover:text-pink-500'}`}>
-          <Link to="/projects" className="flex items-center">
-
-            Projects
-          </Link>
+        <li
+          className={`text-xl font-bold ${
+            isActive('/projects') ? 'text-pink-500' : 'text-gray-700 hover:text-pink-500'
+          }`}
+        >
+          <Link to="/projects">Projects</Link>
         </li>
-        <li className={`flex items-center text-xl font-bold cursor-pointer ${isActive('/settings') ? 'text-pink-500' : 'text-gray-700 hover:text-pink-500'}`}>
-          <Link to="/settings" className="flex items-center">
-
-            Settings
-          </Link>
+        <li
+          className={`text-xl font-bold ${
+            isActive('/settings') ? 'text-pink-500' : 'text-gray-700 hover:text-pink-500'
+          }`}
+        >
+          <Link to="/settings">Settings</Link>
         </li>
       </ul>
     </div>

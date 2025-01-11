@@ -6,6 +6,11 @@ import UsersPage from './modules/Users/pages/UsersPage'
 import ProjectsPage from './modules/Projects/pages/ProjectsPage'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './Layout';
+import AddProjectForm from "./modules/AddProject/pages/AddProjectForm";
+import CloudinaryGallery from './modules/Image/pages/CloudinaryGallery';
+import AddUserPage from './modules/AddUser/pages/AddUserPage';
+import LoginForm from './modules/Login/component/loginForm';
+
 
 function App() {
   return (
@@ -32,6 +37,24 @@ function App() {
           }
         />
         <Route
+          path="/users/add"
+          element={
+            <Layout>
+              <AddUserPage />
+            </Layout>
+          }
+        />
+        <Route
+          path="/login"
+          element={
+           
+            <div className="min-h-screen flex items-center justify-center bg-gray-100">
+            <LoginForm />
+          </div>
+          
+          }
+        />
+        <Route
           path="/settings"
           element={
             <Layout>
@@ -55,7 +78,28 @@ function App() {
             </Layout>
           }
         />
+
+        <Route
+          path="/add-project"
+          element={
+            <Layout>
+              <AddProjectForm />
+            </Layout>
+          }
+        />
+
+        <Route
+          path="/gallery"
+          element={
+            <Layout>
+              <CloudinaryGallery />
+            </Layout>
+          }
+        />
+        
       </Routes>
+
+      
     </Router>
   );
 }

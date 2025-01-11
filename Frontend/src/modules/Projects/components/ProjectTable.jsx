@@ -1,7 +1,9 @@
 import React from "react";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
-const ProjectTable = ({ projects, onDelete }) => {
+const ProjectTable = ({ projects, onDelete, onUpdateStatus }) => {
+  const statusOptions = ["Pending", "Running", "Halted", "Completed"];
+
   const getStatusClass = (status) => {
     switch (status) {
       case "Pending":
@@ -10,6 +12,8 @@ const ProjectTable = ({ projects, onDelete }) => {
         return "text-green-500";
       case "Halted":
         return "text-red-500";
+      case "Completed":
+        return "text-blue-800";
       default:
         return "text-gray-500";
     }
@@ -19,7 +23,7 @@ const ProjectTable = ({ projects, onDelete }) => {
     <table className="w-full border-collapse mb-4">
       <thead>
         <tr className="bg-gray-200">
-          {["ID", "CHARITY", "SCALE", "GOAL", "START", "EXPIRED", "STATUS", "ACTION"].map(
+          {["TITLE", "CHARITY", "SCALE", "GOAL", "START", "EXPIRED", "STATUS", "ACTION"].map(
             (heading) => (
               <th key={heading} className="border border-gray-300 p-2 text-left">
                 {heading}
@@ -31,17 +35,33 @@ const ProjectTable = ({ projects, onDelete }) => {
       <tbody>
         {projects.map((project, index) => (
           <tr key={index} className="odd:bg-white even:bg-gray-50">
-            <td className="border border-gray-300 p-2">{project.id}</td>
-            <td className="border border-gray-300 p-2">{project.charity}</td>
-            <td className="border border-gray-300 p-2">{project.scale}</td>
-            <td className="border border-gray-300 p-2">{project.goal}</td>
-            <td className="border border-gray-300 p-2">{project.start}</td>
-            <td className="border border-gray-300 p-2">{project.expired}</td>
-            <td className={`border border-gray-300 p-2 font-semibold ${getStatusClass(project.status)}`}>
-              {project.status}
+            <td className="border border-gray-300 p-2">{project.title || "N/A"}</td>
+            <td className="border border-gray-300 p-2">{project.charity || "N/A"}</td>
+            <td className="border border-gray-300 p-2">{project.scale || "N/A"}</td>
+            <td className="border border-gray-300 p-2">{project.goal || "N/A"}</td>
+            <td className="border border-gray-300 p-2">{project.start || "N/A"}</td>
+            <td className="border border-gray-300 p-2">{project.expired || "N/A"}</td>
+            <td className={`border border-gray-300 p-2 ${getStatusClass(project.status)}`}>
+              <select
+                value={project.status}
+                onChange={(e) => onUpdateStatus(project.id, e.target.value)}
+                className="border border-gray-300 rounded p-1"
+              >
+                {statusOptions.map((status) => (
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
+                ))}
+              </select>
             </td>
             <td className="border border-gray-300 p-2">
-              <button onClick={() => onDelete(project.id)} className="text-red-500">
+              <button
+                onClick={() => {
+                  console.log("Deleting project with ID:", project.id); // Debugging project ID
+                  onDelete(project.id);
+                }}
+                className="text-red-500"
+              >
                 <DeleteOutlineIcon />
               </button>
             </td>

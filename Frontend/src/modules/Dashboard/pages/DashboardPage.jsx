@@ -1,5 +1,5 @@
 import React from "react";
-import ProjectTable from "../../Projects/components/Dashboard/ProjectTable";
+import ProjectTable from "../../Projects/components/ProjectTable";
 import StatisticsDonationAmount from "../../Statistics/components/StatisticsDashboard/StatisticsDonationAmount";
 import StatisticsPieChartForCategory from "../../Statistics/components/StatisticsPieChart/Category";
 import StatisticsPieChartForCountry from "../../Statistics/components/StatisticsPieChart/Country";
@@ -30,9 +30,9 @@ const Dashboard = () => {
 
       <div className="flex flex-wrap gap-4">
         {/* Project Table */}
-        <div className="bg-white shadow-md rounded-lg p-6 w-full md:w-1/3">
+        {/* <div className="bg-white shadow-md rounded-lg p-6 w-full md:w-1/3">
           <ProjectTable />
-        </div>
+        </div> */}
 
         {/* Pie Charts */}
         <div className="flex flex-wrap bg-white shadow-md rounded-lg p-6 w-full md:w-2/3">

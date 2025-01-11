@@ -4,7 +4,12 @@
 /*/.env
 /*/*/*/node_modules
 /*/*/.env
+.codegpt
 .vscode
 /*/keys
 *.pem
-/*/*/client-test
+node_modules
+package.json
+package-lock.json
+
+BackendV2/services/client-test/

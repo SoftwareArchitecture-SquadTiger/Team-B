@@ -1,24 +1,23 @@
-// services/fetchProjects.js
-import { callProjectsAPI } from "../hooks/callProjectsAPI";
-
-export const fetchProjects = async (url, setProjects) => {
+export const fetchProjectById = async (id) => {
+  const apiUrl = `http://${import.meta.env.VITE_HOST}:${import.meta.env.VITE_PORT}/client-server/project/${id}`;
   try {
-    const projectsData = await callProjectsAPI(url);
-
-    const formattedProjects = projectsData.map((project) => ({
-      id: project.project_id,
-      charity: project.charity_id, // Replace with the actual charity name if needed
-      scale: project.region,
-      goal: `$${project.target_amount}`,
-      start: new Date(project.start_date).toLocaleDateString(),
-      expired: new Date(project.end_date).toLocaleDateString(),
-      status: project.status.charAt(0).toUpperCase() + project.status.slice(1), 
-    }));
-
-    setProjects(formattedProjects);
+    const response = await fetch(apiUrl, {
+      method: "GET",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+    });
+    if (!response.ok) {
+      throw new Error(`Error fetching project by ID: ${response.statusText}`);
+    }
+    const data = await response.json();
+    console.log("Fetched project by ID:", data); // Debugging log
+    return data;
   } catch (error) {
-    console.error("Error fetching projects:", error.message);
+    console.error("Error in fetchProjectById:", error);
+    throw error;
   }
 };
 
-export default fetchProjects;
+
