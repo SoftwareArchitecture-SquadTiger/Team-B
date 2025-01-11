@@ -23,7 +23,7 @@ const ProjectTable = ({ projects, onDelete, onUpdateStatus }) => {
     <table className="w-full border-collapse mb-4">
       <thead>
         <tr className="bg-gray-200">
-          {["TITLE", "CHARITY", "SCALE", "GOAL", "START", "EXPIRED", "STATUS", "ACTION"].map(
+          {["TITLE", "PROJECT_ID", "SCALE", "GOAL", "START", "EXPIRED", "STATUS", "ACTION"].map(
             (heading) => (
               <th key={heading} className="border border-gray-300 p-2 text-left">
                 {heading}
@@ -36,7 +36,7 @@ const ProjectTable = ({ projects, onDelete, onUpdateStatus }) => {
         {projects.map((project, index) => (
           <tr key={index} className="odd:bg-white even:bg-gray-50">
             <td className="border border-gray-300 p-2">{project.title || "N/A"}</td>
-            <td className="border border-gray-300 p-2">{project.charity || "N/A"}</td>
+            <td className="border border-gray-300 p-2">{project.id || "N/A"}</td>
             <td className="border border-gray-300 p-2">{project.scale || "N/A"}</td>
             <td className="border border-gray-300 p-2">{project.goal || "N/A"}</td>
             <td className="border border-gray-300 p-2">{project.start || "N/A"}</td>
