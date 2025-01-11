@@ -1,8 +1,9 @@
 import { GET_DONORS_SERVICE_URL } from "../../../../services/BackendUrlConfig";
+import { fetchWithAuth } from "../../../../utils/fetchWithAuth";
 
 async function callDonorsApi() {
   try {
-    const donorsResponse = await fetch(GET_DONORS_SERVICE_URL, {
+    const donorsResponse = await fetchWithAuth(GET_DONORS_SERVICE_URL, {
       method: "GET", // HTTP method
       headers: {
         Accept: "application/json", // Request JSON response

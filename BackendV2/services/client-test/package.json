@@ -11,6 +11,7 @@
   "description": "",
   "dependencies": {
     "client-test": "file:",
+    "jose": "^5.9.6",
     "kafkajs": "^2.2.4",
     "mongodb": "^6.12.0"
   }

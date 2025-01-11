@@ -10,11 +10,12 @@ import AddProjectForm from "./modules/AddProject/pages/AddProjectForm";
 import CloudinaryGallery from './modules/Image/pages/CloudinaryGallery';
 import AddUserPage from './modules/AddUser/pages/AddUserPage';
 import LoginForm from './modules/Login/component/loginForm';
+import { APIProvider } from './state/APIContext';
 
 
 function App() {
   return (
-    <Router>
+    <APIProvider><Router>
       <Routes>
         {/* Sign-In Page (Without Layout)
         <Route path="/signin" element={<SignInPage />} /> */}
@@ -50,7 +51,8 @@ function App() {
            
             <div className="min-h-screen flex items-center justify-center bg-gray-100">
             <LoginForm />
-          </div>
+            </div>
+          
           
           }
         />
@@ -101,6 +103,7 @@ function App() {
 
       
     </Router>
+    </APIProvider>
   );
 }
 

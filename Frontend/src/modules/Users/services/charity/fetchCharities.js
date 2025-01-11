@@ -12,6 +12,7 @@ export const fetchCharities = async (setCharities) => {
         email: charity.email,
         country: charity.country,
         role: "CHARITY",
+        img_url: charity.img_url || null,
       }));
     // Update the state
     setCharities(formattedCharities);
