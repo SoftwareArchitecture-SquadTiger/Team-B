@@ -18,7 +18,7 @@ const ProjectsPage = () => {
   const [filteredProjects, setFilteredProjects] = useState([]); // Filtered or searched data
   const [searchQuery, setSearchQuery] = useState(""); // Search query state
   const [currentPage, setCurrentPage] = useState(1);
-  const [projectsPerPage] = useState(10);
+  const [projectsPerPage] = useState(15);
   const [filter, setFilter] = useState({ region: "", status: "" });
   const [selectedProject, setSelectedProject] = useState(null); // Selected project for halting
   const [showHaltModal, setShowHaltModal] = useState(false); // To toggle modal visibility
