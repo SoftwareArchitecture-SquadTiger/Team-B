@@ -2,7 +2,7 @@ import axios from 'axios';
 import { getLastUpdateTimestamp, updateLastUpdateTimestamp } from '../utils/syncHandler.js';
 import Donation from '../model/donation.js';
 import Project from '../model/project.js';
-const TeamAPath = process.env.TEAM_B_SERVICE_URL;
+const TeamAPath = process.env.TEAM_A_API_GATEWAY;
 
 
 const fetchAndUpdateDonations = async () => {
