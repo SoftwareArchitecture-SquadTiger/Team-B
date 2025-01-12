@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import forge from "node-forge";
 import { useNavigate } from "react-router-dom";
 import { useAPI } from "../../../state/APIContext";
+import { useHandleInputChange } from "../service/useHandleInputChange";
+import { useHandleSubmit } from "../service/useHandleSubmit";
 
 const LoginForm = () => {
   const { saveToken } = useAPI();

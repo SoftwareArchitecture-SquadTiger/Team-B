@@ -1,7 +1,7 @@
 import Project from '../model/project.js';
 import Donation from '../model/donation.js';
 import axios from 'axios';
-const TeamAPath = process.env.TEAM_B_SERVICE_URL;
+const TeamAPath = process.env.TEAM_A_API_GATEWAY;
 
 /**
  * Get the count of projects created per month within a specified time range.

@@ -4,7 +4,7 @@ import "dotenv/config";
 // Initialize Kafka client
 const kafka = new Kafka({
   clientId: 'statistics-service',
-  brokers: ['10.247.205.104:9093'], 
+  brokers: [process.env.KAFKA_BROKER], 
 });
 
 const producer = kafka.producer();
