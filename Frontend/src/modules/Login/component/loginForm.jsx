@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import forge from "node-forge";
 import { useNavigate } from "react-router-dom";
 import { useAPI } from "../../../state/APIContext";
-import { useHandleInputChange } from "../service/useHandleInputChange";
-import { useHandleSubmit } from "../service/useHandleSubmit";
 
 const LoginForm = () => {
   const { saveToken } = useAPI();
@@ -61,7 +59,7 @@ TQIDAQAB
 
   
       const response = await fetch(
-        "http://192.168.1.108:5001/admin-server/auth/login",
+        "http://192.168.0.103:5001/admin-server/auth/login",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

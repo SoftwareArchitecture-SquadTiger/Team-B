@@ -1,10 +1,8 @@
-import { fetchWithAuth } from "../../../utils/fetchWithAuth";
-
 const url = `http://${import.meta.env.VITE_HOST}:${import.meta.env.VITE_PORT}`;
 
 export const callDonorAPI  = async () => {
   try {
-    const response = await fetchWithAuth(`${url}/admin-server/donors`);
+    const response = await fetch(`${url}/admin-server/donors`);
     if (!response.ok) {
       throw new Error(`Error: ${response.status}`);
     }
