@@ -20,7 +20,6 @@ const produceSaveRequest = async (topic, message) => {
       deletePendingRequest(correlationId);
       reject(new Error(`Timeout: The consumer may not listening to Kafka`));
     }, timeout);
-    console.log("2");
     addPendingRequest(correlationId, resolve, timeoutId);
     try {
       await producer.send({
@@ -35,11 +34,11 @@ const produceSaveRequest = async (topic, message) => {
           },
         ],
       });    
-    console.log('3');} catch (error) {
+    } catch (error) {
       console.log("there is an error, rejecting promise");
       deletePendingRequest(correlationId); // Clean up on failure by deleting the stored id
       reject(error); // Reject the promise if sending fails
-    }console.log('4');
+    }
   });
 };
 
