@@ -5,7 +5,7 @@ import { produceMessage } from './producer.js';
 
 const kafka = new Kafka({
   clientId: 'statistics-service',
-  brokers: ['10.247.205.104:9093'],
+  brokers: [process.env.KAFKA_BROKER],
 });
 
 const consumer = kafka.consumer({ groupId: 'statistics-group' });

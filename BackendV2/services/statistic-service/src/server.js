@@ -4,12 +4,9 @@ import { getLastUpdateTimestamp } from './utils/syncHandler.js';
 import { consumeMessages } from './events/consumer.js';
 import dotenv from 'dotenv';
 const app = express();
-const PORT = 3000;
 
 const syncOnBoot = async () => {
   console.log('Performing boot-time synchronization...');
-
-  const currentTime = new Date();
   const yesterday = new Date();
   yesterday.setDate(yesterday.getDate() - 1);
 
@@ -45,10 +42,7 @@ const startServer = async () => {
     // Perform boot-time synchronization
     await syncOnBoot();
     await consumeMessages();
-    // Start the Express server
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
-    });
+
   } catch (error) {
     console.error('Error starting the server:', error.message);
     process.exit(1);
