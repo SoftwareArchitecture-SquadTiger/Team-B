@@ -55,6 +55,7 @@ services:
       context: ./services/statistic-service
       dockerfile: Dockerfile
     container_name: statistic-service
+    restart: on-failure
     depends_on:
       - charity-service
       - donor-service
