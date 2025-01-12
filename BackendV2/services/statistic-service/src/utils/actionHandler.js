@@ -1,4 +1,4 @@
-import { getTotalDonationByDonor, getDonorLeaderboard, getTotalDonationsByDay,  getTotalDonationForProject} from "../service/donationService.js";
+import { getTotalDonationByDonor, getDonorLeaderboard, getTotalDonationsByDay,  getTotalDonationForProject, getDonationsByMonth} from "../service/donationService.js";
 import {
   getProjectsCreatedPerMonth,
   getProjectsByCountry,
@@ -40,7 +40,11 @@ export const actionHandlers = {
   GET_PROJECTS_BY_MONTH: async (data) => {
     const projectsByMonth = await getProjectsByMonth(data.startMonth,data.endMonth);
     return { status: "success", data: projectsByMonth };
-  }
+  },
+  GET_TOTAL_DONATIONS_BY_MONTH: async (data) => {
+    const donationByMonth = await getDonationsByMonth(data.startMonth,data.endMonth);
+    return { status: "success", data: donationByMonth };
+  },
 };
 
 

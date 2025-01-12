@@ -216,45 +216,172 @@ const getTotalDonationForProject = async (projectId) => {
     throw error; // Re-throw error for higher-level handling
   }
 };
+/**
+ * Fetch total donations grouped by month within a specified date range.
+ * @param {String} startDate - Start date in 'YYYY-MM-DD' format.
+ * @param {String} endDate - End date in 'YYYY-MM-DD' format.
+ * @returns {Array} Total donations grouped by month.
+ */
+const getDonationsByMonth = async (startMonth, endMonth) => {
+  // Step 1: Generate the filters for MongoDB query
+  const filters = buildFilters({ timePeriod: 'custom', startMonth, endMonth });
 
+  // Step 2: Fetch local data from MongoDB
+  const localData = await Donation.aggregate([
+    { $match: filters }, // Apply the filters
+    {
+      $group: {
+        _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } }, // Group by month
+        totalAmount: { $sum: "$amount" }, // Sum donation amounts
+      },
+    },
+    { $sort: { _id: 1 } }, // Sort by month
+    {
+      $project: {
+        month: "$_id", // Rename `_id` to `month`
+        totalAmount: 1,
+        _id: 0, // Exclude `_id` from output
+      },
+    },
+  ]);
+
+  console.log("Local data by month:", localData);
+
+  // Step 3: Fetch latest donations for the date range
+  const latestDonations = (await fetchAndUpdateDonations()) || [];
+  console.log("Latest donations:", latestDonations);
+
+  // Step 4: Group latest donations by month
+  const latestData = latestDonations.reduce((acc, donation) => {
+    const month = donation.createdAt.split("T")[0].slice(0, 7); // Extract 'YYYY-MM'
+    acc[month] = (acc[month] || 0) + donation.amount;
+    return acc;
+  }, {});
+
+  console.log("Latest data grouped by month:", latestData);
+
+  // Step 5: Combine local and latest data
+  const combinedData = [...localData];
+  for (const [month, totalAmount] of Object.entries(latestData)) {
+    const existing = combinedData.find((item) => item.month === month);
+    if (existing) {
+      existing.totalAmount += totalAmount;
+    } else {
+      combinedData.push({ month, totalAmount });
+    }
+  }
+
+  console.log("Combined data before filling missing months:", combinedData);
+
+  // Step 6: Fill in missing months with zero donations
+  const allMonths = generateMonthRange(startMonth, endMonth); // Generate all months in the range
+  const completeData = allMonths.map((month) => {
+    const existing = combinedData.find((item) => item.month === month);
+    return { month, totalAmount: existing ? existing.totalAmount : 0 }; // Fill missing months with 0
+  });
+
+  console.log("Complete data:", completeData);
+
+  // Step 7: Return the complete data sorted by month
+  return completeData.sort((a, b) => new Date(a.month) - new Date(b.month));
+};
+
+/**
+ * Generate a range of months from startDate to endDate (inclusive).
+ * @param {String} startDate - Start date in 'YYYY-MM-DD' format.
+ * @param {String} endDate - End date in 'YYYY-MM-DD' format.
+ * @returns {Array} Array of months in 'YYYY-MM' format.
+ */
+const generateMonthRange = (startMonth, endMonth) => {
+  const start = new Date(startMonth);
+  const end = new Date(endMonth);
+  const months = [];
+
+  // Ensure start is the first day of the month
+  start.setDate(1);
+
+  while (start <= end) {
+    months.push(start.toISOString().slice(0, 7)); // Format as 'YYYY-MM'
+    start.setMonth(start.getMonth() + 1); // Increment by 1 month
+  }
+
+  return months;
+};
+
+
+/**
+ * Build query filters for MongoDB based on provided query parameters.
+ * Supports filtering by year, month, custom date ranges, and startMonth-endMonth.
+ * @param {Object} queryParams - Query parameters for filtering.
+ * @returns {Object} MongoDB query filters.
+ */
 const buildFilters = (queryParams) => {
   const filters = {};
 
   if (queryParams.timePeriod === 'year' && queryParams.year) {
+    // Filter by year
     filters.createdAt = {
       $gte: new Date(`${queryParams.year}-01-01`),
       $lt: new Date(`${queryParams.year + 1}-01-01`),
     };
   } else if (queryParams.timePeriod === 'month' && queryParams.year && queryParams.month) {
+    // Filter by specific month
     const startDate = new Date(`${queryParams.year}-${queryParams.month}-01`);
     const endDate = new Date(startDate);
     endDate.setMonth(startDate.getMonth() + 1);
     filters.createdAt = { $gte: startDate, $lt: endDate };
   } else if (queryParams.timePeriod === 'custom' && queryParams.startDate && queryParams.endDate) {
+    // Filter by custom date range
     let { startDate, endDate } = queryParams;
 
     // Convert to Date objects
     const start = new Date(startDate);
     const end = new Date(endDate);
 
-    // Handle invalid date ranges
+    // Validate date range
     if (isNaN(start.getTime()) || isNaN(end.getTime())) {
-      throw new Error("Invalid startDate or endDate provided");
+      throw new Error("Invalid startDate or endDate provided.");
     }
 
     // Automatically fix reversed date ranges
     if (start > end) {
       console.warn("startDate is later than endDate. Swapping the values.");
-      [startDate, endDate] = [endDate, startDate]; // Swap the dates
+      [startDate, endDate] = [endDate, startDate];
     }
 
-    filters.createdAt = { $gte: new Date(startDate), $lt: new Date(new Date(endDate).getTime() + 24 * 60 * 60 * 1000) }; // Include endDate
+    filters.createdAt = {
+      $gte: new Date(startDate),
+      $lte: new Date(endDate),
+    };
+  } else if (queryParams.startMonth && queryParams.endMonth) {
+    // Filter by startMonth and endMonth
+    const startMonth = new Date(`${queryParams.startMonth}-01`); // First day of startMonth
+    const endMonth = new Date(`${queryParams.endMonth}-01`); // First day of endMonth
+    endMonth.setMonth(endMonth.getMonth() + 1); // Move to the next month
+    endMonth.setDate(0); // Set to the last day of the specified month
+
+    // Validate month range
+    if (isNaN(startMonth.getTime()) || isNaN(endMonth.getTime())) {
+      throw new Error("Invalid startMonth or endMonth provided.");
+    }
+
+    // Automatically fix reversed month ranges
+    if (startMonth > endMonth) {
+      console.warn("startMonth is later than endMonth. Swapping the values.");
+      [startMonth, endMonth] = [endMonth, startMonth];
+    }
+
+    filters.createdAt = {
+      $gte: startMonth,
+      $lte: endMonth,
+    };
   } else {
-    throw new Error("Invalid query parameters for building filters");
+    throw new Error("Invalid query parameters for building filters.");
   }
 
   return filters;
 };
 
 
-export { getTotalDonationByDonor, getDonorLeaderboard, getTotalDonationsByDay, getTotalDonationForProject };
+
+export { getTotalDonationByDonor, getDonorLeaderboard, getTotalDonationsByDay, getTotalDonationForProject, getDonationsByMonth };
