@@ -15,12 +15,21 @@ import { APIProvider } from './state/APIContext';
 
 function App() {
   return (
-    <APIProvider><Router>
+    <APIProvider>
+      <Router>
       <Routes>
         {/* Sign-In Page (Without Layout)
         <Route path="/signin" element={<SignInPage />} /> */}
 
         {/* Other Pages (With Layout) */}
+        <Route
+          path="/"
+          element={
+            <Layout>
+              <DashboardPage />
+            </Layout>
+          }
+        />
         <Route
           path="/dashboard"
           element={

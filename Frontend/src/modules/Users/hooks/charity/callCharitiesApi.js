@@ -1,9 +1,8 @@
 import { GET_CHARITIES_SERVICE_URL } from "../../../../services/BackendUrlConfig";
-import { fetchWithAuth } from "../../../../utils/fetchWithAuth";
 
 async function callCharitiesApi() {
   try {
-    const charitiesResponse = await fetchWithAuth(GET_CHARITIES_SERVICE_URL, {
+    const charitiesResponse = await fetch(GET_CHARITIES_SERVICE_URL, {
       method: "GET", // HTTP method
       headers: {
         Accept: "application/json", // Accept JSON response

@@ -4,6 +4,7 @@ services:
       context: ./services/donor-service
       dockerfile: Dockerfile
     container_name: donor-service
+    restart: on-failure
     environment:
       KAFKA_BROKER: ${KAFKA_EXTERNAL_ADVERTISED_HOSTNAME}:${KAFKA_EXTERNAL_PORT}
       MONGO_URI: ${MONGO_URI} 
@@ -17,6 +18,7 @@ services:
       context: ./services/charity-service
       dockerfile: Dockerfile
     container_name: charity-service
+    restart: on-failure
     environment:
       KAFKA_BROKER: ${KAFKA_EXTERNAL_ADVERTISED_HOSTNAME}:${KAFKA_EXTERNAL_PORT}
       MONGO_URI: ${MONGO_URI}
@@ -30,6 +32,7 @@ services:
       context: ./services/authentication-service
       dockerfile: Dockerfile
     container_name: authentication-service
+    restart: on-failure
     depends_on:
       - charity-service
       - donor-service

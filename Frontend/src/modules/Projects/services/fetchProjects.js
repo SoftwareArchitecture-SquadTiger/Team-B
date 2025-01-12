@@ -1,5 +1,5 @@
-export const fetchProjectById = async (id) => {
-  const apiUrl = `http://${import.meta.env.VITE_HOST}:${import.meta.env.VITE_PORT}/client-server/project/${id}`;
+export const fetchProjectByTitle = async (title) => {
+  const apiUrl = `http://${import.meta.env.VITE_HOST}:${import.meta.env.VITE_PORT}/client-server/project/title/${encodeURIComponent(title)}`;
   try {
     const response = await fetch(apiUrl, {
       method: "GET",
@@ -9,15 +9,13 @@ export const fetchProjectById = async (id) => {
       },
     });
     if (!response.ok) {
-      throw new Error(`Error fetching project by ID: ${response.statusText}`);
+      throw new Error(`Error fetching project by title: ${response.statusText}`);
     }
     const data = await response.json();
-    console.log("Fetched project by ID:", data); // Debugging log
+    console.log("Fetched project by title:", data); // Debugging log
     return data;
   } catch (error) {
-    console.error("Error in fetchProjectById:", error);
+    console.error("Error in fetchProjectByTitle:", error);
     throw error;
   }
 };
-
-
