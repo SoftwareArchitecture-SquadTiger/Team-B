@@ -23,7 +23,7 @@ const ProjectTable = ({ projects, onDelete, onUpdateStatus }) => {
     <table className="w-full border-collapse mb-4">
       <thead>
         <tr className="bg-gray-200">
-          {["TITLE", "PROJECT_ID", "SCALE", "GOAL", "START", "EXPIRED", "STATUS", "ACTION"].map(
+          {["TITLE", "PROJECT_ID", "REGION", "GOAL", "START", "EXPIRED", "STATUS", "ACTION"].map(
             (heading) => (
               <th key={heading} className="border-b border-gray-300 p-2 text-left">
                 {heading}

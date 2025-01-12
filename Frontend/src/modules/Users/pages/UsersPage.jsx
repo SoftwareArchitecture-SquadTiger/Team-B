@@ -59,6 +59,7 @@ const UsersPage = () => {
           email: donor.email,
           country: donor.country,
           type: "N/A",
+          img_url: donor.img_url || null,
         }));
         setDonors(formattedDonors);
       }
