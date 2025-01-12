@@ -14,7 +14,7 @@ import { filterDonorsByCountry } from "../hooks/donor/callFilterDonorByCountryAp
 import searchCharities from "../services/charity/searchCharities";
 import searchDonors from "../services/donor/searchDonors";
 import paginate from "../services/paginate";
-
+import { useAPI } from "../../../state/APIContext";
 const UsersPage = () => {
   const [searchQueryDonor, setSearchQueryDonor] = useState("");
   const [searchQueryCharity, setSearchQueryCharity] = useState("");
@@ -27,20 +27,23 @@ const UsersPage = () => {
   const [donors, setDonors] = useState([]);
   const [charities, setCharities] = useState([]);
 
+  const { authToken } = useAPI(); // Access the API context
+
+
   useEffect(() => {
     const fetchData = async () => {
-      try {
-        const donorsPromise = fetchDonors(setDonors);
-        const charitiesPromise = fetchCharities(setCharities);
+      if (!authToken) {
+        console.error("No auth token available");
+        return;
 
-        await Promise.all([donorsPromise, charitiesPromise]);
-      } catch (error) {
-        console.error("Error fetching users:", error.message);
-      }
+      } 
+      const donorsPromise = fetchDonors(setDonors);
+      const charitiesPromise = fetchCharities(setCharities);
+      await Promise.all([donorsPromise, charitiesPromise]);
+      console.log("Current Auth Token: ", authToken)
     };
-
     fetchData();
-  }, []);
+  }, [authToken]);
 
   const handleDonorCountryFilterChange = async (country) => {
     try {
@@ -85,7 +88,7 @@ const UsersPage = () => {
       console.error("Error fetching filtered charities by country:", error.message);
     }
   };
-  
+
 
   const handleCharityTypeFilterChange = async (type) => {
     try {
@@ -108,7 +111,7 @@ const UsersPage = () => {
       console.error("Error fetching filtered charities by type:", error.message);
     }
   };
-  
+
 
   const filteredDonors = searchDonors(donors, searchQueryDonor);
   const { paginatedItems: paginatedDonors, totalPages: donorTotalPages } = paginate(

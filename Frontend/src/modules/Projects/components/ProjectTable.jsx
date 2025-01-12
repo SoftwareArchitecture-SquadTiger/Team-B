@@ -25,7 +25,7 @@ const ProjectTable = ({ projects, onDelete, onUpdateStatus }) => {
         <tr className="bg-gray-200">
           {["TITLE", "PROJECT_ID", "SCALE", "GOAL", "START", "EXPIRED", "STATUS", "ACTION"].map(
             (heading) => (
-              <th key={heading} className="border border-gray-300 p-2 text-left">
+              <th key={heading} className="border-b border-gray-300 p-2 text-left">
                 {heading}
               </th>
             )
@@ -35,17 +35,23 @@ const ProjectTable = ({ projects, onDelete, onUpdateStatus }) => {
       <tbody>
         {projects.map((project, index) => (
           <tr key={index} className="odd:bg-white even:bg-gray-50">
-            <td className="border border-gray-300 p-2">{project.title || "N/A"}</td>
-            <td className="border border-gray-300 p-2">{project.id || "N/A"}</td>
-            <td className="border border-gray-300 p-2">{project.scale || "N/A"}</td>
-            <td className="border border-gray-300 p-2">{project.goal || "N/A"}</td>
-            <td className="border border-gray-300 p-2">{project.start || "N/A"}</td>
-            <td className="border border-gray-300 p-2">{project.expired || "N/A"}</td>
-            <td className={`border border-gray-300 p-2 ${getStatusClass(project.status)}`}>
+            <td className="p-2">{project.title || "N/A"}</td>
+            <td className="p-2">{project.id || "N/A"}</td>
+            <td className="p-2">{project.scale || "N/A"}</td>
+            <td className="p-2">{project.goal || "N/A"}</td>
+            <td className="p-2">{project.start || "N/A"}</td>
+            <td className="p-2">{project.expired || "N/A"}</td>
+            <td className="p-2">
               <select
                 value={project.status}
                 onChange={(e) => onUpdateStatus(project.id, e.target.value)}
-                className="border border-gray-300 rounded p-1"
+                className={`border-2 rounded p-1 ${getStatusClass(project.status)}`}
+                style={{
+                  outline: "2px solid #6b7280", // Subtle gray outline (tailwind gray-500 equivalent)
+                  borderColor: "#6b7280", // Match border color with a subtle gray
+                  outlineOffset: "2px", // Maintain space for clean appearance
+                  backgroundColor: "white", // Keep dropdown background white
+                }}
               >
                 {statusOptions.map((status) => (
                   <option key={status} value={status}>
@@ -54,17 +60,17 @@ const ProjectTable = ({ projects, onDelete, onUpdateStatus }) => {
                 ))}
               </select>
             </td>
-            <td className="border border-gray-300 p-2">
+
+
+            <td className="p-2 text-center">
               <button
-                onClick={() => {
-                  console.log("Deleting project with ID:", project.id); // Debugging project ID
-                  onDelete(project.id);
-                }}
+                onClick={() => onDelete(project.id)}
                 className="text-red-500"
               >
                 <DeleteOutlineIcon />
               </button>
             </td>
+
           </tr>
         ))}
       </tbody>
