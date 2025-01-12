@@ -5,19 +5,28 @@ const APIContext = createContext();
 
 // Create a provider component
 export const APIProvider = ({ children }) => {
-  const [apiData, setApiData] = useState(null); // Store API data like `dataToSend`
+  const [authToken, setAuthToken] = useState(null);
+  
+  const saveToken = (token) => {
+    setAuthToken(token);
+  };
 
-  // Function to update the context
-  const updateApiData = (data) => {
-    setApiData(data);
+  const clearToken = () => {
+    setAuthToken(null);
   };
 
   return (
-    <APIContext.Provider value={{ apiData, updateApiData }}>
+    <APIContext.Provider value={{ authToken, saveToken, clearToken }}>
       {children}
     </APIContext.Provider>
   );
 };
 
 // Custom hook to use the context
-export const useAPI = () => useContext(APIContext);
+export const useAPI = () => {
+  const context = useContext(APIContext);
+  if (!context) {
+    throw new Error("useAPI must be used within an APIProvider");
+  }
+  return context;
+};

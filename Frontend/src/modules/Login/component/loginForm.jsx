@@ -1,17 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import forge from "node-forge";
+import { useNavigate } from "react-router-dom";
 import { useAPI } from "../../../state/APIContext";
 
 const LoginForm = () => {
+  const { saveToken } = useAPI();
+  const navigate = useNavigate(); 
+  const [error, setError] = useState("");
+  
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     userType: "Admin",
   });
-
-  const [error, setError] = useState("");
-  
-  const { updateApiData } = useAPI(); // Get the context function
 
   const rsaPublicKey = `-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAu/tB9+zU3RxhdeiLXgZF
@@ -38,12 +39,12 @@ TQIDAQAB
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (!formData.email || !formData.password) {
       setError("Please enter both email and password");
       return;
     }
-
+  
     try {
       const encryptedPassword = encryptData(formData.password);
       const encryptedEmail = encryptData(formData.email);
@@ -52,40 +53,45 @@ TQIDAQAB
         password: encryptedPassword,
         userType: formData.userType,
       };
-console.log(dataToSend)
-      // Store dataToSend in the context
-      updateApiData(dataToSend);
+  
+      console.log(dataToSend);
+  
 
-      const response = await fetch("http://10.247.205.99:5001/admin-server/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json"
-         },
-        body: JSON.stringify(dataToSend),
-        
-      });
-
+  
+      const response = await fetch(
+        "http://192.168.1.108:5001/admin-server/auth/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(dataToSend),
+        }
+      );
+  
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Login failed");
       }
-
+  
       const data = await response.json();
-
+  
       if (data.status === "success") {
-        const jwe = data.JWE; // Extract JWE
-        localStorage.setItem("authToken", jwe); // Save JWE for subsequent requests
-        alert("Login successful!");
-      } else {
+  const jwe = data.JWE; // Extract JWE
+  
+  console.log("Token successfully stored in context:", jwe); // Debugging line
+  saveToken(jwe);
+  alert("Login successful!");
+  navigate("/users");
+}
+
+      else {
         throw new Error("Invalid credentials");
       }
-
-
-      alert("Login successful!");
     } catch (error) {
       setError(error.message);
       console.error("Error:", error.message);
     }
   };
+  
 
   return (
     <form
