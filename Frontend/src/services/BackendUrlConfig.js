@@ -19,6 +19,7 @@ const GET_PROJECT_BY_COUNTRY = `${HOST_URL_ADMIN_SERVER}/statistics/projects/by-
 const GET_PROJECT_BY_MONTH = `${HOST_URL_ADMIN_SERVER}/statistics/projects/by-month`;
 const GET_AMOUNT_BY_MONTH = `${HOST_URL_ADMIN_SERVER}/statistics/donations/by-month`;
 const GET_AMOUNT_BY_DAY = `${HOST_URL_ADMIN_SERVER}/statistics/donations/by-day`;
+const VALIDATE_TOKEN_URL = `${HOST_URL_ADMIN_SERVER}/auth/validate-token`;
 
 export {
     GET_DONORS_SERVICE_URL,
@@ -36,5 +37,6 @@ export {
     GET_AMOUNT_BY_DAY,
     GET_PROJECT_BY_MONTH,
     ADMIN_LOGOUT_URL,
-    ADD_ADMIN_SERVICE_URL
+    ADD_ADMIN_SERVICE_URL,
+    VALIDATE_TOKEN_URL
 }

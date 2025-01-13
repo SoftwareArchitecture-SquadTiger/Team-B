@@ -15,6 +15,7 @@ import searchCharities from "../services/charity/searchCharities";
 import searchDonors from "../services/donor/searchDonors";
 import paginate from "../services/paginate";
 import { useAPI } from "../../../state/APIContext";
+import { validateUser } from "../../../services/handleValidateToken";
 const UsersPage = () => {
   const [searchQueryDonor, setSearchQueryDonor] = useState("");
   const [searchQueryCharity, setSearchQueryCharity] = useState("");
@@ -31,6 +32,8 @@ const UsersPage = () => {
   
   useEffect(() => {
     const fetchData = async () => {
+      const userData = await validateUser(navigate); 
+            if (!userData) return;
       const donorsPromise = fetchDonors(setDonors);
       const charitiesPromise = fetchCharities(setCharities);
       await Promise.all([donorsPromise, charitiesPromise]);

@@ -1,8 +1,7 @@
-const url = `http://${import.meta.env.VITE_HOST}:${import.meta.env.VITE_PORT}`;
-
+import { GET_DONORS_SERVICE_URL } from "../../../services/BackendUrlConfig";
 export const callDonorAPI  = async () => {
   try {
-    const response = await fetch(`${url}/admin-server/donors`,{
+    const response = await fetch(GET_DONORS_SERVICE_URL,{
       method: "GET",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
