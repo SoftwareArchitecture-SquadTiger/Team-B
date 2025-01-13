@@ -13,6 +13,7 @@ export const fetchProjectsAPI = async () => {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
+      credentials: "include",
     });
     console.log("Fetched response:", response.data); // Check the actual response
     if (!response.data.projectResponse) throw new Error("Unexpected response format");

@@ -1,12 +1,24 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { validateUser } from "../../../services/handleValidateToken";
 import ProjectTable from "../../Projects/components/ProjectTable";
 import StatisticsDonationAmount from "../../Statistics/components/StatisticsDashboard/StatisticsDonationAmount";
 import StatisticsPieChartForCategory from "../../Statistics/components/StatisticsPieChart/Category";
 import StatisticsPieChartForCountry from "../../Statistics/components/StatisticsPieChart/Country";
-import DonorsCard from "../components/DonorsCard"
+import DonorsCard from "../components/DonorsCard";
 import CharitiesCard from "../components/CharitiesCard";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkAuthentication = async () => {
+      await validateUser(navigate);
+    };
+
+    checkAuthentication();
+  }, [navigate]);
+
   return (
     <div className="flex flex-col flex-1 bg-gray-50 p-6">
       {/* Header */}
@@ -16,7 +28,7 @@ const Dashboard = () => {
 
       <div className="flex justify-between gap-4 mb-8">
         {/* Cards */}
-        <div className="flex flex-wrap space-y-4 w-full flex-col md:w-1/4">
+        <div className="flex flex-wrap space-y-12 w-full flex-col md:w-1/4">
           <DonorsCard />
           <CharitiesCard />
         </div>

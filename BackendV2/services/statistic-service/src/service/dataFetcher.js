@@ -8,14 +8,17 @@ const TeamAPath = process.env.TEAM_A_API_GATEWAY;
 const fetchAndUpdateDonations = async () => {
   const lastUpdate = await getLastUpdateTimestamp('donation_last_update');
 const lastUpdateString = lastUpdate.toISOString();
+const currentTime = new Date().toISOString();
 // Fetch new donations
 const response = await axios.get(
   `${TeamAPath}donation`,
   {
     params: {
       'internal-api': process.env.INTERNAL_API_KEY,
-      startDate: lastUpdateString
-    }
+      timePeriod: 'custom',
+      startDate: lastUpdateString,
+      endDate: currentTime
+    },withCredentials: true
   }
 );
 const donations = response.data.donationResponse;

@@ -1,17 +1,25 @@
-import React from "react";
+import React, { useEffect } from "react";
 import StatisticProjectCount from "../components/StatisticsProjectCount"
-import StatisticsFilter from "../components/StatisticsFilter";
 import StatisticsTotalAmount from "../components/StatisticsTotalAmount"
 import StatisticsPieChartForCategory from "../components/StatisticsPieChart/Category";
 import StatisticsPieChartForCountry from "../components/StatisticsPieChart/Country";
+import { useNavigate } from "react-router-dom";
+import { validateUser } from "../../../services/handleValidateToken";
 
 function StatisticsPage() {
+    const navigate = useNavigate();
+    useEffect(() => {
+        const validateToken = async () => {
+          const userData = await validateUser(navigate);
+          if(!userData) return;
+        }
+        validateToken();
+      })
     return (
         <div>
             <div className="flex justify-between items-center mb-6 p-6">
                 <h2 className="text-2xl font-semibold text-gray-800">Statistics</h2>
             </div>
-            <StatisticsFilter />
             <div>
                 <h3 className="text-xl font-medium text-black mb-8 mt-8 text-center">Project Count Per Month</h3>
                 <div className="flex justify-center items-center">

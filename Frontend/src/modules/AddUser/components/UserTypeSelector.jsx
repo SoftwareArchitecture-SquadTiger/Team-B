@@ -8,8 +8,9 @@ const UserTypeSelector = ({ value, onChange }) => {
         onChange={onChange}
         className="border border-gray-300 rounded p-2"
       >
-        <option value="Charity User">Charity User</option>
-        <option value="Donor User">Donor User</option>
+        <option value="Charity User">Charity</option>
+        <option value="Donor User">Donor</option>
+        <option value="Donor User">Admin</option>
       </select>
     </div>
   );
