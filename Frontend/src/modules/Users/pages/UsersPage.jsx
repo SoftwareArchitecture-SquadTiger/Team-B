@@ -32,11 +32,11 @@ const UsersPage = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!authToken) {
-        console.error("No auth token available");
-        return;
+      // if (!authToken) {
+      //   console.error("No auth token available");
+      //   return;
 
-      } 
+      // } 
       const donorsPromise = fetchDonors(setDonors);
       const charitiesPromise = fetchCharities(setCharities);
       await Promise.all([donorsPromise, charitiesPromise]);
