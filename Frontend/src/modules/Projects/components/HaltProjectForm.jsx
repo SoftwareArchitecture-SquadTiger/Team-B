@@ -54,7 +54,7 @@ const HaltProjectForm = ({ projectId, projectTitle, charityId, onClose, onUpdate
       // Update project status to "Halted"
       const statusPayload = { status: "Halted" };
       const updateResponse = await axios.put(
-        `http://192.168.20.6:5001/client-server/project/update/${projectId}`,
+        `http://${import.meta.env.VITE_HOST}:${import.meta.env.VITE_PORT}/client-server/project/update/${projectId}`,
         statusPayload
       );
 
