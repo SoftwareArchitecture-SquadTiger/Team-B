@@ -1,7 +1,7 @@
 # Team-B System
 
 ## Overview
-Team-B System is a web application designed for administrators to manage the user system developed by Team A. The architecture includes a modularized frontend and a microservice-based backend with integrated Kafka and Redis services.
+Team-B System is a web application designed for administrators to manage the user system developed by Team A. The architecture includes a modularized frontend and a microservice-based backend with integrated Kafka as message broker
 
 ---
 
