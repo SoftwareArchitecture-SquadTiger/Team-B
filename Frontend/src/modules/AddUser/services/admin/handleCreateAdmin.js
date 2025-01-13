@@ -4,6 +4,7 @@ export const handleCreateAdmin = async (formData) => {
       const payload = {
         email: formData.email,
         password: formData.password,
+        userType:"Admin"
       };
     
       try {
