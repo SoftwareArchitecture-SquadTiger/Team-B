@@ -22,4 +22,37 @@ export const produceMessage = async (topic, message) => {
   }
 };
 
+const produceGetAllMessage = async (topic) => {
+  const correlationId = uuidv4();
+  const timeout = 20000; //The wait time for the response from kafka (20s)
+
+  return new Promise(async (resolve, reject) => {
+    const timeoutId = setTimeout(() => {
+      deletePendingRequest(correlationId);
+      reject(new Error(`Timeout: The consumer may not listening to Kafka`));
+    }, timeout);
+    addPendingRequest(correlationId, resolve, timeoutId);
+    try {
+      await producer.connect();
+      await producer.send({
+        topic: topic,
+        messages: [
+          {
+            value: JSON.stringify({
+              action: 'GET_ALL',
+              correlationId: correlationId,
+            }),
+          },
+        ],
+      });    
+    } catch (error) {
+      console.log("there is an error, rejecting promise");
+      deletePendingRequest(correlationId); // Clean up on failure by deleting the stored id
+      reject(error); // Reject the promise if sending fails
+    } finally {
+      await producer.disconnect();
+    }
+  });
+};
+
 
