@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import forge from "node-forge";
 import { useNavigate } from "react-router-dom";
 import { useAPI } from "../../../state/APIContext";
-
+import { ADMIN_LOGIN_URL } from "../../../services/BackendUrlConfig";
 const LoginForm = () => {
   const { saveToken } = useAPI();
   const navigate = useNavigate(); 
@@ -58,8 +58,7 @@ TQIDAQAB
   
 
   
-      const response = await fetch(
-        "http://192.168.0.103:5001/admin-server/auth/login",
+      const response = await fetch( ADMIN_LOGIN_URL,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

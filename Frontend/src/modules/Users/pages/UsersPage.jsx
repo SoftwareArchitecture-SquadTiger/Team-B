@@ -29,7 +29,10 @@ const UsersPage = () => {
 
   const { authToken } = useAPI(); // Access the API context
 
-
+  useEffect(() => {
+    console.log("AuthToken updated:", authToken);
+  }, [authToken]);
+  
   useEffect(() => {
     const fetchData = async () => {
       if (!authToken) {

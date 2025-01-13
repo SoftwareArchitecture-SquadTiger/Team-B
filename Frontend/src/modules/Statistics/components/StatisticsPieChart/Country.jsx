@@ -1,21 +1,28 @@
-import * as React from 'react';
+import React, { useEffect, useState } from 'react';
 import { PieChart } from '@mui/x-charts/PieChart';
+import { fetchCountryData } from '../../services/projectByCountry/fetchProjectByCountry';
 
 export default function StatisticsPieChartForCountry() {
+  const [countryData, setCountryData] = useState([]);
+
+  useEffect(() => {
+    const loadCountryData = async () => {
+      try {
+        const data = await fetchCountryData(); // Fetch and format the data
+        setCountryData(data); // Update the state with the formatted data
+      } catch (error) {
+        console.error('Error loading country data:', error.message);
+      }
+    };
+
+    loadCountryData();
+  }, []);
+
   return (
     <PieChart
       series={[
         {
-          data: [
-            { id: 0, value: 10, label: 'Global' },
-            { id: 1, value: 15, label: 'Vietnam' },
-            { id: 2, value: 20, label: 'Germany' },
-            { id: 3, value: 20, label: 'China' },
-            { id: 4, value: 20, label: 'Ukraine' },
-            { id: 5, value: 20, label: 'Australia' },
-            
-
-          ],
+          data: countryData, // Use the fetched and formatted data
         },
       ]}
       width={500}
