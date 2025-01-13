@@ -63,24 +63,22 @@ TQIDAQAB
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(dataToSend),
-        }
+          credentials: "include",
+        },
+        
       );
   
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || "Login failed");
       }
-  
+      
       const data = await response.json();
   
-      if (data.status === "success") {
-  const jwe = data.JWE; // Extract JWE
-  
-  console.log("Token successfully stored in context:", jwe); // Debugging line
-  saveToken(jwe);
-  alert("Login successful!");
-  navigate("/users");
-}
+    if (data.status === "success") {
+    alert("Login successful!");
+    navigate("/users");
+    }
 
       else {
         throw new Error("Invalid credentials");

@@ -2,7 +2,11 @@ const url = `http://${import.meta.env.VITE_HOST}:${import.meta.env.VITE_PORT}`;
 
 export const callDonorAPI  = async () => {
   try {
-    const response = await fetch(`${url}/admin-server/donors`);
+    const response = await fetch(`${url}/admin-server/donors`,{
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+    });
     if (!response.ok) {
       throw new Error(`Error: ${response.status}`);
     }
