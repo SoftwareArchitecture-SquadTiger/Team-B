@@ -106,6 +106,8 @@ const getDonorLeaderboard = async () => {
  */
 const getTotalDonationsByDay = async (startDate, endDate) => {
   // Step 1: Generate the filters for MongoDB query
+  const latestDonations = (await fetchAndUpdateDonations({ startDate, endDate })) || [];
+
   const filters = buildFilters({ timePeriod: 'custom', startDate, endDate });
 
   // Step 2: Fetch local data from MongoDB
@@ -127,37 +129,10 @@ const getTotalDonationsByDay = async (startDate, endDate) => {
     },
   ]);
 
-  console.log("Local data:", localData);
-
-  // Step 3: Fetch latest donations for the date range
-  const latestDonations = (await fetchAndUpdateDonations({ startDate, endDate })) || [];
-  console.log("Latest donations:", latestDonations);
-
-  const latestData = latestDonations.reduce((acc, donation) => {
-    const date = donation.createdAt.split("T")[0]; // Extract date as YYYY-MM-DD
-    acc[date] = (acc[date] || 0) + donation.amount;
-    return acc;
-  }, {});
-
-  console.log("Latest data grouped by day:", latestData);
-
-  // Step 4: Combine local and latest data
-  const combinedData = [...localData];
-  for (const [date, totalAmount] of Object.entries(latestData)) {
-    const existing = combinedData.find((item) => item.date === date);
-    if (existing) {
-      existing.totalAmount += totalAmount;
-    } else {
-      combinedData.push({ date, totalAmount });
-    }
-  }
-
-  console.log("Combined data before filling missing dates:", combinedData);
-
   // Step 5: Fill in missing dates with zero donations
   const allDates = generateDateRange(startDate, endDate); // Generate all dates in the range
   const completeData = allDates.map((date) => {
-    const existing = combinedData.find((item) => item.date === date);
+    const existing = localData.find((item) => item.date === date);
     return { date, totalAmount: existing ? existing.totalAmount : 0 }; // Fill missing dates with 0
   });
 
@@ -225,7 +200,9 @@ const getTotalDonationForProject = async (projectId) => {
 const getDonationsByMonth = async (startMonth, endMonth) => {
   // Step 1: Generate the filters for MongoDB query
   const filters = buildFilters({ timePeriod: 'custom', startMonth, endMonth });
-
+  // Step 3: Fetch latest donations for the date range
+  const latestDonations = (await fetchAndUpdateDonations()) || [];
+  console.log("Latest donations:", latestDonations);
   // Step 2: Fetch local data from MongoDB
   const localData = await Donation.aggregate([
     { $match: filters }, // Apply the filters
@@ -247,36 +224,11 @@ const getDonationsByMonth = async (startMonth, endMonth) => {
 
   console.log("Local data by month:", localData);
 
-  // Step 3: Fetch latest donations for the date range
-  const latestDonations = (await fetchAndUpdateDonations()) || [];
-  console.log("Latest donations:", latestDonations);
-
-  // Step 4: Group latest donations by month
-  const latestData = latestDonations.reduce((acc, donation) => {
-    const month = donation.createdAt.split("T")[0].slice(0, 7); // Extract 'YYYY-MM'
-    acc[month] = (acc[month] || 0) + donation.amount;
-    return acc;
-  }, {});
-
-  console.log("Latest data grouped by month:", latestData);
-
-  // Step 5: Combine local and latest data
-  const combinedData = [...localData];
-  for (const [month, totalAmount] of Object.entries(latestData)) {
-    const existing = combinedData.find((item) => item.month === month);
-    if (existing) {
-      existing.totalAmount += totalAmount;
-    } else {
-      combinedData.push({ month, totalAmount });
-    }
-  }
-
-  console.log("Combined data before filling missing months:", combinedData);
 
   // Step 6: Fill in missing months with zero donations
   const allMonths = generateMonthRange(startMonth, endMonth); // Generate all months in the range
   const completeData = allMonths.map((month) => {
-    const existing = combinedData.find((item) => item.month === month);
+    const existing = localData.find((item) => item.month === month);
     return { month, totalAmount: existing ? existing.totalAmount : 0 }; // Fill missing months with 0
   });
 
