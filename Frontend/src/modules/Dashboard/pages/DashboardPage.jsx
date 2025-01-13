@@ -16,7 +16,7 @@ const Dashboard = () => {
 
       <div className="flex justify-between gap-4 mb-8">
         {/* Cards */}
-        <div className="flex flex-wrap space-y-4 w-full flex-col md:w-1/4">
+        <div className="flex flex-wrap space-y-12 w-full flex-col md:w-1/4">
           <DonorsCard />
           <CharitiesCard />
         </div>
