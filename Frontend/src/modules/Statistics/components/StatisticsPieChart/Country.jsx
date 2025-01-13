@@ -25,7 +25,7 @@ export default function StatisticsPieChartForCountry() {
           data: countryData, // Use the fetched and formatted data
         },
       ]}
-      width={500}
+      width={600}
       height={300}
     />
   );

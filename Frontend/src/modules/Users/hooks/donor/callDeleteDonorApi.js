@@ -3,6 +3,7 @@ import { DELETE_DONOR_SERVICE_URL } from "../../../../services/BackendUrlConfig"
 async function callDeleteDonorApi(userId) {
   const response = await fetch(`${DELETE_DONOR_SERVICE_URL}/${userId}`, {
     method: "DELETE",
+    credentials: "include",
   });
 
   if (!response.ok) {

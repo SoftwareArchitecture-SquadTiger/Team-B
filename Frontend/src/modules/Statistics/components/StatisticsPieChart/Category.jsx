@@ -25,7 +25,7 @@ export default function StatisticsPieChartForCategory() {
           data: categoryData, // Use the data directly from the state
         },
       ]}
-      width={500}
+      width={600}
       height={300}
     />
   );

@@ -8,6 +8,7 @@ export const fetchProjectsByCountry = async () => {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
+      credentials: "include",
     });
   
     if (!response.ok) {

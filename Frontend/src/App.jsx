@@ -18,16 +18,14 @@ function App() {
     <APIProvider>
       <Router>
       <Routes>
-        {/* Sign-In Page (Without Layout)
-        <Route path="/signin" element={<SignInPage />} /> */}
-
-        {/* Other Pages (With Layout) */}
         <Route
           path="/"
           element={
+         
             <Layout>
               <DashboardPage />
             </Layout>
+           
           }
         />
         <Route
@@ -47,7 +45,7 @@ function App() {
           }
         />
         <Route
-          path="/users/add"
+          path="/add-user"
           element={
             <Layout>
               <AddUserPage />

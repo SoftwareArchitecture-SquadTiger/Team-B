@@ -8,6 +8,7 @@ export const fetchDonationDataByDay = async (startDate, endDate) => {
         Accept: "application/json",
         "Content-Type": "application/json",
       },
+      credentials: "include",
     });
   
     if (!response.ok) {

@@ -3,6 +3,7 @@ import { DELETE_CHARITY_SERVICE_URL } from "../../../../services/BackendUrlConfi
 async function callDeleteCharityApi(userId) {
   const response = await fetch(`${DELETE_CHARITY_SERVICE_URL}/${userId}`, {
     method: "DELETE",
+    credentials: "include",
   });
 
   if (!response.ok) {

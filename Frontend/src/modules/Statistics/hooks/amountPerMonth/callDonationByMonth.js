@@ -8,6 +8,7 @@ export const fetchDonationsByMonth = async (startMonth, endMonth) => {
         Accept: 'application/json',
         'Content-Type': 'application/json',
       },
+      credentials: "include",
     });
   
     if (!response.ok) {

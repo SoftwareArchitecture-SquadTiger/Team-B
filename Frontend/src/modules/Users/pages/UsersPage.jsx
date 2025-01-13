@@ -28,17 +28,12 @@ const UsersPage = () => {
   const [charities, setCharities] = useState([]);
 
   const { authToken } = useAPI(); // Access the API context
-
-  useEffect(() => {
-    console.log("AuthToken updated:", authToken);
-  }, [authToken]);
   
   useEffect(() => {
     const fetchData = async () => {
       const donorsPromise = fetchDonors(setDonors);
       const charitiesPromise = fetchCharities(setCharities);
       await Promise.all([donorsPromise, charitiesPromise]);
-      console.log("Current Auth Token: ", authToken)
     };
     fetchData();
   }, [authToken]);
@@ -57,6 +52,7 @@ const UsersPage = () => {
           email: donor.email,
           country: donor.country,
           type: "N/A",
+          img_url: donor.img_url || null
         }));
         setDonors(formattedDonors);
       }
@@ -79,6 +75,8 @@ const UsersPage = () => {
           email: charity.email,
           country: charity.country,
           role: "CHARITY",
+          img_url: charity.img_url || null
+
         }));
         setCharities(formattedCharities);
       }
@@ -102,6 +100,8 @@ const UsersPage = () => {
           email: charity.email,
           country: charity.country,
           role: "CHARITY",
+          img_url: charity.img_url || null
+
         }));
         setCharities(formattedCharities);
       }
@@ -131,7 +131,7 @@ const UsersPage = () => {
         <h2 className="text-2xl font-semibold text-gray-800">Users</h2>
       </div>
       <div className="flex gap-4 mb-4">
-        <AddUser onAdd={() => navigate("/users/add")} />
+        <AddUser onAdd={() => navigate("/add-user")} />
       </div>
 
       {/* Donors Table */}

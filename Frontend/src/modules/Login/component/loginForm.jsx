@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from "react";
 import forge from "node-forge";
 import { useNavigate } from "react-router-dom";
-import { useAPI } from "../../../state/APIContext";
 import { ADMIN_LOGIN_URL } from "../../../services/BackendUrlConfig";
 const LoginForm = () => {
-  const { saveToken } = useAPI();
   const navigate = useNavigate(); 
   const [error, setError] = useState("");
   
@@ -77,7 +75,7 @@ TQIDAQAB
   
     if (data.status === "success") {
     alert("Login successful!");
-    navigate("/users");
+    navigate("/");
     }
 
       else {

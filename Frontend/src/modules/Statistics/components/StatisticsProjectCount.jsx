@@ -6,7 +6,7 @@ import { fetchChartData } from '../services/projectPerMonth/fetchProjectByMonth'
 const chartSetting = {
   yAxis: [
     {
-      label: 'project(s)',
+      
     },
   ],
   width: 900,
