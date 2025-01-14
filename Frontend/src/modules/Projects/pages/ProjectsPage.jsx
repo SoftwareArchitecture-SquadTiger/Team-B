@@ -12,6 +12,7 @@ import { updateProjectStatusAPI } from "../services/updateProjectStatus";
 import { fetchProjectByRegion } from "../services/fetchProjectbyRegion";
 import { fetchProjectsByStatus } from "../services/fetchProjectsByStatus";
 import { useNavigate } from "react-router-dom";
+import { validateUser } from "../../../services/handleValidateToken";
 
 const ProjectsPage = () => {
   const [projects, setProjects] = useState([]); // All projects data
@@ -27,6 +28,9 @@ const ProjectsPage = () => {
   // Fetch all projects on mount
   useEffect(() => {
     const fetchProjects = async () => {
+      const userData = await validateUser(navigate); 
+      if (!userData) return;
+      
       try {
         const response = await fetchProjectsAPI();
         const transformedProjects = response.projectResponse.map((project) => ({

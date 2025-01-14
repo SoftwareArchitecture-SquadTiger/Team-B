@@ -1,7 +1,7 @@
 # Team-B System
 
 ## Overview
-Team-B System is a web application designed for administrators to manage the user system developed by Team A. The architecture includes a modularized frontend and a microservice-based backend with integrated Kafka and Redis services.
+Team-B System is a web application designed for administrators to manage the user system developed by Team A. The architecture includes a modularized frontend and a microservice-based backend with integrated Kafka as message broker
 
 ---
 
@@ -33,7 +33,7 @@ The backend uses a microservice architecture. Each service is containerized usin
     KAFKA_PORT=9092
     KAFKA_EXTERNAL_PORT=9093
     KAFKA_ADVERTISED_HOSTNAME=kafka
-    KAFKA_EXTERNAL_ADVERTISED_HOSTNAME=<>
+    KAFKA_EXTERNAL_ADVERTISED_HOSTNAME=<IPv4 address>
 3. Build and start the Kafka container
    ```bash
    docker-compose up -d --build
@@ -67,7 +67,7 @@ The backend uses a microservice architecture. Each service is containerized usin
    ```bash
    # Kafka Configuration
     KAFKA_EXTERNAL_PORT=9093
-    KAFKA_EXTERNAL_ADVERTISED_HOSTNAME=192.168.1.10
+    KAFKA_EXTERNAL_ADVERTISED_HOSTNAME=<IPv4 address>
 
     #MongoDB Uri
     MONGO_URI=mongodb+srv://admin:iamadmin@monolithic-cluster.xgeha.mongodb.net/?retryWrites=true&w=majority&appName=Monolithic-Cluster

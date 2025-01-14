@@ -8,6 +8,7 @@ async function callCharitiesApi() {
         Accept: "application/json", // Accept JSON response
         "Content-Type": "application/json", // Content type
       },
+      credentials: "include", // Include credentials
     });
 
     if (!charitiesResponse.ok) {

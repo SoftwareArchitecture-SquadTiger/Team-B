@@ -8,6 +8,7 @@ async function callDonorsApi() {
         Accept: "application/json", // Request JSON response
         "Content-Type": "application/json", // Content type for the request
       },
+      credentials: "include", // Include credentials
     });
 
     if (!donorsResponse.ok) {

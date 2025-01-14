@@ -8,6 +8,7 @@ export const filterCharitiesByCountry = async (country) => {
         Accept: "application/json", // Request JSON response
         "Content-Type": "application/json", // Content type for the request
       },
+      credentials: "include",
     });
 
     if (!response.ok) {

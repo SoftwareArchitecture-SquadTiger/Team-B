@@ -1,10 +1,12 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import FormInput from "../components/FormInput";
 import SuccessModal from "../components/SuccessModal";
 import AvatarUpload from "../components/AvatarUpload";
 import { handleCreateDonor } from "../services/donor/handleCreateDonor";
 
 function DonorForm() {
+  const navigate = useNavigate();
   const [image, setImage] = useState(null);
   const [formData, setFormData] = useState({
     email: "",
@@ -46,18 +48,21 @@ function DonorForm() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      await handleCreateDonor(formData, image); // Call the handler
-      setShowSuccessModal(true); // Show success modal
+      await handleCreateDonor(formData, image); 
+      setShowSuccessModal(true); 
     } catch (error) {
       console.error("Error:", error);
       alert("Error creating donor: " + error.message);
     }
   };
 
+  const handleReturn = () => {
+    navigate("/users"); 
+  };
+
   return (
     <form onSubmit={handleSubmit} className="grid gap-4 p-6 bg-white shadow rounded">
-        <AvatarUpload image={image} handleImageUpload={handleImageUpload} />
-      
+      <AvatarUpload image={image} handleImageUpload={handleImageUpload} />
 
       <div className="grid grid-cols-2 gap-4">
         <FormInput
@@ -145,7 +150,14 @@ function DonorForm() {
         />
       </div>
 
-      <div className="flex justify-end">
+      <div className="flex justify-between items-center mt-6">
+        <button
+          type="button"
+          onClick={handleReturn} // Call the return handler
+          className="px-4 py-2 bg-gray-300 text-gray-800 rounded hover:bg-gray-400"
+        >
+          Return
+        </button>
         <button
           type="submit"
           className="px-6 py-2 bg-pink-500 text-white rounded shadow hover:bg-pink-600"
