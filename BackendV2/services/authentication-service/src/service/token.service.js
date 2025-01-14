@@ -5,20 +5,13 @@ import fs from 'fs';
 const publicKeyPath = process.env.JWE_PUBLIC_KEY_PATH;
 const publicKeyPem = fs.readFileSync(publicKeyPath, 'utf8');
 
-// Public key object for encryption
+// Define key
 let publicKeyObject;
 
-/**
- * Load and import the public key asynchronously at startup.
- */
+// Import keys asynchronously
 (async () => {
-  try {
-    publicKeyObject = await importSPKI(publicKeyPem, 'RSA-OAEP');
-    console.log('Public key loaded successfully for JWE encryption.');
-  } catch (error) {
-    console.error('Error loading public key:', error.message);
-    throw new Error('Failed to load public key for JWE encryption.');
-  }
+  publicKeyObject = await importSPKI(publicKeyPem, 'RSA-OAEP');
+  console.log('Keys loaded successfully');
 })();
 
 /**
@@ -33,21 +26,16 @@ let publicKeyObject;
  * @throws {Error} - If the public key is not loaded or encryption fails.
  */
 export async function createAndEncryptToken(payload) {
-  try {
-    if (!publicKeyObject) {
-      throw new Error('Public key is not yet loaded for JWE encryption.');
-    }
-
-    // Create and encrypt the JWE
-    const jwe = await new EncryptJWT(payload)
-      .setProtectedHeader({ alg: 'RSA-OAEP', enc: 'A256GCM' })
-      .setIssuedAt()
-      .setExpirationTime('1h') // Token expires in 1 hour
-      .encrypt(publicKeyObject);
-
-    return jwe;
-  } catch (error) {
-    console.error('Error creating and encrypting JWE:', error.message);
-    throw new Error('Failed to create and encrypt the token.');
+  if (!publicKeyObject) {
+    throw new Error('Public key not yet loaded for JWE encryption.');
   }
+
+  // Encrypt the payload directly as a JWE
+  const jwe = await new EncryptJWT(payload)
+    .setProtectedHeader({ alg: 'RSA-OAEP', enc: 'A256GCM' })
+    .setIssuedAt()
+    .setExpirationTime('1h') // Set expiration time for the token
+    .encrypt(publicKeyObject);
+
+  return jwe;
 }

@@ -1,12 +1,11 @@
 import Credential from '../model/credential.model.js';
-import { produceLoginResponse, produceRegisterResponse, produceSaveRequest } from '../events/producer.js';
+import {produceLoginResponse, produceRegisterResponse, produceSaveRequest } from '../events/producer.js';
 import { createAndEncryptToken } from './token.service.js';
 import bcrypt from 'bcryptjs';
 import { v4 as uuidv4 } from "uuid";
 import { handleServiceError } from '../utils/errorHandler.js';
 import fs from 'fs';
 import forge from 'node-forge';
-
 // Load RSA private key for signing JWS
 const privateKeyPath = process.env.RSA_PRIVATE_KEY_PATH;
 const privateKey = fs.readFileSync(privateKeyPath, 'utf8');
@@ -24,7 +23,7 @@ function decryptCredentials(encryptedData) {
     const decrypted = privateDecryptionKey.decrypt(encryptedBinary, "RSA-OAEP", {
       md: forge.md.sha256.create(),
     });
-    return decrypted;
+    return decrypted; // Decrypted value (username, password, etc.)
   } catch (error) {
     throw new Error('Failed to decrypt data', error);
   }
@@ -41,38 +40,36 @@ function decryptCredentials(encryptedData) {
  */
 async function handleLoginRequest(msg) {
   const { correlationId, data } = msg;
+  console.log('Handling login request:', data);
   const { email, password, userType } = data;
 
   try {
-    console.log('Handling login request');
-    const decryptedEmail = decryptCredentials(email);
-    const decryptedPassword = decryptCredentials(password);
-
+    //Decryption
+    const decryptedEmail = decryptCredentials(email); 
+    const decryptedPassword = decryptCredentials(password); 
     console.log(`Decrypted Email: ${decryptedEmail}, UserType: ${userType}`);
 
     const credential = await Credential.findOne({ email: decryptedEmail, userType });
     if (!credential) {
       throw new Error('Email not found or invalid userType');
     }
-
-    console.log('Credential found');
-
+    console.log('Credential found:', credential);
+    
+    //Password validation
     const isMatch = await bcrypt.compare(decryptedPassword, credential.password);
     if (!isMatch) {
       throw new Error('Invalid credentials');
     }
-
-    console.log('Password matched successfully');
-
-    const payload = { userType, userId: credential.userId };
+    const payload = { userType, userId: credential.userId }; 
     const jwe = await createAndEncryptToken(payload);
+    console.log('JWE:', jwe);
 
-    console.log('Generated JWE');
-
+    //Send success message
     await produceLoginResponse('success', { correlationId, JWE: jwe });
+
     console.log(`Login request processed successfully for ${decryptedEmail}`);
   } catch (error) {
-    console.error('Error during login:', error.message);
+    console.log('Error during login:', error.message);
     await handleServiceError('login-response', correlationId, error.message);
   }
 }
@@ -89,40 +86,41 @@ async function handleLoginRequest(msg) {
  */
 async function handleRegisterRequest(msg) {
   const { correlationId, data } = msg;
-  const { email, password, userType, ...userData } = data;
-
+  const { email, password, userType, ...userData } = data; 
   try {
-    console.log('Handling register request');
-    const decryptedEmail = decryptCredentials(email);
+    const decryptedEmail = decryptCredentials(email); 
 
-    const emailCheck = await Credential.findOne({ email: decryptedEmail });
+    const emailCheck = await Credential.findOne({ decryptedEmail });
     if (emailCheck) {
       throw new Error("This email has already been used");
     }
 
     const userId = uuidv4();
-    const decryptedPassword = decryptCredentials(password);
+
+    const decryptedPassword = decryptCredentials(password); 
+
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(decryptedPassword, saltRounds);
-
+    
+    // Handle admin case
     if (userType === 'Admin') {
       console.log('Registering Admin account');
 
+      // Store password
       const adminCredential = new Credential({
         userId,
         email: decryptedEmail,
         userType: 'Admin',
-        password: hashedPassword,
+        password: hashedPassword, 
       });
       await adminCredential.save();
-
       console.log(`Admin credentials saved for email ${decryptedEmail}`);
-      await produceRegisterResponse('success', { correlationId, userId, userType });
-      return;
-    }
 
+      // Produce a register success response for Admin
+      produceRegisterResponse('success', { correlationId, userId, userType });
+      return; 
+    }
     const topic = userType === 'Charity' ? 'charity-request' : 'donor-request';
-    console.log(`Topic determined: ${topic}`);
 
     const saveRequest = {
       correlationId,
@@ -133,15 +131,18 @@ async function handleRegisterRequest(msg) {
     };
 
     const result = await produceSaveRequest(topic, saveRequest);
-    console.log("Response from save request");
-
-    const extractedId = topic === 'charity-request'
-      ? result.data?.charity_id
-      : result.data?.donor_id;
-
-    if (!extractedId) {
-      throw new Error("Failed to extract user ID from response");
-    }
+    let extractedId;
+    if (result.data) {
+      // Extract based on the topic
+      if (topic === 'charity-request') {
+          extractedId = result.data.charity_id; 
+      } else {
+          extractedId = result.data.donor_id; 
+      }
+  } else {
+      throw new Error("No data property found in the result object");
+  }
+    console.log(extractedId);
 
     const credential = new Credential({
       userId: extractedId,
@@ -150,13 +151,12 @@ async function handleRegisterRequest(msg) {
       password: hashedPassword,
     });
     await credential.save();
+    console.log(`Credentials saved for user ${email}`);
+    produceRegisterResponse('success',{ correlationId, userType });
 
-    console.log(`Credentials saved for user: ${decryptedEmail}`);
-    await produceRegisterResponse('success', { correlationId, userType });
   } catch (error) {
-    console.error('Error during registration:', error.message);
     await handleServiceError('register-response', correlationId, error.message);
   }
 }
 
-export { handleLoginRequest, handleRegisterRequest };
+export { handleLoginRequest, handleRegisterRequest};

@@ -13,8 +13,8 @@ const responseConsumer = kafka.consumer({
   heartbeatInterval: 3000,
 });
 
+//Consumer for donor and charity response data
 async function startResponseConsumer() {
-  // Connect this consumer
   await responseConsumer.connect();
   await responseConsumer.subscribe({ topic: 'donor-response', fromBeginning: false });
   await responseConsumer.subscribe({ topic: 'charity-response', fromBeginning: false });

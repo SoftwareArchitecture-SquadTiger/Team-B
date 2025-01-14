@@ -1,4 +1,4 @@
-import { getTotalDonationByDonor, getDonorLeaderboard, getCharityLeaderboard, getTotalDonationsByDay,  getTotalDonationForProject, getDonationsByMonth} from "../service/donationService.js";
+import { getTotalDonationByDonor, getDonorLeaderboard, getCharityLeaderboard, getTotalDonationsByDay, getDonationsByMonth} from "../service/donationService.js";
 import {
   getProjectsCreatedPerMonth,
   getProjectsByCountry,
@@ -25,10 +25,6 @@ export const actionHandlers = {
     return { status: "success", data: leaderboard };
   },
   // Project Service Handlers
-  GET_TOTAL_DONATION_FOR_PROJECT: async (data) => {
-    const totalDonation = await getTotalDonationForProject(data.projectId);
-    return { status: "success", data: totalDonation };
-  },
   GET_PROJECTS_CREATED_PER_MONTH: async () => {
     const projectsPerMonth = await getProjectsCreatedPerMonth();
     return { status: "success", data: projectsPerMonth };

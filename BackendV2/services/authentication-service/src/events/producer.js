@@ -11,6 +11,11 @@ const producer = kafka.producer();
 async function startProducer() {
   await producer.connect();
 }
+
+/**
+ * Produce a user-data-save-request message
+ * @param {Object} msg - { correlationId, userType, userData }
+ */
 const produceSaveRequest = async (topic, message) => {
   const correlationId = uuidv4();
   const timeout = 20000; 
@@ -43,8 +48,8 @@ const produceSaveRequest = async (topic, message) => {
 };
 
 /**
- * Produce a user-data-save-request message
- * @param {Object} msg - { correlationId, userType, userData }
+ * Produce a login-response
+ * @param {Object} msg - { status, error }
  */
 async function produceLoginResponse(status, msg) {
   const messageWithStatus = {
@@ -61,8 +66,8 @@ async function produceLoginResponse(status, msg) {
 }
 
 /**
- * Produce a user-data-save-request message
- * @param {Object} msg - { correlationId, userType, userData }
+ * Produce a register-response
+ * @param {Object} msg - { status, error }
  */
 async function produceRegisterResponse(status ,msg) {
   const messageWithStatus = {
