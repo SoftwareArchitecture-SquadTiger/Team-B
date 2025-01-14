@@ -16,12 +16,8 @@ const responseConsumer = kafka.consumer({
 async function startResponseConsumer() {
   // Connect this consumer
   await responseConsumer.connect();
-
-  // Subscribe to donor-response and charity-response topics
   await responseConsumer.subscribe({ topic: 'donor-response', fromBeginning: false });
   await responseConsumer.subscribe({ topic: 'charity-response', fromBeginning: false });
-
-  // Run the consumer loop
   await responseConsumer.run({
     eachMessage: async ({ topic, message }) => {
       const msg = JSON.parse(message.value.toString());

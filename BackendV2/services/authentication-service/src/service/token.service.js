@@ -5,33 +5,49 @@ import fs from 'fs';
 const publicKeyPath = process.env.JWE_PUBLIC_KEY_PATH;
 const publicKeyPem = fs.readFileSync(publicKeyPath, 'utf8');
 
-// Define privateKeyObject and publicKeyObject
+// Public key object for encryption
 let publicKeyObject;
 
-// Import private and public keys asynchronously
+/**
+ * Load and import the public key asynchronously at startup.
+ */
 (async () => {
-  // Import the private key for signing JWS
-  // Import the public key for encrypting JWE
-  publicKeyObject = await importSPKI(publicKeyPem, 'RSA-OAEP');
-  console.log('Keys loaded successfully');
+  try {
+    publicKeyObject = await importSPKI(publicKeyPem, 'RSA-OAEP');
+    console.log('Public key loaded successfully for JWE encryption.');
+  } catch (error) {
+    console.error('Error loading public key:', error.message);
+    throw new Error('Failed to load public key for JWE encryption.');
+  }
 })();
 
 /**
- * Create, Sign, and Encrypt a JWT (JWE).
- * 1. Sign the payload as JWS using JOSE.
- * 2. Encrypt the signed JWS into a JWE using JOSE.
+ * Create, sign, and encrypt a JWT (JWE).
+ * - Signs the payload as JWS using JOSE.
+ * - Encrypts the signed JWS into a JWE using JOSE.
+ *
+ * @param {Object} payload - The payload to include in the JWT.
+ * @param {string} payload.userType - The type of the user (e.g., "Admin", "User").
+ * @param {string} payload.userId - The unique ID of the user.
+ * @returns {Promise<string>} - The encrypted JWE token.
+ * @throws {Error} - If the public key is not loaded or encryption fails.
  */
 export async function createAndEncryptToken(payload) {
-  if (!publicKeyObject) {
-    throw new Error('Public key not yet loaded for JWE encryption.');
+  try {
+    if (!publicKeyObject) {
+      throw new Error('Public key is not yet loaded for JWE encryption.');
+    }
+
+    // Create and encrypt the JWE
+    const jwe = await new EncryptJWT(payload)
+      .setProtectedHeader({ alg: 'RSA-OAEP', enc: 'A256GCM' })
+      .setIssuedAt()
+      .setExpirationTime('1h') // Token expires in 1 hour
+      .encrypt(publicKeyObject);
+
+    return jwe;
+  } catch (error) {
+    console.error('Error creating and encrypting JWE:', error.message);
+    throw new Error('Failed to create and encrypt the token.');
   }
-
-  // Encrypt the payload directly as a JWE
-  const jwe = await new EncryptJWT(payload)
-    .setProtectedHeader({ alg: 'RSA-OAEP', enc: 'A256GCM' })
-    .setIssuedAt()
-    .setExpirationTime('1h') // Set expiration time for the token
-    .encrypt(publicKeyObject);
-
-  return jwe;
 }

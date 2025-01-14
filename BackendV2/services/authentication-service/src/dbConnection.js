@@ -6,8 +6,8 @@ export const getDbConnection = (dbName, clusterURI) => {
   if (!connections[dbName]) {
     
     const dbURI = clusterURI.includes("?")
-      ? clusterURI.replace("?", `${dbName}?`) // Insert dbName before query params
-      : `${clusterURI}/${dbName}`; // If no query params, simply append dbName
+      ? clusterURI.replace("?", `${dbName}?`)
+      : `${clusterURI}/${dbName}`; 
 
     console.log(`Connecting to database: ${dbURI}`);
 

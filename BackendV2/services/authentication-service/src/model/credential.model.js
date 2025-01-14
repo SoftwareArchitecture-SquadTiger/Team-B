@@ -4,15 +4,14 @@ import "dotenv/config";
 
 const clusterURI = process.env.MONGO_URI;
 
-// Get 'credentialDB' connection
 const credentialDb = getDbConnection("authenticationDB", clusterURI);
 
 const credentialSchema = new mongoose.Schema({
     userId: { type: String, unique: true, required: true},
     email: { type: String, unique: true, required: true },
     userType: { type: String, required: true },
-    password: { type: String, required: true } // received from encryption service
-}   ,
+    password: { type: String, required: true } 
+},
  {
     timestamps: true
 });
