@@ -24,16 +24,16 @@ The backend uses a microservice architecture. Each service is containerized usin
     cd Kafka
 2. Create a .env file and add the necessary environment variables.
     ```bash
-    # Zookeeper Configuration
-    ZOOKEEPER_PORT=2181
-    ZOOKEEPER_TICK_TIME=2000
+   # Zookeeper Configuration
+   ZOOKEEPER_PORT=2181
+   ZOOKEEPER_TICK_TIME=2000
 
-    # Kafka Configuration
-    KAFKA_BROKER_ID=1
-    KAFKA_PORT=9092
-    KAFKA_EXTERNAL_PORT=9093
-    KAFKA_ADVERTISED_HOSTNAME=kafka
-    KAFKA_EXTERNAL_ADVERTISED_HOSTNAME=<IPv4 address>
+   # Kafka Configuration
+   KAFKA_BROKER_ID=1
+   KAFKA_PORT=9092
+   KAFKA_EXTERNAL_PORT=9093
+   KAFKA_ADVERTISED_HOSTNAME=kafka
+   KAFKA_EXTERNAL_ADVERTISED_HOSTNAME=<Kafka IPv4 address>
 3. Build and start the Kafka container
    ```bash
    docker-compose up -d --build
@@ -65,19 +65,23 @@ The backend uses a microservice architecture. Each service is containerized usin
    cd BackendV2
 2. Create a .env file and add the necessary environment variables
    ```bash
-   # Kafka Configuration
-    KAFKA_EXTERNAL_PORT=9093
-    KAFKA_EXTERNAL_ADVERTISED_HOSTNAME=<IPv4 address>
+    # Kafka Configuration
+   KAFKA_EXTERNAL_PORT=9093
+   KAFKA_EXTERNAL_ADVERTISED_HOSTNAME=<Kafka IPv4 address>
 
-    #MongoDB Uri
-    MONGO_URI=mongodb+srv://admin:iamadmin@monolithic-cluster.xgeha.mongodb.net/?retryWrites=true&w=majority&appName=Monolithic-Cluster
+   #MongoDB Uri
+   MONGO_URI=mongodb+srv://admin:iamadmin@monolithic-cluster.xgeha.mongodb.net/?retryWrites=true&w=majority&appName=Monolithic-Cluster
 
-    #Auth Key
-    JWS_PRIVATE_KEY_PATH=/usr/src/app/keys/jws_private.pem
-    JWE_PUBLIC_KEY_PATH=/usr/src/app/keys/jwe_public.pem
-    RSA_PRIVATE_KEY_PATH=/usr/src/app/keys/rsa_private.pem
-    ADMIN_USERNAME=admin
-    ADMIN_PASSWORD=admin
+   #Auth Key
+   JWS_PRIVATE_KEY_PATH=/usr/src/app/keys/jws_private.pem
+   JWE_PUBLIC_KEY_PATH=/usr/src/app/keys/jwe_public.pem
+   RSA_PRIVATE_KEY_PATH=/usr/src/app/keys/rsa_private.pem
+   ADMIN_USERNAME=admin
+   ADMIN_PASSWORD=admin
+
+   #Stats
+   TEAM_A_API_GATEWAY = http://<API-Gateway IPv4 address>:5001/internal/
+   INTERNAL_API_KEY=291zhI0AhUzU99YJ3CrkqatoPtb_8tY42VpD4y9CcuHNsizecGlQZylwoicQhiYSUHczM93Zk-mJl_yyI17RlQ
 3. Build and start the backend services
    ```bash
    docker-compose up -d --build
@@ -91,12 +95,25 @@ The frontend handles the user interface for the admin portal
    cd Frontend
 2. Create a .env file and add the necessary environment variables
    ```bash
-3. Install dependencies:
+   VITE_HOST=<API-Gateway IPv4 address>
+   VITE_PORT=5001
+3. Navigate to the vite.config.js file
+   ```bash
+   import { defineConfig } from 'vite'
+   import react from '@vitejs/plugin-react'
+
+   // https://vite.dev/config/
+   export default defineConfig({
+   server: {
+      host: <website IPv4>,
+   },
+   plugins: [react()],
+   })
+4. Install dependencies:
    ```bash
    npm install
-4. Start the web app:
+5. Start the web app:
    ```bash
    npm run dev
-
 ## License
 This project is licensed under the [MIT License](LICENSE).
