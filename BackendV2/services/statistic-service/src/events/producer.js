@@ -1,6 +1,7 @@
 import { Kafka } from 'kafkajs';
 import "dotenv/config";
-
+import { v4 as uuidv4 } from 'uuid';
+import { addPendingRequest, deletePendingRequest } from '../utils/requestHandler.js';
 // Initialize Kafka client
 const kafka = new Kafka({
   clientId: 'statistics-service',
@@ -22,7 +23,7 @@ export const produceMessage = async (topic, message) => {
   }
 };
 
-const produceGetAllMessage = async (topic) => {
+export const produceGetAllMessage = async (topic) => {
   const correlationId = uuidv4();
   const timeout = 20000; //The wait time for the response from kafka (20s)
 

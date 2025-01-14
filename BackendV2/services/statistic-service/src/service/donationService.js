@@ -1,6 +1,9 @@
 import Donation from '../model/donation.js';
 import {fetchAndUpdateDonations} from './dataFetcher.js';
-import {produceGetAllMessage} from './kafkaProducer.js';
+import {produceGetAllMessage} from '../events/producer.js';
+import axios from 'axios';
+const TeamAPath = process.env.TEAM_A_API_GATEWAY;
+
 /**
  * Fetch total donations by a specific donor.
  */
@@ -59,26 +62,24 @@ const getDonorLeaderboard = async () => {
 
     // Step 4: Fetch the local leaderboard from the database
     const localLeaderboard = await Donation.aggregate([
-      { $match: { ...buildFilters(queryParams), donor_id: { $ne: null } } }, // Exclude null donor IDs
+      { $match: { ...buildFilters(queryParams), donor_id: { $nin: [null,""] } } }, // Exclude null donor IDs
       { $group: { _id: "$donor_id", totalAmount: { $sum: "$amount" } } },
       { $sort: { totalAmount: -1 } },
       { $limit: 10 },
     ]);
 
     console.log('Local leaderboard:', localLeaderboard);
-
-    // Step 5: Fetch donor details using produceGetAllMessage
-    const donors = await produceGetAllMessage('donor-request', { action: 'GET_ALL' });
-    console.log('Fetched donors:', donors);
-
     // Step 6: Merge donor details into the leaderboard
-    const enrichedLeaderboard = localLeaderboard.map((entry) => {
-      const donor = donors.find((donor) => donor.id === entry._id);
+    const enrichedLeaderboard = localLeaderboard
+    .filter((entry) => donors.some((donor) => donor.donor_id === entry._id)) // Skip donations without a valid donor
+    .map((entry) => {
+      const donor = donors.find((donor) => donor.donor_id === entry._id);
       return {
         donor_id: entry._id,
         totalAmount: entry.totalAmount,
-        name: donor ? `${donor.first_name} ${donor.last_name}` : 'Unknown Donor',
-      };
+        name: donor ? `${donor.first_name} ${donor.last_name}` : 'Unknown Donor', // Use 'Unknown Donor' for unmatched entries
+        profileImage: donor ? donor.img_url : 'default-placeholder.png',
+        };
     });
 
     console.log('Final enriched leaderboard:', enrichedLeaderboard);
@@ -90,13 +91,11 @@ const getDonorLeaderboard = async () => {
   }
 };
 
-import { produceGetAllMessage } from './kafkaProducer.js'; // Adjust the path based on your project structure
-import axios from 'axios';
 
 /**
  * Generate a leaderboard of top 10 charities for the current month.
  */
-const getTopCharities = async (req, res) => {
+const getCharityLeaderboard = async (req, res) => {
   try {
     // Step 1: Get the current month and year
     const now = new Date();
@@ -106,32 +105,37 @@ const getTopCharities = async (req, res) => {
     console.log('Fetching all charities...');
 
     // Step 2: Fetch all charities using produceGetAllMessage
-    const allCharities = await produceGetAllMessage('charity-service-request', { action: 'GET_ALL' });
-    console.log('Fetched charities:', allCharities);
-
-    if (!Array.isArray(allCharities) || allCharities.length === 0) {
-      return res.status(404).json({ message: 'No charities found.' });
-    }
+    const response = await produceGetAllMessage('charity-request', { action: 'GET_ALL' });
+    const charities = response.data;
+    console.log('Fetched charities:', charities);
 
     console.log('Fetching donations for each charity...');
 
     // Step 3: Fetch donations for each charity
     const charityDonations = await Promise.all(
-      allCharities.map(async (charity) => {
+      charities.map(async (charity) => {
         try {
-          // Fetch donations for the current month and year
-          const donationsResponse = await axios.get(`https://api.example.com/donations`, {
-            params: {
-              charity_id: charity.charity_id,
-              year: currentYear,
-              month: currentMonth,
-            },
-          });
+          console.log(`Fetching donations for charity ID: ${charity.charity_id} (${charity.name})`);
+          // Validate charity_id
+          if (!charity.charity_id) {
+            console.warn(`Charity ${charity.name} has an invalid charity_id.`);
+            return { charity, totalDonation: 0 };
+          }
 
-          const donations = donationsResponse.data;
+          // Fetch donations for the current month and year
+          const response = await axios.get(
+            `${TeamAPath}donation/total-donations/charity/${charity.charity_id}`,
+            {
+              params: {
+                'internal-api': process.env.INTERNAL_API_KEY,
+                year: currentYear,
+                month: currentMonth,
+              },
+            }
+          );
 
           // Calculate total donations for the charity
-          const totalDonation = donations.reduce((sum, donation) => sum + donation.amount, 0);
+          const totalDonation = response.data.donationResponse.totalAmount;
 
           return {
             charity,
@@ -143,7 +147,6 @@ const getTopCharities = async (req, res) => {
         }
       })
     );
-
     console.log('Charity donations:', charityDonations);
 
     // Step 4: Filter out charities without donations
@@ -154,22 +157,18 @@ const getTopCharities = async (req, res) => {
 
     // Step 6: Get the top 10 charities
     const topCharities = rankedCharities.slice(0, 10).map((entry, index) => ({
-      rank: index + 1,
-      charity_id: entry.charity.charity_id,
       charity_name: entry.charity.name,
       totalDonation: entry.totalDonation,
+      profileImage: entry.charity.image_url || "default-image-url.png",
     }));
 
-    console.log('Top charities:', topCharities);
-
-    res.status(200).json(topCharities);
-  } catch (err) {
+    console.log('Charity leaderboard:', topCharities);
+    return topCharities;
+  } catch (error) {
     console.error('Error generating charity leaderboard:', err.message);
-    res.status(500).json({ error: err.message });
+    throw error;
   }
 };
-
-export { getTopCharities };
 
 /**
  * Fetch total donations grouped by day within a specified date range.
@@ -406,4 +405,4 @@ const buildFilters = (queryParams) => {
 
 
 
-export { getTotalDonationByDonor, getDonorLeaderboard, getTotalDonationsByDay, getTotalDonationForProject, getDonationsByMonth };
+export { getTotalDonationByDonor, getDonorLeaderboard, getCharityLeaderboard, getTotalDonationsByDay, getTotalDonationForProject, getDonationsByMonth };
