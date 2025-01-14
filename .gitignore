@@ -6,8 +6,6 @@
 /*/*/.env
 .codegpt
 .vscode
-/*/keys
-*.pem
 node_modules
 package.json
 package-lock.json
