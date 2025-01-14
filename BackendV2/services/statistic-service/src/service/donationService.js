@@ -67,8 +67,8 @@ const getDonorLeaderboard = async () => {
     ]);
 
     console.log('Local leaderboard:', localLeaderboard);
+    const response = await produceGetAllMessage('donor-request');
 
-    const response = await produceGetAllMessage('donor-request', { action: 'GET_ALL' });
     const donors = response.data;
     console.log('Fetched donors:', donors);
     
@@ -96,7 +96,7 @@ const getDonorLeaderboard = async () => {
 /**
  * Generate a leaderboard of top 10 charities for the current month.
  */
-const getCharityLeaderboard = async (req, res) => {
+const getCharityLeaderboard = async () => {
   try {
     // Step 1: Get the current month and year
     const now = new Date();
@@ -106,7 +106,7 @@ const getCharityLeaderboard = async (req, res) => {
     console.log('Fetching all charities...');
 
     // Step 2: Fetch all charities using produceGetAllMessage
-    const response = await produceGetAllMessage('charity-request', { action: 'GET_ALL' });
+    const response = await produceGetAllMessage('charity-request');
     const charities = response.data;
     console.log('Fetched charities:', charities);
 
