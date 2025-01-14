@@ -3,6 +3,7 @@ import { fetchAndUpdateDonations, fetchAndUpdateProjects } from './service/dataF
 import { getLastUpdateTimestamp } from './utils/syncHandler.js';
 import { consumeMessages } from './events/consumer.js';
 import dotenv from 'dotenv';
+import { startResponseConsumer } from './events/response.consumer.js';
 const app = express();
 
 const syncOnBoot = async () => {
@@ -42,7 +43,7 @@ const startServer = async () => {
     // Perform boot-time synchronization
     await syncOnBoot();
     await consumeMessages();
-
+    await startResponseConsumer();
   } catch (error) {
     console.error('Error starting the server:', error.message);
     process.exit(1);

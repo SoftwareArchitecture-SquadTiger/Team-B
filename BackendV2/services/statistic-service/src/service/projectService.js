@@ -1,5 +1,3 @@
-import Project from '../model/project.js';
-import Donation from '../model/donation.js';
 import axios from 'axios';
 const TeamAPath = process.env.TEAM_A_API_GATEWAY;
 
@@ -12,28 +10,24 @@ const TeamAPath = process.env.TEAM_A_API_GATEWAY;
  const getProjectsCreatedPerMonth = async (queryParams) => {
   try {
     const { startMonth, endMonth } = queryParams;
-    // Fetch all projects
-    const response = await axios.get(`${TeamAPath}project`); // Assuming this endpoint fetches all projects
+    const response = await axios.get(`${TeamAPath}project`);
     const allProjects = response.data;
 
-    // Filter projects within the specified time range
     const filteredProjects = allProjects.filter((project) => {
-      const projectMonth = new Date(project.createdAt).toISOString().slice(0, 7); // Extract 'YYYY-MM'
+      const projectMonth = new Date(project.createdAt).toISOString().slice(0, 7);
       return projectMonth >= startMonth && projectMonth <= endMonth;
     });
 
-    // Aggregate projects by month
     const aggregatedData = filteredProjects.reduce((acc, project) => {
-      const month = new Date(project.createdAt).toISOString().slice(0, 7); // Extract 'YYYY-MM'
+      const month = new Date(project.createdAt).toISOString().slice(0, 7);
       acc[month] = (acc[month] || 0) + 1;
       return acc;
     }, {});
 
-    // Convert aggregated data into a sorted array
     const result = Object.entries(aggregatedData)
       .map(([month, count], index) => ({
         id: index,
-        month, // 'YYYY-MM'
+        month,
         projectCount: count,
       }))
       .sort((a, b) => new Date(a.month) - new Date(b.month));
@@ -56,21 +50,19 @@ const getProjectsByCountry = async () => {
       headers: { 'internal-api': process.env.INTERNAL_API_KEY },
     });
 
-    const allProjects = response.data?.projectResponse || []; // Extract projectResponse array
+    const allProjects = response.data?.projectResponse || [];
     console.log("All projects:", allProjects);
     if (!Array.isArray(allProjects)) {
       throw new Error("Invalid response: Expected an array of projects");
     }
 
-    // Aggregate projects by country
     const aggregatedData = allProjects.reduce((acc, project) => {
-      if (project.country) { // Ensure project has a country field
+      if (project.country) { 
         acc[project.country] = (acc[project.country] || 0) + 1;
       }
       return acc;
     }, {});
 
-    // Format aggregated data for output
     const result = Object.entries(aggregatedData).map(([country, count], index) => ({
       id: index,
       value: count,
@@ -82,7 +74,7 @@ const getProjectsByCountry = async () => {
     return result;
   } catch (error) {
     console.error("Error fetching projects by country:", error.message);
-    throw error; // Re-throw error to ensure proper error handling
+    throw error; 
   }
 };
 
@@ -97,15 +89,13 @@ const getProjectsByCategory = async () => {
       headers: { 'internal-api': process.env.INTERNAL_API_KEY },
     });
 
-    const allProjects = response.data?.projectResponse || []; // Extract projectResponse array
+    const allProjects = response.data?.projectResponse || []; 
     console.log("All projects:", allProjects);
 
-    // Validate the response to ensure it's an array
     if (!Array.isArray(allProjects)) {
       throw new Error("Invalid response: Expected an array of projects");
     }
 
-    // Aggregate projects by category
     const aggregatedData = allProjects.reduce((acc, project) => {
       if (project.category) { // Ensure project has a category field
         acc[project.category] = (acc[project.category] || 0) + 1;
@@ -113,7 +103,6 @@ const getProjectsByCategory = async () => {
       return acc;
     }, {});
 
-    // Format aggregated data for output
     const result = Object.entries(aggregatedData).map(([category, count], index) => ({
       id: index,
       value: count,
@@ -129,9 +118,9 @@ const getProjectsByCategory = async () => {
   }
 };
 
+
 const getProjectsByMonth = async (startMonth, endMonth) => {
   try {
-    // Validate and parse startMonth and endMonth
     if (!startMonth || !endMonth) {
       throw new Error("startMonth and endMonth are required");
     }
@@ -149,21 +138,19 @@ const getProjectsByMonth = async (startMonth, endMonth) => {
       throw new Error("startMonth cannot be after endMonth.");
     }
 
-    // Fetch all projects from the API
     const response = await axios.get(`${TeamAPath}projects`, {
       headers: { 'internal-api': process.env.INTERNAL_API_KEY },
     });
 
-    const allProjects = response.data?.projectResponse || []; // Extract projectResponse array
+    const allProjects = response.data?.projectResponse || []; 
     console.log("All projects:", allProjects);
 
     if (!Array.isArray(allProjects)) {
       throw new Error("Invalid response: Expected an array of projects");
     }
 
-    // Aggregate projects by month
     const aggregatedData = allProjects.reduce((acc, project) => {
-      const projectMonth = new Date(project.start_date).toISOString().slice(0, 7); // Extract YYYY-MM
+      const projectMonth = new Date(project.start_date).toISOString().slice(0, 7); 
       if (!acc[projectMonth]) {
         acc[projectMonth] = 0;
       }
@@ -173,14 +160,12 @@ const getProjectsByMonth = async (startMonth, endMonth) => {
 
     console.log("Aggregated data:", aggregatedData);
 
-    // Generate all months in the range
     const allMonths = generateMonthsInRange(startMonth, endMonth);
 
-    // Map aggregated data to include all months with missing months set to 0
     const result = allMonths.map((month, index) => ({
       id: index,
-      month, // Month in YYYY-MM format
-      projectCount: aggregatedData[month] || 0, // Use count or default to 0
+      month, 
+      projectCount: aggregatedData[month] || 0, 
     }));
 
     console.log("Complete project data by month:", result);

@@ -3,7 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 import {addPendingRequest, deletePendingRequest} from "../utils/requestHandler.js";
 const kafka = new Kafka({
   clientId: 'auth-service-producer',
-  brokers: [process.env.KAFKA_BROKER], // Use localhost, not kafka
+  brokers: [process.env.KAFKA_BROKER], 
 });
 
 const producer = kafka.producer();
@@ -11,9 +11,14 @@ const producer = kafka.producer();
 async function startProducer() {
   await producer.connect();
 }
+
+/**
+ * Produce a user-data-save-request message
+ * @param {Object} msg - { correlationId, userType, userData }
+ */
 const produceSaveRequest = async (topic, message) => {
   const correlationId = uuidv4();
-  const timeout = 20000; //The wait time for the response from kafka (20s)
+  const timeout = 20000; 
 
   return new Promise(async (resolve, reject) => {
     const timeoutId = setTimeout(() => {
@@ -36,15 +41,15 @@ const produceSaveRequest = async (topic, message) => {
       });    
     } catch (error) {
       console.log("there is an error, rejecting promise");
-      deletePendingRequest(correlationId); // Clean up on failure by deleting the stored id
-      reject(error); // Reject the promise if sending fails
+      deletePendingRequest(correlationId);
+      reject(error); 
     }
   });
 };
 
 /**
- * Produce a user-data-save-request message
- * @param {Object} msg - { correlationId, userType, userData }
+ * Produce a login-response
+ * @param {Object} msg - { status, error }
  */
 async function produceLoginResponse(status, msg) {
   const messageWithStatus = {
@@ -61,8 +66,8 @@ async function produceLoginResponse(status, msg) {
 }
 
 /**
- * Produce a user-data-save-request message
- * @param {Object} msg - { correlationId, userType, userData }
+ * Produce a register-response
+ * @param {Object} msg - { status, error }
  */
 async function produceRegisterResponse(status ,msg) {
   const messageWithStatus = {

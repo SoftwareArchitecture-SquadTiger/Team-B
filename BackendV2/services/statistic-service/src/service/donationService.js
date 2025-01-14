@@ -1,5 +1,9 @@
 import Donation from '../model/donation.js';
 import {fetchAndUpdateDonations} from './dataFetcher.js';
+import {produceGetAllMessage} from '../events/producer.js';
+import axios from 'axios';
+const TeamAPath = process.env.TEAM_A_API_GATEWAY;
+
 /**
  * Fetch total donations by a specific donor.
  */
@@ -34,83 +38,147 @@ const getTotalDonationByDonor = async (donorId) => {
   return combinedTotal;
 };
 
+
 /**
  * Generate a leaderboard of top 10 donors for the current month.
+ *
+ * @returns {Array} Top 10 donors with total donation amounts and donor details.
  */
 const getDonorLeaderboard = async () => {
-  // Step 1: Get the current month and year
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const currentMonth = now.getMonth() + 1;
+  try {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1;
 
-  // Step 2: Build query params for the current month
-  const queryParams = {
-    timePeriod: "month",
-    year: currentYear,
-    month: currentMonth,
-  };
+    const queryParams = {
+      timePeriod: 'month',
+      year: currentYear,
+      month: currentMonth,
+    };
 
-  // Step 3: Fetch local leaderboard
-  const localLeaderboard = await Donation.aggregate([
-    { $match: buildFilters(queryParams) }, // Filter donations for the current month
-    { $group: { _id: "$donor_id", totalAmount: { $sum: "$amount" } } }, // Group by donor_id
-    { $sort: { totalAmount: -1 } }, // Sort by total amount in descending order
-    { $limit: 10 }, // Limit to top 10 donors
-  ]);
+    await fetchAndUpdateDonations();
+    console.log('Donations have been fetched and updated.');
 
-  console.log("Local leaderboard:", localLeaderboard);
+    const localLeaderboard = await Donation.aggregate([
+      { $match: { ...buildFilters(queryParams), donor_id: { $nin: [null,""] } } },
+      { $group: { _id: "$donor_id", totalAmount: { $sum: "$amount" } } },
+      { $sort: { totalAmount: -1 } },
+      { $limit: 10 },
+    ]);
 
-  // Step 4: Fetch latest donations for the current month
-  const latestDonations = (await fetchAndUpdateDonations(queryParams)) || []; // Ensure it defaults to an empty array
-  console.log("Latest donations:", latestDonations);
+    console.log('Local leaderboard:', localLeaderboard);
+    const response = await produceGetAllMessage('donor-request');
 
-  // Step 5: Calculate totals from the latest donations
-  const latestTotals = latestDonations.reduce((acc, donation) => {
-    if (donation.donor_id) { // Safeguard against missing donor_id
-      acc[donation.donor_id] = (acc[donation.donor_id] || 0) + donation.amount;
-    }
-    return acc;
-  }, {});
+    const donors = response.data;
+    console.log('Fetched donors:', donors);
+    
+    const enrichedLeaderboard = localLeaderboard
+    .filter((entry) => donors.some((donor) => donor.donor_id === entry._id))
+    .map((entry) => {
+      const donor = donors.find((donor) => donor.donor_id === entry._id);
+      return {
+        donor_id: entry._id,
+        totalAmount: entry.totalAmount,
+        name: donor ? `${donor.first_name} ${donor.last_name}` : 'Unknown Donor',
+        profileImage: donor ? donor.img_url : 'default.png',
+        };
+    });
 
-  console.log("Latest totals:", latestTotals);
+    console.log('Final enriched leaderboard:', enrichedLeaderboard);
 
-  // Step 6: Combine local and latest totals
-  const combinedTotals = {};
-
-  // Add local totals to combinedTotals
-  localLeaderboard.forEach((entry) => {
-    combinedTotals[entry._id] = entry.totalAmount + (latestTotals[entry._id] || 0);
-  });
-
-  // Add latest totals for donors not in localLeaderboard
-  Object.entries(latestTotals).forEach(([donorId, total]) => {
-    if (!combinedTotals[donorId]) {
-      combinedTotals[donorId] = total;
-    }
-  });
-
-  // Step 7: Format the combined totals into a leaderboard
-  const leaderboard = Object.entries(combinedTotals)
-    .map(([donor_id, totalAmount]) => ({ donor_id, totalAmount }))
-    .sort((a, b) => b.totalAmount - a.totalAmount) // Sort by total amount
-    .slice(0, 10); // Limit to top 10
-
-  console.log("Final leaderboard:", leaderboard);
-
-  return leaderboard;
+    return enrichedLeaderboard;
+  } catch (error) {
+    console.error('Error generating donor leaderboard:', error.message);
+    throw error;
+  }
 };
 
+/**
+ * Generate a leaderboard of top 10 charities for the current month.
+ */
+const getCharityLeaderboard = async () => {
+  try {
+    // Step 1: Get the current month and year
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1;
+
+    console.log('Fetching all charities...');
+
+    // Step 2: Fetch all charities using produceGetAllMessage
+    const response = await produceGetAllMessage('charity-request');
+    const charities = response.data;
+    console.log('Fetched charities:', charities);
+
+    console.log('Fetching donations for each charity...');
+
+    // Step 3: Fetch donations for each charity
+    const charityDonations = await Promise.all(
+      charities.map(async (charity) => {
+        try {
+          console.log(`Fetching donations for charity ID: ${charity.charity_id} (${charity.name})`);
+          // Validate charity_id
+          if (!charity.charity_id) {
+            console.warn(`Charity ${charity.name} has an invalid charity_id.`);
+            return { charity, totalDonation: 0 };
+          }
+
+          // Fetch donations for the current month and year
+          const response = await axios.get(
+            `${TeamAPath}donation/total-donations/charity/${charity.charity_id}`,
+            {
+              params: {
+                'internal-api': process.env.INTERNAL_API_KEY,
+                year: currentYear,
+                month: currentMonth,
+              },
+            }
+          );
+
+          // Calculate total donations for the charity
+          const totalDonation = response.data.donationResponse.totalAmount;
+
+          return {
+            charity,
+            totalDonation,
+          };
+        } catch (err) {
+          console.error(`Error fetching donations for charity ID ${charity.charity_id}:`, err.message);
+          return { charity, totalDonation: 0 }; // Return 0 if there is an error
+        }
+      })
+    );
+    console.log('Charity donations:', charityDonations);
+
+    // Step 4: Filter out charities without donations
+    const filteredCharities = charityDonations.filter((entry) => entry.totalDonation > 0);
+
+    // Step 5: Rank charities by donation amount
+    const rankedCharities = filteredCharities.sort((a, b) => b.totalDonation - a.totalDonation);
+
+    // Step 6: Get the top 10 charities
+    const topCharities = rankedCharities.slice(0, 10).map((entry, index) => ({
+      charity_name: entry.charity.name,
+      totalDonation: entry.totalDonation,
+      profileImage: entry.charity.image_url || "default.png",
+    }));
+
+    console.log('Charity leaderboard:', topCharities);
+    return topCharities;
+  } catch (error) {
+    console.error('Error generating charity leaderboard:', err.message);
+    throw error;
+  }
+};
 
 /**
  * Fetch total donations grouped by day within a specified date range.
  */
 const getTotalDonationsByDay = async (startDate, endDate) => {
-  // Step 1: Generate the filters for MongoDB query
   const latestDonations = (await fetchAndUpdateDonations({ startDate, endDate })) || [];
 
   const filters = buildFilters({ timePeriod: 'custom', startDate, endDate });
 
-  // Step 2: Fetch local data from MongoDB
   const localData = await Donation.aggregate([
     { $match: filters }, // Apply the filters
     {
@@ -129,7 +197,6 @@ const getTotalDonationsByDay = async (startDate, endDate) => {
     },
   ]);
 
-  // Step 5: Fill in missing dates with zero donations
   const allDates = generateDateRange(startDate, endDate); // Generate all dates in the range
   const completeData = allDates.map((date) => {
     const existing = localData.find((item) => item.date === date);
@@ -156,41 +223,7 @@ const generateDateRange = (startDate, endDate) => {
   return dates;
 };
 
-const getTotalDonationForProject = async (projectId) => {
-  try {
-    // Step 1: Validate inputs
-    if (!projectId) {
-      throw new Error("Project ID is required");
-    }
 
-    // Step 2: Fetch local donations from the database
-    const localTotalResult = await Donation.aggregate([
-      { $match: { project_id: projectId } }, // Match project_id and filter by queryParams
-      { $group: { _id: null, totalAmount: { $sum: "$amount" } } }, // Sum donation amounts
-    ]);
-
-    const localTotal = localTotalResult[0]?.totalAmount || 0; // Handle empty aggregation results
-    console.log("Local total:", localTotal);
-
-    // Step 3: Fetch latest donations
-    const latestDonations = (await fetchAndUpdateDonations()) || []; // Default to an empty array
-    console.log("Latest donations:", latestDonations);
-
-    const latestTotal = latestDonations
-      .filter((donation) => donation.project_id === projectId) // Filter by project_id
-      .reduce((sum, donation) => sum + donation.amount, 0); // Sum donation amounts
-    console.log("Latest total:", latestTotal);
-
-    // Step 4: Combine local and latest totals
-    const combinedTotal = localTotal + latestTotal;
-    console.log("Combined total donations for project:", combinedTotal);
-
-    return combinedTotal;
-  } catch (error) {
-    console.error("Error in getTotalDonationForProject:", error.message);
-    throw error; // Re-throw error for higher-level handling
-  }
-};
 /**
  * Fetch total donations grouped by month within a specified date range.
  * @param {String} startDate - Start date in 'YYYY-MM-DD' format.
@@ -336,4 +369,4 @@ const buildFilters = (queryParams) => {
 
 
 
-export { getTotalDonationByDonor, getDonorLeaderboard, getTotalDonationsByDay, getTotalDonationForProject, getDonationsByMonth };
+export { getTotalDonationByDonor, getDonorLeaderboard, getCharityLeaderboard, getTotalDonationsByDay, getDonationsByMonth };

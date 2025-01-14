@@ -5,21 +5,25 @@ import fs from 'fs';
 const publicKeyPath = process.env.JWE_PUBLIC_KEY_PATH;
 const publicKeyPem = fs.readFileSync(publicKeyPath, 'utf8');
 
-// Define privateKeyObject and publicKeyObject
+// Define key
 let publicKeyObject;
 
-// Import private and public keys asynchronously
+// Import keys asynchronously
 (async () => {
-  // Import the private key for signing JWS
-  // Import the public key for encrypting JWE
   publicKeyObject = await importSPKI(publicKeyPem, 'RSA-OAEP');
   console.log('Keys loaded successfully');
 })();
 
 /**
- * Create, Sign, and Encrypt a JWT (JWE).
- * 1. Sign the payload as JWS using JOSE.
- * 2. Encrypt the signed JWS into a JWE using JOSE.
+ * Create, sign, and encrypt a JWT (JWE).
+ * - Signs the payload as JWS using JOSE.
+ * - Encrypts the signed JWS into a JWE using JOSE.
+ *
+ * @param {Object} payload - The payload to include in the JWT.
+ * @param {string} payload.userType - The type of the user (e.g., "Admin", "User").
+ * @param {string} payload.userId - The unique ID of the user.
+ * @returns {Promise<string>} - The encrypted JWE token.
+ * @throws {Error} - If the public key is not loaded or encryption fails.
  */
 export async function createAndEncryptToken(payload) {
   if (!publicKeyObject) {

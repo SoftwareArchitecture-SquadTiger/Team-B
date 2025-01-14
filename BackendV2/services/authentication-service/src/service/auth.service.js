@@ -10,6 +10,12 @@ import forge from 'node-forge';
 const privateKeyPath = process.env.RSA_PRIVATE_KEY_PATH;
 const privateKey = fs.readFileSync(privateKeyPath, 'utf8');
 
+/**
+ * Decrypt encrypted credentials using RSA private key.
+ * @param {String} encryptedData - The base64-encoded encrypted data.
+ * @returns {String} - Decrypted plaintext value.
+ * @throws {Error} - If decryption fails.
+ */
 function decryptCredentials(encryptedData) {
   try {
     const privateDecryptionKey = forge.pki.privateKeyFromPem(privateKey);
@@ -24,8 +30,13 @@ function decryptCredentials(encryptedData) {
 }
 
 /**
- * Handle login request
- * @param {Object} msg - { correlationId, email, password, userType }
+ * Handle user login request.
+ * @param {Object} msg - The message object containing login details.
+ * @param {String} msg.correlationId - Unique ID for correlating responses.
+ * @param {Object} msg.data - Data object with email, password, and userType.
+ * @param {String} msg.data.email - Encrypted email of the user.
+ * @param {String} msg.data.password - Encrypted password of the user.
+ * @param {String} msg.data.userType - Type of the user (e.g., Admin, Charity, Donor).
  */
 async function handleLoginRequest(msg) {
   const { correlationId, data } = msg;
@@ -33,33 +44,27 @@ async function handleLoginRequest(msg) {
   const { email, password, userType } = data;
 
   try {
-    // Step 1: Decrypt the email and password
-    const decryptedEmail = decryptCredentials(email); // Decrypts the email
-    const decryptedPassword = decryptCredentials(password); // Decrypts the password
+    //Decryption
+    const decryptedEmail = decryptCredentials(email); 
+    const decryptedPassword = decryptCredentials(password); 
     console.log(`Decrypted Email: ${decryptedEmail}, UserType: ${userType}`);
 
-    // Step 2: Fetch the user's credentials based on email and userType
     const credential = await Credential.findOne({ email: decryptedEmail, userType });
     if (!credential) {
       throw new Error('Email not found or invalid userType');
     }
-
     console.log('Credential found:', credential);
-
-    // Step 3: Compare hashed passwords
+    
+    //Password validation
     const isMatch = await bcrypt.compare(decryptedPassword, credential.password);
     if (!isMatch) {
       throw new Error('Invalid credentials');
     }
-
-    console.log('Password matched successfully');
-
-    // Step 4: Generate and encrypt the token
-    const payload = { userType, userId: credential.userId }; // Minimal payload for the token
+    const payload = { userType, userId: credential.userId }; 
     const jwe = await createAndEncryptToken(payload);
     console.log('JWE:', jwe);
 
-    // Step 5: Produce login response
+    //Send success message
     await produceLoginResponse('success', { correlationId, JWE: jwe });
 
     console.log(`Login request processed successfully for ${decryptedEmail}`);
@@ -69,87 +74,84 @@ async function handleLoginRequest(msg) {
   }
 }
 
-
-
 /**
- * Handle register request
- * @param {Object} msg - { action, correlationId, data: { email, password, userType, ...userData } }
+ * Handle user registration request.
+ * @param {Object} msg - The message object containing registration details.
+ * @param {String} msg.correlationId - Unique ID for correlating responses.
+ * @param {Object} msg.data - Data object with email, password, userType, and user-specific data.
+ * @param {String} msg.data.email - Encrypted email of the user.
+ * @param {String} msg.data.password - Encrypted password of the user.
+ * @param {String} msg.data.userType - Type of the user (e.g., Admin, Charity, Donor).
+ * @param {Object} msg.data.userData - Additional data for the user.
  */
 async function handleRegisterRequest(msg) {
   const { correlationId, data } = msg;
-  const { email, password, userType, ...userData } = data; // Extract required fields from the data object
+  const { email, password, userType, ...userData } = data; 
   try {
-    const decryptedEmail = decryptCredentials(email); // Decrypts the email
+    const decryptedEmail = decryptCredentials(email); 
 
-    // Step 1: Check if email has been used
     const emailCheck = await Credential.findOne({ decryptedEmail });
     if (emailCheck) {
       throw new Error("This email has already been used");
     }
 
-    // Step 2: Generate a new userId
     const userId = uuidv4();
 
-    // Step 3: Decrypt the incoming password
-    const decryptedPassword = decryptCredentials(password); // Decrypts the password sent from the frontend
+    const decryptedPassword = decryptCredentials(password); 
 
-    // Step 4: Hash the password
     const saltRounds = 10;
     const hashedPassword = await bcrypt.hash(decryptedPassword, saltRounds);
+    
+    // Handle admin case
     if (userType === 'Admin') {
-      // Handle admin account registration
       console.log('Registering Admin account');
 
-      // Step 5: Save admin credentials in the Credential collection
+      // Store password
       const adminCredential = new Credential({
         userId,
         email: decryptedEmail,
         userType: 'Admin',
-        password: hashedPassword, // Store the hashed password
+        password: hashedPassword, 
       });
       await adminCredential.save();
       console.log(`Admin credentials saved for email ${decryptedEmail}`);
 
-      // Step 6: Produce a register success response for Admin
+      // Produce a register success response for Admin
       produceRegisterResponse('success', { correlationId, userId, userType });
-      return; // Exit early as Admin registration is complete
+      return; 
     }
     const topic = userType === 'Charity' ? 'charity-request' : 'donor-request';
-    console.log(topic);
-// Step 5: Produce save request and wait for response
-const saveRequest = {
-  correlationId,
-  userData: {
-    ...userData,
-    email: decryptedEmail,
-  },
-};
+
+    const saveRequest = {
+      correlationId,
+      userData: {
+        ...userData,
+        email: decryptedEmail,
+      },
+    };
 
     const result = await produceSaveRequest(topic, saveRequest);
-    console.log("Full Result Data:", result);
     let extractedId;
     if (result.data) {
       // Extract based on the topic
       if (topic === 'charity-request') {
-          extractedId = result.data.charity_id; // Use `charity_id` if topic is 'charity-request'
+          extractedId = result.data.charity_id; 
       } else {
-          extractedId = result.data.donor_id; // Use `donor_id` otherwise
+          extractedId = result.data.donor_id; 
       }
   } else {
       throw new Error("No data property found in the result object");
   }
     console.log(extractedId);
-    // Step 4: Save credentials in Credential collection
+
     const credential = new Credential({
       userId: extractedId,
       email: decryptedEmail,
       userType,
-      password: hashedPassword, // Store the encrypted password
+      password: hashedPassword,
     });
     await credential.save();
     console.log(`Credentials saved for user ${email}`);
-
-    // Step 5: Produce register success response
     produceRegisterResponse('success',{ correlationId, userType });
 
   } catch (error) {
