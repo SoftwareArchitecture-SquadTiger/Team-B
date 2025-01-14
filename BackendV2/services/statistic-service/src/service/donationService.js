@@ -78,7 +78,7 @@ const getDonorLeaderboard = async () => {
         donor_id: entry._id,
         totalAmount: entry.totalAmount,
         name: donor ? `${donor.first_name} ${donor.last_name}` : 'Unknown Donor', // Use 'Unknown Donor' for unmatched entries
-        profileImage: donor ? donor.img_url : 'default-placeholder.png',
+        profileImage: donor ? donor.img_url : 'default.png',
         };
     });
 
@@ -159,7 +159,7 @@ const getCharityLeaderboard = async (req, res) => {
     const topCharities = rankedCharities.slice(0, 10).map((entry, index) => ({
       charity_name: entry.charity.name,
       totalDonation: entry.totalDonation,
-      profileImage: entry.charity.image_url || "default-image-url.png",
+      profileImage: entry.charity.image_url || "default.png",
     }));
 
     console.log('Charity leaderboard:', topCharities);
