@@ -1,0 +1,372 @@
+import Donation from '../model/donation.js';
+import {fetchAndUpdateDonations} from './dataFetcher.js';
+import {produceGetAllMessage} from '../events/producer.js';
+import axios from 'axios';
+const TeamAPath = process.env.TEAM_A_API_GATEWAY;
+
+/**
+ * Fetch total donations by a specific donor.
+ */
+const getTotalDonationByDonor = async (donorId) => {
+  // Step 1: Fetch local data from MongoDB
+  const localTotal = await Donation.aggregate([
+    { $match: { donor_id: donorId } }, // Match donor ID
+    {
+      $group: {
+        _id: null,
+        totalAmount: { $sum: "$amount" }, // Sum all donations by this donor
+      },
+    },
+  ]);
+
+  console.log("Local total donations:", localTotal);
+
+  // Step 2: Fetch and process the latest donations
+  const latestDonations = (await fetchAndUpdateDonations()) || []; // Fetch all latest donations
+  console.log("Latest donations:", latestDonations);
+
+  const latestTotal = latestDonations
+    .filter((donation) => donation.donor_id === donorId) // Filter by donor ID
+    .reduce((sum, donation) => sum + donation.amount, 0); // Sum the amounts
+
+  console.log("Latest total donations:", latestTotal);
+
+  // Step 3: Combine local and latest totals
+  const combinedTotal = (localTotal[0]?.totalAmount || 0) + latestTotal;
+  console.log("Combined total donations:", combinedTotal);
+
+  return combinedTotal;
+};
+
+
+/**
+ * Generate a leaderboard of top 10 donors for the current month.
+ *
+ * @returns {Array} Top 10 donors with total donation amounts and donor details.
+ */
+const getDonorLeaderboard = async () => {
+  try {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1;
+
+    const queryParams = {
+      timePeriod: 'month',
+      year: currentYear,
+      month: currentMonth,
+    };
+
+    await fetchAndUpdateDonations();
+    console.log('Donations have been fetched and updated.');
+
+    const localLeaderboard = await Donation.aggregate([
+      { $match: { ...buildFilters(queryParams), donor_id: { $nin: [null,""] } } },
+      { $group: { _id: "$donor_id", totalAmount: { $sum: "$amount" } } },
+      { $sort: { totalAmount: -1 } },
+      { $limit: 10 },
+    ]);
+
+    console.log('Local leaderboard:', localLeaderboard);
+    const response = await produceGetAllMessage('donor-request');
+
+    const donors = response.data;
+    console.log('Fetched donors:', donors);
+    
+    const enrichedLeaderboard = localLeaderboard
+    .filter((entry) => donors.some((donor) => donor.donor_id === entry._id))
+    .map((entry) => {
+      const donor = donors.find((donor) => donor.donor_id === entry._id);
+      return {
+        donor_id: entry._id,
+        totalAmount: entry.totalAmount,
+        name: donor ? `${donor.first_name} ${donor.last_name}` : 'Unknown Donor',
+        profileImage: donor ? donor.img_url : 'default.png',
+        };
+    });
+
+    console.log('Final enriched leaderboard:', enrichedLeaderboard);
+
+    return enrichedLeaderboard;
+  } catch (error) {
+    console.error('Error generating donor leaderboard:', error.message);
+    throw error;
+  }
+};
+
+/**
+ * Generate a leaderboard of top 10 charities for the current month.
+ */
+const getCharityLeaderboard = async () => {
+  try {
+    // Step 1: Get the current month and year
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1;
+
+    console.log('Fetching all charities...');
+
+    // Step 2: Fetch all charities using produceGetAllMessage
+    const response = await produceGetAllMessage('charity-request');
+    const charities = response.data;
+    console.log('Fetched charities:', charities);
+
+    console.log('Fetching donations for each charity...');
+
+    // Step 3: Fetch donations for each charity
+    const charityDonations = await Promise.all(
+      charities.map(async (charity) => {
+        try {
+          console.log(`Fetching donations for charity ID: ${charity.charity_id} (${charity.name})`);
+          // Validate charity_id
+          if (!charity.charity_id) {
+            console.warn(`Charity ${charity.name} has an invalid charity_id.`);
+            return { charity, totalDonation: 0 };
+          }
+
+          // Fetch donations for the current month and year
+          const response = await axios.get(
+            `${TeamAPath}donation/total-donations/charity/${charity.charity_id}`,
+            {
+              params: {
+                'internal-api': process.env.INTERNAL_API_KEY,
+                year: currentYear,
+                month: currentMonth,
+              },
+            }
+          );
+
+          // Calculate total donations for the charity
+          const totalDonation = response.data.donationResponse.totalAmount;
+
+          return {
+            charity,
+            totalDonation,
+          };
+        } catch (err) {
+          console.error(`Error fetching donations for charity ID ${charity.charity_id}:`, err.message);
+          return { charity, totalDonation: 0 }; // Return 0 if there is an error
+        }
+      })
+    );
+    console.log('Charity donations:', charityDonations);
+
+    // Step 4: Filter out charities without donations
+    const filteredCharities = charityDonations.filter((entry) => entry.totalDonation > 0);
+
+    // Step 5: Rank charities by donation amount
+    const rankedCharities = filteredCharities.sort((a, b) => b.totalDonation - a.totalDonation);
+
+    // Step 6: Get the top 10 charities
+    const topCharities = rankedCharities.slice(0, 10).map((entry, index) => ({
+      charity_name: entry.charity.name,
+      totalDonation: entry.totalDonation,
+      profileImage: entry.charity.image_url || "default.png",
+    }));
+
+    console.log('Charity leaderboard:', topCharities);
+    return topCharities;
+  } catch (error) {
+    console.error('Error generating charity leaderboard:', err.message);
+    throw error;
+  }
+};
+
+/**
+ * Fetch total donations grouped by day within a specified date range.
+ */
+const getTotalDonationsByDay = async (startDate, endDate) => {
+  const latestDonations = (await fetchAndUpdateDonations({ startDate, endDate })) || [];
+
+  const filters = buildFilters({ timePeriod: 'custom', startDate, endDate });
+
+  const localData = await Donation.aggregate([
+    { $match: filters }, // Apply the filters
+    {
+      $group: {
+        _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } }, // Group by date
+        totalAmount: { $sum: "$amount" }, // Sum donation amounts
+      },
+    },
+    { $sort: { _id: 1 } }, // Sort by date
+    {
+      $project: {
+        date: "$_id", // Rename `_id` to `date`
+        totalAmount: 1,
+        _id: 0, // Exclude `_id` from output
+      },
+    },
+  ]);
+
+  const allDates = generateDateRange(startDate, endDate); // Generate all dates in the range
+  const completeData = allDates.map((date) => {
+    const existing = localData.find((item) => item.date === date);
+    return { date, totalAmount: existing ? existing.totalAmount : 0 }; // Fill missing dates with 0
+  });
+
+  console.log("Complete data:", completeData);
+
+  // Step 6: Return the complete data sorted by date
+  return completeData.sort((a, b) => new Date(a.date) - new Date(b.date));
+};
+
+/**
+ * Generate a range of dates from startDate to endDate (inclusive).
+ */
+const generateDateRange = (startDate, endDate) => {
+  const start = new Date(startDate);
+  const end = new Date(endDate);
+  const dates = [];
+  while (start <= end) {
+    dates.push(start.toISOString().split("T")[0]); // Format as YYYY-MM-DD
+    start.setDate(start.getDate() + 1); // Increment by 1 day
+  }
+  return dates;
+};
+
+
+/**
+ * Fetch total donations grouped by month within a specified date range.
+ * @param {String} startDate - Start date in 'YYYY-MM-DD' format.
+ * @param {String} endDate - End date in 'YYYY-MM-DD' format.
+ * @returns {Array} Total donations grouped by month.
+ */
+const getDonationsByMonth = async (startMonth, endMonth) => {
+  // Step 1: Generate the filters for MongoDB query
+  const filters = buildFilters({ timePeriod: 'custom', startMonth, endMonth });
+  // Step 3: Fetch latest donations for the date range
+  const latestDonations = (await fetchAndUpdateDonations()) || [];
+  console.log("Latest donations:", latestDonations);
+  // Step 2: Fetch local data from MongoDB
+  const localData = await Donation.aggregate([
+    { $match: filters }, // Apply the filters
+    {
+      $group: {
+        _id: { $dateToString: { format: "%Y-%m", date: "$createdAt" } }, // Group by month
+        totalAmount: { $sum: "$amount" }, // Sum donation amounts
+      },
+    },
+    { $sort: { _id: 1 } }, // Sort by month
+    {
+      $project: {
+        month: "$_id", // Rename `_id` to `month`
+        totalAmount: 1,
+        _id: 0, // Exclude `_id` from output
+      },
+    },
+  ]);
+
+  console.log("Local data by month:", localData);
+
+
+  // Step 6: Fill in missing months with zero donations
+  const allMonths = generateMonthRange(startMonth, endMonth); // Generate all months in the range
+  const completeData = allMonths.map((month) => {
+    const existing = localData.find((item) => item.month === month);
+    return { month, totalAmount: existing ? existing.totalAmount : 0 }; // Fill missing months with 0
+  });
+
+  console.log("Complete data:", completeData);
+
+  // Step 7: Return the complete data sorted by month
+  return completeData.sort((a, b) => new Date(a.month) - new Date(b.month));
+};
+
+/**
+ * Generate a range of months from startDate to endDate (inclusive).
+ * @param {String} startDate - Start date in 'YYYY-MM-DD' format.
+ * @param {String} endDate - End date in 'YYYY-MM-DD' format.
+ * @returns {Array} Array of months in 'YYYY-MM' format.
+ */
+const generateMonthRange = (startMonth, endMonth) => {
+  const start = new Date(startMonth);
+  const end = new Date(endMonth);
+  const months = [];
+
+  // Ensure start is the first day of the month
+  start.setDate(1);
+
+  while (start <= end) {
+    months.push(start.toISOString().slice(0, 7)); // Format as 'YYYY-MM'
+    start.setMonth(start.getMonth() + 1); // Increment by 1 month
+  }
+
+  return months;
+};
+
+
+/**
+ * Build query filters for MongoDB based on provided query parameters.
+ * Supports filtering by year, month, custom date ranges, and startMonth-endMonth.
+ * @param {Object} queryParams - Query parameters for filtering.
+ * @returns {Object} MongoDB query filters.
+ */
+const buildFilters = (queryParams) => {
+  const filters = {};
+
+  if (queryParams.timePeriod === 'year' && queryParams.year) {
+    // Filter by year
+    filters.createdAt = {
+      $gte: new Date(`${queryParams.year}-01-01`),
+      $lt: new Date(`${queryParams.year + 1}-01-01`),
+    };
+  } else if (queryParams.timePeriod === 'month' && queryParams.year && queryParams.month) {
+    // Filter by specific month
+    const startDate = new Date(`${queryParams.year}-${queryParams.month}-01`);
+    const endDate = new Date(startDate);
+    endDate.setMonth(startDate.getMonth() + 1);
+    filters.createdAt = { $gte: startDate, $lt: endDate };
+  } else if (queryParams.timePeriod === 'custom' && queryParams.startDate && queryParams.endDate) {
+    // Filter by custom date range
+    let { startDate, endDate } = queryParams;
+
+    // Convert to Date objects
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    // Validate date range
+    if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+      throw new Error("Invalid startDate or endDate provided.");
+    }
+
+    // Automatically fix reversed date ranges
+    if (start > end) {
+      console.warn("startDate is later than endDate. Swapping the values.");
+      [startDate, endDate] = [endDate, startDate];
+    }
+
+    filters.createdAt = {
+      $gte: new Date(startDate),
+      $lte: new Date(endDate),
+    };
+  } else if (queryParams.startMonth && queryParams.endMonth) {
+    // Filter by startMonth and endMonth
+    const startMonth = new Date(`${queryParams.startMonth}-01`); // First day of startMonth
+    const endMonth = new Date(`${queryParams.endMonth}-01`); // First day of endMonth
+    endMonth.setMonth(endMonth.getMonth() + 1); // Move to the next month
+    endMonth.setDate(0); // Set to the last day of the specified month
+
+    // Validate month range
+    if (isNaN(startMonth.getTime()) || isNaN(endMonth.getTime())) {
+      throw new Error("Invalid startMonth or endMonth provided.");
+    }
+
+    // Automatically fix reversed month ranges
+    if (startMonth > endMonth) {
+      console.warn("startMonth is later than endMonth. Swapping the values.");
+      [startMonth, endMonth] = [endMonth, startMonth];
+    }
+
+    filters.createdAt = {
+      $gte: startMonth,
+      $lte: endMonth,
+    };
+  } else {
+    throw new Error("Invalid query parameters for building filters.");
+  }
+
+  return filters;
+};
+
+
+
+export { getTotalDonationByDonor, getDonorLeaderboard, getCharityLeaderboard, getTotalDonationsByDay, getDonationsByMonth };

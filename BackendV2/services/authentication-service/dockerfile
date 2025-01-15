@@ -1,4 +1,4 @@
-FROM node:18
+FROM node:23
 
 # Set working directory
 WORKDIR /usr/src/app
@@ -12,9 +12,6 @@ RUN npm install
 # Copy the application files
 COPY . .
 
-
-# Expose the application port
-EXPOSE 3000
 
 # Start the application
 CMD ["node", "src/app.js"]

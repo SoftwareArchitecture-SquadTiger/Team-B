@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import CharityForm from "../components/CharityForm";
 import DonorForm from "../components/DonorForm";
+import AdminForm from "../components/AdminForm";
 
 function AddUserPage() {
   const [formType, setFormType] = useState("Charity");
@@ -18,9 +19,13 @@ function AddUserPage() {
         >
           <option value="Charity">Charity</option>
           <option value="Donor">Donor</option>
+          <option value="Admin">Admin</option>
+
         </select>
       </div>
-      {formType === "Charity" ? <CharityForm /> : <DonorForm />}
+      {formType === "Charity" && <CharityForm />}
+      {formType === "Donor" && <DonorForm />}
+      {formType === "Admin" && <AdminForm />}
     </div>
   );
 }

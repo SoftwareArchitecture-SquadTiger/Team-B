@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { validateUser } from '../../../services/handleValidateToken';
 
 function SettingsPage() {
   const [darkMode, setDarkMode] = useState(false); // State for theme toggle

@@ -6,7 +6,7 @@ const kafka = new Kafka({
   brokers: [process.env.KAFKA_BROKER], 
 });
 
-const consumer = kafka.consumer({ groupId: 'auth-service-group', heartbeatInterval: 3000,   //Sends heartbeat frequently to make sure consumer is alive
+const consumer = kafka.consumer({ groupId: 'auth-service-group', heartbeatInterval: 3000,  
 });
 
 async function startConsumer() {
@@ -19,17 +19,17 @@ async function startConsumer() {
   await consumer.run({
     eachMessage: async ({ topic, message }) => {
       const msg = JSON.parse(message.value.toString());
-      const { correlationId, ...data } = msg; // Extract 'id' if available
+      const { correlationId, ...data } = msg; 
       try {
         switch (topic) {
           case 'login-request':
             console.log(`Processing login request with id: ${correlationId}...`);
-            await handleLoginRequest({ correlationId, ...data }); // Trigger login workflow with id
+            await handleLoginRequest({ correlationId, ...data }); 
             console.log('Login request processed successfully.');
             break;
           case 'register-request':
             console.log(`Processing register request with id: ${correlationId}...`);
-            await handleRegisterRequest({ correlationId, ...data }); // Trigger registration workflow with id
+            await handleRegisterRequest({ correlationId, ...data }); 
             console.log('Register request processed successfully.');
             break;
         }

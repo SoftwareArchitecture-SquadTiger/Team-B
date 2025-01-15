@@ -15,6 +15,7 @@ import searchCharities from "../services/charity/searchCharities";
 import searchDonors from "../services/donor/searchDonors";
 import paginate from "../services/paginate";
 import { useAPI } from "../../../state/APIContext";
+import { validateUser } from "../../../services/handleValidateToken";
 const UsersPage = () => {
   const [searchQueryDonor, setSearchQueryDonor] = useState("");
   const [searchQueryCharity, setSearchQueryCharity] = useState("");
@@ -28,8 +29,7 @@ const UsersPage = () => {
   const [charities, setCharities] = useState([]);
 
   const { authToken } = useAPI(); // Access the API context
-
-
+  
   useEffect(() => {
     const fetchData = async () => {
       // if (!authToken) {
@@ -37,10 +37,11 @@ const UsersPage = () => {
       //   return;
 
       // } 
+      const userData = await validateUser(navigate); 
+            if (!userData) return;
       const donorsPromise = fetchDonors(setDonors);
       const charitiesPromise = fetchCharities(setCharities);
       await Promise.all([donorsPromise, charitiesPromise]);
-      console.log("Current Auth Token: ", authToken)
     };
     fetchData();
   }, [authToken]);
@@ -82,6 +83,8 @@ const UsersPage = () => {
           email: charity.email,
           country: charity.country,
           role: "CHARITY",
+          img_url: charity.img_url || null
+
         }));
         setCharities(formattedCharities);
       }
@@ -105,6 +108,8 @@ const UsersPage = () => {
           email: charity.email,
           country: charity.country,
           role: "CHARITY",
+          img_url: charity.img_url || null
+
         }));
         setCharities(formattedCharities);
       }
@@ -134,7 +139,7 @@ const UsersPage = () => {
         <h2 className="text-2xl font-semibold text-gray-800">Users</h2>
       </div>
       <div className="flex gap-4 mb-4">
-        <AddUser onAdd={() => navigate("/users/add")} />
+        <AddUser onAdd={() => navigate("/add-user")} />
       </div>
 
       {/* Donors Table */}
@@ -235,7 +240,6 @@ const UsersPage = () => {
 };
 
 export default UsersPage;
-
 
 
 

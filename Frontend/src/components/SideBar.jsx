@@ -1,9 +1,11 @@
-import React from 'react';
-import { useLocation, Link } from 'react-router-dom';
-import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
+import React from "react";
+import { useLocation, useNavigate, Link } from "react-router-dom";
+import FavoriteBorderIcon from "@mui/icons-material/FavoriteBorder";
+import { handleLogout } from "../modules/Logout/service/handleLogout";
 
 function Sidebar() {
   const location = useLocation();
+  const navigate = useNavigate();
 
   const isActive = (path) => location.pathname === path;
 
@@ -20,38 +22,46 @@ function Sidebar() {
       <ul className="space-y-12">
         <li
           className={`text-xl font-bold ${
-            isActive('/dashboard') ? 'text-pink-500' : 'text-gray-700 hover:text-pink-500'
+            isActive("/dashboard") ? "text-pink-500" : "text-gray-700 hover:text-pink-500"
           }`}
         >
           <Link to="/dashboard">Dashboard</Link>
         </li>
         <li
           className={`text-xl font-bold ${
-            isActive('/statistics') ? 'text-pink-500' : 'text-gray-700 hover:text-pink-500'
+            isActive("/statistics") ? "text-pink-500" : "text-gray-700 hover:text-pink-500"
           }`}
         >
           <Link to="/statistics">Statistics</Link>
         </li>
         <li
           className={`text-xl font-bold ${
-            isActive('/users') ? 'text-pink-500' : 'text-gray-700 hover:text-pink-500'
+            isActive("/users") ? "text-pink-500" : "text-gray-700 hover:text-pink-500"
           }`}
         >
           <Link to="/users">Users</Link>
         </li>
         <li
           className={`text-xl font-bold ${
-            isActive('/projects') ? 'text-pink-500' : 'text-gray-700 hover:text-pink-500'
+            isActive("/projects") ? "text-pink-500" : "text-gray-700 hover:text-pink-500"
           }`}
         >
           <Link to="/projects">Projects</Link>
         </li>
         <li
           className={`text-xl font-bold ${
-            isActive('/settings') ? 'text-pink-500' : 'text-gray-700 hover:text-pink-500'
+            isActive("/settings") ? "text-pink-500" : "text-gray-700 hover:text-pink-500"
           }`}
         >
           <Link to="/settings">Settings</Link>
+        </li>
+        <li className="text-xl font-bold text-red-500 hover:text-red-500">
+          <button
+            onClick={() => handleLogout(navigate)} // Use the handleLogout function
+            className="w-full text-left"
+          >
+            Log out
+          </button>
         </li>
       </ul>
     </div>

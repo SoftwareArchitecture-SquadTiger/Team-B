@@ -50,3 +50,21 @@ services:
       - ./keys:/usr/src/app/keys
     command: ["npm", "start"]
 
+  statistics-service:
+    build:
+      context: ./services/statistic-service
+      dockerfile: Dockerfile
+    container_name: statistic-service
+    restart: on-failure
+    depends_on:
+      - charity-service
+      - donor-service
+    environment:
+      KAFKA_BROKER: ${KAFKA_EXTERNAL_ADVERTISED_HOSTNAME}:${KAFKA_EXTERNAL_PORT}
+      MONGO_URI: ${MONGO_URI}
+      TEAM_A_API_GATEWAY: ${TEAM_A_API_GATEWAY}
+      INTERNAL_API_KEY: ${INTERNAL_API_KEY}
+    volumes:
+      - ./services/statistic-service:/usr/src/app
+      - /usr/src/app/node_modules
+    command: ["npm", "start"]
